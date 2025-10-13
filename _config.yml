@@ -13,8 +13,8 @@ timezone: 'China/Beijing ' # Your timezone, find yours here: https://en.wikipedi
 # If you are using GitHub Pages, it should be: https://<Your-GitHub-Username>.github.io
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://leecdiang.github.io
-root: /
+url: https://leecdiang.github.io/myblog-source
+root: /myblog-source/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
