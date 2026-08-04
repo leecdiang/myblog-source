@@ -6,3 +6,20 @@ node_modules/
 public/
 .deploy*/
 .deploy_git/
+
+# IndexNow URL 缓存文件
+.indexnow-cache.json
+
+# 备份与临时产物
+.backups/
+*.bak*
+_admin-config.yml
+.obsidian/
+
+# 博文媒体（体积大，不入库；已有 blogbackup + 线上备份）
+source/_posts/**/*.jpg
+source/_posts/**/*.jpeg
+source/_posts/**/*.png
+source/_posts/**/*.heic
+source/_posts/**/*.gif
+source/_posts/**/*.webp

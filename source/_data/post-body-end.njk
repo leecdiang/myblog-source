@@ -1,0 +1,34 @@
+{% if page.image_width == 'max' %}
+<style>.post-body img { max-width: 100%; }</style>
+{% elif page.image_width == 'wide' %}
+<style>.post-body img { max-width: 95%; }</style>
+{% elif page.image_width == 'mid' %}
+<style>.post-body img { max-width: 80%; }</style>
+{% elif page.image_width == 'mid-narrow' %}
+<style>.post-body img { max-width: 70%; }</style>
+{% elif page.image_width == 'narrow' %}
+<style>.post-body img { max-width: 60%; }</style>
+{% endif %}
+
+{%- if not is_index %}
+{%- set deepest_category = null %}
+{%- if post.categories and post.categories.length %}
+  {%- set cats_arr = post.categories.toArray() %}
+  {%- if cats_arr.length %}
+    {%- set deepest_category = cats_arr[cats_arr.length - 1] %}
+  {%- endif %}
+{%- endif %}
+
+<nav class="post-exit-nav{% if not deepest_category %} post-exit-nav--single{% endif %}" aria-label="Article navigation">
+  <a class="post-exit-nav__item post-exit-nav__home" href="{{ config.root }}">
+    <span aria-hidden="true">←</span>
+    <span>Back Home</span>
+  </a>
+  {%- if deepest_category %}
+  <a class="post-exit-nav__item post-exit-nav__category" href="{{ [config.root, deepest_category.path] | join }}">
+    <span>More in {{ deepest_category.name }}</span>
+    <span aria-hidden="true">→</span>
+  </a>
+  {%- endif %}
+</nav>
+{%- endif %}

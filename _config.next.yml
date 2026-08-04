@@ -1,0 +1,10 @@
+# Theme override config for NexT
+darkmode: true
+lazyload: true
+post_navigation: false
+
+mermaid:
+  enable: true
+  theme:
+    light: default
+    dark: dark
