@@ -18,9 +18,6 @@ keywords: Apple Health XML to CSV, 苹果健康数据转换, AI 训练数据, �
 description: Apple Health 导出的 XML 文件庞大且难以直接读取。本文介绍如何利用我开发的转换工具，将复杂的 ZIP/XML 数据瞬间转换为 AI 可读的清爽 CSV 格式，助力你的个人健康数据分析。
 image_width: wide
 ---
-
-<aside class="healthpro-correction" role="note" aria-label="内容更新与更正" style="margin:0 0 2rem;padding:1.2rem;border:2px solid currentColor;border-radius:12px"><h2>2026-11-04 更新与更正</h2><p>这篇文章保留了早期版本的介绍。当前使用方法、多来源记录处理和隐私说明，请阅读 <a href="/2026/11/04/apple-health-pro-local-export/">Apple Health Pro 本地导出指南</a>。</p><p><strong>更正：</strong>下文把 AI 描述为“数字私人医生”，并建议要求模型给出“接近专业体检级别”的判断，这些表述不准确，不应作为使用建议。Apple Health Pro 是数据转换工具；导出数据或大模型回答不能替代医疗诊断，也不应据此自行作医疗决定。向任何在线服务上传健康文件前，应检查分享内容和接收方的数据使用方式。</p><p>导出保留多来源原始记录，不自动去重；来源名遮盖也不等于完整去标识化。</p></aside>
-
 ## 01. 前言：Apple Health 的数据围城
 
 导出过 Apple 健康数据的朋友都深有体会：苹果给我们的不仅是数据，更是一道技术门槛。
