@@ -1,6 +1,7 @@
 ---
 title: 从 PFC 到 ready/valid：流控到底在控制什么？
 date: 2026-11-05 17:30:00
+updated: 2026-11-05 20:23:54
 lang: zh-CN
 published: true
 categories: Silicon & Circuits
@@ -56,6 +57,10 @@ PAUSE、PFC 会因为队列积压而触发，但它们直接执行的是链路�
 {% visual_svg flow-control/fig02_pause_pfc %}
 图 2｜同样是 B 要求 A 停发，PAUSE 不区分普通数据帧的优先级，PFC 可以只暂停指定优先级。示例选择 priority 3，没有赋予它固定业务含义；控制帧不画入这组业务条带。来源：<a href="#ref-1">[1]</a>、<a href="#ref-2">[2]</a>。
 {% endvisual_svg %}
+{% raw %}
+<div class="v-figure paper-figure"><a href="/images/flow-control-papers/pfc-mechanism.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/pfc-mechanism.png" alt="论文原图：相邻交换机通过 PFC 暂停指定优先级。这里展示的是逐跳反馈，不是按 RDMA QP 暂停。" loading="lazy" /></a><p class="v-caption">论文原图：相邻交换机通过 PFC 暂停指定优先级。这里展示的是逐跳反馈，不是按 RDMA QP 暂停。 来源：<a href="https://www.techscience.com/cmc/v75n1/51518/html">Jin Wang et al. (2023), Figure 1</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
+{% endraw %}
+
 
 “PFC 是 PAUSE 的升级版”这个理解还需要补上两个限定。
 
@@ -100,6 +105,14 @@ PAUSE、PFC 会因为队列积压而触发，但它们直接执行的是链路�
 {% visual_svg flow-control/fig05_hol %}
 图 5｜A、B 共享上游链路的 priority 3。A 所在方向拥塞后，该优先级被暂停，去往空闲方向的 B 也受影响。下方为背压继续向上游传播的示意；每一跳生成自己的流控消息，并不是把原 PFC 帧一路转发。参考 <a href="#ref-4">[4]</a>、<a href="#ref-5">[5]</a>。
 {% endvisual_svg %}
+{% raw %}
+<div class="v-figure paper-figure"><a href="/images/flow-control-papers/pfc-propagation.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/pfc-propagation.png" alt="论文仿真拓扑：长流与突发短流共享部分上游路径，用于分析 PFC 暂停对非拥塞流的影响。" loading="lazy" /></a><p class="v-caption">论文仿真拓扑：长流与突发短流共享部分上游路径，用于分析 PFC 暂停对非拥塞流的影响。 来源：<a href="https://www.techscience.com/cmc/v75n1/51518/html">Jin Wang et al. (2023), Figure 3</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
+{% endraw %}
+
+{% raw %}
+<div class="v-figure paper-figure"><a href="/images/flow-control-papers/pfc-hol-blocking.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/pfc-hol-blocking.png" alt="论文原图：Head-of-Line Blocking。拥塞流触发的暂停，会波及共享队列或优先级的其他流。" loading="lazy" /></a><p class="v-caption">论文原图：Head-of-Line Blocking。拥塞流触发的暂停，会波及共享队列或优先级的其他流。 来源：<a href="https://www.techscience.com/cmc/v75n1/51518/html">Jin Wang et al. (2023), Figure 2</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
+{% endraw %}
+
 
 暂停还可能向上游传播：下游暂停，上游无法排空，自己的缓冲继续升高，于是再向更上游发出 PFC。拥塞影响的范围由此扩大。
 
@@ -124,6 +137,10 @@ ECN 是 Explicit Congestion Notification，显式拥塞通知。对具备 ECN �
 {% visual_svg flow-control/fig06_dcqcn %}
 图 6｜DCQCN 的控制闭环。交换机观察拥塞并标记，接收端生成反馈，发送端执行调速；控制逻辑分布在不同设备上。箭头时序为示意，不代表每个标记都产生一个 CNP。来源：<a href="#ref-4">[4]</a>、<a href="#ref-6">[6]</a>。
 {% endvisual_svg %}
+{% raw %}
+<div class="v-figure paper-figure"><a href="/images/flow-control-papers/dcqcn-vs-timely-hpcc.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/dcqcn-vs-timely-hpcc.png" alt="论文原始 NS-3 仿真：在指定突发流量场景下 DCQCN、TIMELY、HPCC 和 FACC 的交换机队列长度与发送速率恢复。这里对比的是拥塞响应，不是 PAUSE/PFC 控制帧时序。" loading="lazy" /></a><p class="v-caption">论文原始 NS-3 仿真：在指定突发流量场景下 DCQCN、TIMELY、HPCC 和 FACC 的交换机队列长度与发送速率恢复。这里对比的是拥塞响应，不是 PAUSE/PFC 控制帧时序。 来源：<a href="https://link.springer.com/article/10.1186/s13677-025-00830-0">Xin He et al. (2025), Figure 2</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
+{% endraw %}
+
 
 “收到 CNP 就固定减半”不是 DCQCN 的准确概括。减速与恢复由算法状态决定；工程实现中的速率上下限、更新周期和状态粒度，也要看具体实现。最重要的区别是：PFC 直接控制一跳内的优先级能否发送，DCQCN 让源端根据拥塞反馈调整流的发送速率。
 
@@ -150,6 +167,14 @@ TIMELY 选择 RTT，即往返时延，尤其关注时延变化。队列开始积
 {% visual_svg flow-control/fig07_signals %}
 图 7｜拥塞控制的观测信号与代价。表中的“代价”指该机制需要额外处理的条件，不是性能排名；QCN、TIMELY、HPCC 也不是可以直接互换的线缆协议。来源：<a href="#ref-4">[4]</a>、<a href="#ref-9">[9]</a>–<a href="#ref-11">[11]</a>。
 {% endvisual_svg %}
+{% raw %}
+<div class="v-figure paper-figure"><a href="/images/flow-control-papers/switch-queue-comparison.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/switch-queue-comparison.png" alt="论文原始仿真曲线：不同拥塞控制策略下的交换机队列积压，展示队列作为拥塞观测信号的价值；不能由此断言某机制在所有网络中最优。" loading="lazy" /></a><p class="v-caption">论文原始仿真曲线：不同拥塞控制策略下的交换机队列积压，展示队列作为拥塞观测信号的价值；不能由此断言某机制在所有网络中最优。 来源：<a href="https://www.techscience.com/cmc/v75n1/51518/html">Jin Wang et al. (2023), Figure 11</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
+{% endraw %}
+
+{% raw %}
+<div class="v-figure paper-figure"><a href="/images/flow-control-papers/burst-throughput-recovery.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/burst-throughput-recovery.png" alt="论文原始仿真曲线：突发流量发生后，ICC、DCQCN、TIMELY 与 PCN 的流吞吐恢复过程。属于论文 NS-3 场景，不是现代 400G 网卡实测。" loading="lazy" /></a><p class="v-caption">论文原始仿真曲线：突发流量发生后，ICC、DCQCN、TIMELY 与 PCN 的流吞吐恢复过程。属于论文 NS-3 场景，不是现代 400G 网卡实测。 来源：<a href="https://www.techscience.com/cmc/v75n1/51518/html">Jin Wang et al. (2023), Figure 5</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
+{% endraw %}
+
 
 ### 论文导读：信号更丰富，控制一定更好吗
 
