@@ -3,8 +3,23 @@ darkmode: true
 lazyload: true
 post_navigation: false
 
+# Long listings scroll inside the article instead of requiring an expand button.
+codeblock:
+  fold:
+    enable: false
+
 mermaid:
   enable: true
   theme:
     light: default
     dark: dark
+
+
+theme_color:
+  light: "#eaf5fb"
+  dark: "#121f2b"
+
+# Set false to restore the original NexT appearance.
+studio_design: true
+vendors:
+  mathjax: /vendor/mathjax/tex-mml-chtml.js

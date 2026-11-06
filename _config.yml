@@ -13,12 +13,12 @@ timezone: Asia/Shanghai # Your timezone, find yours here: https://en.wikipedia.o
 # If you are using GitHub Pages, it should be: https://<Your-GitHub-Username>.github.io
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://leecdiang.github.io
+url: https://leecdiang.com
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
-  trailing_index: true 
+  trailing_index: false 
   trailing_html: true
 # ----------------- Theme -----------------
 # Set the theme you installed. 'next' is a very popular choice.
@@ -45,6 +45,7 @@ code_dir: downloads/code
 i18n_dir: :lang
 skip_render:
   - "*.txt"
+  - "_posts/**/reproduce/**"
 
 # Writing
 new_post_name: :title.md
@@ -166,7 +167,7 @@ sitemap:
 # Baidu 站点地图（附赠 SEO，Google 也可用）
 baidusitemap:
   path: baidusitemap.xml
-  url: https://leecdiang.github.io
+  url: https://leecdiang.com
 
 # Atom Feed（Google Search Console 可接受）
 feed:
@@ -177,13 +178,13 @@ feed:
   content: true
   content_limit: 0
   order_by: -date
-  icon: /images/avatar.png
+  icon: /images/avatar-snow.jpg
   autodetect: false
 
 
 # IndexNow 自动提交（Bing / Yandex 等）
 indexnow:
   enable: true
-  key: "f3d4d23e6edb425b8bc639efacb24f70"
-  keyLocation: "https://leecdiang.github.io/myblog-source/f3d4d23e6edb425b8bc639efacb24f70.txt"
+  key: "9a3afc6a3c4f484d8ebf008614d16815"
+  keyLocation: "https://leecdiang.com/9a3afc6a3c4f484d8ebf008614d16815.txt"
 

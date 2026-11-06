@@ -1,0 +1,12 @@
+{%- if theme.busuanzi_count.enable %}
+  {%- if theme.vendors.busuanzi %}
+  <script{{ pjax }} async src="{{ theme.vendors.busuanzi }}"></script>
+  {%- else %}
+  <script{{ pjax }} async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  {%- endif %}
+
+  <script>
+    if (CONFIG.page.isPost) { addCount(Counter); } else if (document.querySelectorAll('.post-title-link').length >= 1) { showTime(Counter); }
+  </script>
+
+{%- endif %}

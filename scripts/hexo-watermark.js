@@ -183,10 +183,15 @@ async function hasRealTransparency(meta) {
  * Update all HTML routes to replace oldImgName with newImgName.
  */
 async function updateHtmlReferences(route, routes, oldName, newName) {
-  // Try matching raw filename and URL-encoded filename (for non-ASCII names)
+  // Only match the filename as a complete path segment / attribute value.
+  // Keep the left boundary in the replacement so a short name like "2.png"
+  // cannot match inside "favicon-32x32.png" during server-side rendering.
+  const leftBoundary = '(^|[\\/"\'=])';
+  const rightBoundary = '(?=$|[\\/"\'?#])';
+  // Try matching raw filename and URL-encoded filename (for non-ASCII names).
   const candidates = [
-    { re: new RegExp(escapeRegex(oldName), 'g'), replacement: newName },
-    { re: new RegExp(escapeRegex(encodeURI(oldName)), 'g'), replacement: encodeURI(newName) },
+    { re: new RegExp(leftBoundary + '(' + escapeRegex(oldName) + ')' + rightBoundary, 'g'), replacement: '$1' + newName },
+    { re: new RegExp(leftBoundary + '(' + escapeRegex(encodeURI(oldName)) + ')' + rightBoundary, 'g'), replacement: '$1' + encodeURI(newName) },
   ];
   const htmlRoutes = routes.filter(r => r.endsWith('.html'));
   let updatedCount = 0;

@@ -1,0 +1,61 @@
+{% extends '_layout.njk' %}
+{% import '_macro/sidebar.njk' as sidebar_template with context %}
+
+{% block title %}{{ __('title.archive') }} | {{ title }}{% endblock %}
+
+{% block class %}archive btc-archive-index{% endblock %}
+
+{% block content %}
+
+  <div class="post-block{% if theme.studio_design %} archive-reading-plane{% endif %}">
+    <div class="post-content">
+      {% set posts = page.posts.sort('date', -1).toArray() %}
+      <header class="btc-archive-heading">
+        <h1>{% if theme.studio_design %}文章{% else %}Archives{% endif %}</h1>
+        <p>{{ page.posts.length }} 篇文章{% if posts.length %}
+          {% set newest_year = date(posts[0].date, 'YYYY') %}
+          {% set oldest_year = date(posts[posts.length - 1].date, 'YYYY') %}
+          <span aria-hidden="true"> · </span>{{ oldest_year }}{% if oldest_year != newest_year %}—{{ newest_year }}{% endif %}
+        {% endif %}</p>
+      </header>
+
+      {% if theme.studio_design %}
+      <nav class="archive-categories" aria-label="按主题筛选文章" hidden>
+        <button type="button" data-section="all" aria-pressed="true">全部 <span>{{ page.posts.length }}</span></button>
+        {% for section in studio_sections(page.posts) %}
+        <button type="button" data-section="{{ section.id }}" aria-pressed="false">{{ section.label }} <span>{{ section.count }}</span></button>
+        {% endfor %}
+        <a href="{{ url_for('categories/') }}">所有分类 ↗</a>
+      </nav>
+      <noscript><p><a href="{{ url_for('categories/') }}">按分类浏览文章 ↗</a></p></noscript>
+      {% endif %}
+
+      {% set current_year = '' %}
+      {% for post in posts %}
+        {% set year = date(post.date, 'YYYY') %}
+        {% if year != current_year %}
+          {% if not loop.first %}</ul></section>{% endif %}
+          {% set current_year = year %}
+          <section class="btc-archive-year" aria-labelledby="archive-year-{{ year }}">
+            <h2 id="archive-year-{{ year }}">{{ year }} <span>{{ post_count(year) }} 篇</span></h2>
+            <ul class="btc-archive-list">
+        {% endif %}
+              <li{% if theme.studio_design %} data-section="{{ studio_section(post) }}"{% endif %}>
+                <a class="btc-archive-row" href="{{ url_for(post.link or post.path) }}">
+                  <time datetime="{{ moment(post.date).format() }}" aria-label="{{ date(post.date, 'YYYY年MM月DD日') }}">{{ date(post.date, 'MM.DD') }}</time>
+                  <span class="archive-copy" lang="{{ post.lang or 'zh-CN' }}"><span class="btc-archive-title">{{ post.title or __('post.untitled') }}{% if post.link %} <i class="fa fa-external-link-alt" aria-label="外部文章"></i>{% endif %}</span>{% if theme.studio_design and post.description %}<span class="archive-excerpt">{{ post.description }}</span>{% endif %}</span>
+                  {% if post.categories.length %}<span class="btc-archive-category">{{ post.categories.toArray()[0].name }}</span>{% endif %}
+                </a>
+              </li>
+        {% if loop.last %}</ul></section>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {%- include '_partials/pagination.njk' -%}
+
+{% endblock %}
+
+{% block sidebar %}
+  {{ sidebar_template.render(false) }}
+{% endblock %}

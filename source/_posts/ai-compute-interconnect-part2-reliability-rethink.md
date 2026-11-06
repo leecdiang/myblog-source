@@ -1,4 +1,5 @@
 ---
+lang: zh-CN
 title: 智算互联(中):重构可靠性--从强制无损到端网协同
 date: 2026-06-28 22:39:00
 categories: Silicon & Circuits
@@ -313,6 +314,21 @@ UEC 把安全与 Transport 协同设计,而不是把加密视为后挂功能。�
 | 乱序处理 | 传统 RC 较敏感 | 自定义 | Direct Data Placement + Flexible Ordering |
 | 拥塞控制 | PFC、ECN、DCQCN 等 | 分布式端点自治 | Sender CC、可选 Receiver Credit、Telemetry |
 | 通用性 | 面向广泛服务器与存储生态 | 为特定系统简化 | 追求多厂商互操作 |
+
+<div class="v-figure">
+<table class="v-matrix">
+<thead><tr><th>维度</th><th>RoCEv2</th><th>TTPoE</th><th>UET</th></tr></thead>
+<tbody>
+<tr><td>生态成熟度</td><td class="lv4">高</td><td class="lv1">有限</td><td class="lv2">建设中</td></tr>
+<tr><td>容损能力</td><td class="lv1">弱</td><td class="lv3">端点保证</td><td class="lv4">强</td></tr>
+<tr><td>多路径</td><td class="lv2">ECMP</td><td class="lv2">定制</td><td class="lv4">Packet Spraying</td></tr>
+<tr><td>乱序处理</td><td class="lv2">敏感</td><td class="lv3">自定义</td><td class="lv4">灵活排序</td></tr>
+<tr><td>拥塞控制</td><td class="lv3">PFC / ECN / DCQCN</td><td class="lv3">端点自治</td><td class="lv4">Sender CC + Credit</td></tr>
+<tr><td>通用性</td><td class="lv4">广泛</td><td class="lv1">特定</td><td class="lv3">多厂商</td></tr>
+</tbody>
+</table>
+<p class="v-caption">图 1：三种 Transport 的定性对比。lv0–lv4 是作者主观分级，不是性能测试。</p>
+</div>
 
 这张表不是胜负表。RoCE 的部署基础和软件生态是实实在在的优势;TTPoE 展示了定制系统可以多激进;UET 则试图在开放性与 AI 原生能力之间找到新的平衡。
 

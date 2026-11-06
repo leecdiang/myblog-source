@@ -1,0 +1,6 @@
+{%- if theme.mermaid.enable %}
+  {{ next_data('mermaid', theme.mermaid, {
+    js: '/js/third-party/mermaid.min.js'
+  }) }}
+  <script src="{{ url_for('/js/studio-mermaid-loader.js') }}?v=20261106-performance" defer></script>
+{%- endif %}

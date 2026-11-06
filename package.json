@@ -32,5 +32,10 @@
     "hexo-theme-landscape": "^1.0.0",
     "markdown-it-mark": "^4.0.0",
     "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "mathjax": "^3.2.2",
+    "terser": "^5.44.1"
   }
 }

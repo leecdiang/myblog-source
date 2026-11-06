@@ -1,9 +1,10 @@
 ---
+lang: zh-CN
 title: MacBook Air M4 15寸扩容记录
 date: 2025-10-13 09:15:00
 description: MacBook Air M4 15寸 扩容1tb记录以及建议
 categories:
-  - Digital Anatomy
+  - Everyday Anatomy
 etoc: true
 tags:
   - MacBook

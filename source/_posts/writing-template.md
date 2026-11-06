@@ -13,6 +13,12 @@ description: Beyond the Clock 博客的 Markdown 写作规范与可用元素速�
 keywords: 写作模板, markdown, hexo, next-theme, tag plugins
 ---
 
+## 维护规范入口（2026-11-01）
+
+当前部署流程见项目根 `README.md`，图表组件见 `source/_visuals/README.md`。新文章开头复用 `note primary` 简介卡片，资料入口复用 `glass-pill` 图标按钮；图表跟随主题变量，照片保留原色。
+
+宽图可参照 `film-emulation-pipelines.md` 的 `visual_svg` 标签（通用 `v-chart-scroll` 组件）。数学文章中的美元价格要检查是否误作公式，必要时使用 `USD` 表示币种。备份与临时文件放到项目外，复现附件通过 skip_render 原样输出，发布前仍需检查 sitemap 中没有附件页面。
+
 # Front Matter 字段说明
 
 ```yaml

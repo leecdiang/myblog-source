@@ -7,7 +7,7 @@ date: 2026-06-04
 
 <div class="abt-head">
   <h1 class="abt-head-name">LEEcDiang</h1>
-  <p class="abt-head-brief">A third-year undergraduate student majoring in Microelectronics Science and Engineering at UESTC — University of Electronic Science and Technology of China.</p>
+  <p class="abt-head-brief">A final-year undergraduate student majoring in Microelectronics Science and Engineering at UESTC — University of Electronic Science and Technology of China.</p>
   <p class="abt-head-brief-second">My work and notes currently center on digital IC front-end design, CPU/GPU architecture, and the systems that connect silicon, tools, and visual thinking.</p>
 </div>
 
@@ -28,7 +28,7 @@ date: 2026-06-04
 <div class="abt-item">
   <span class="abt-item-num">01</span>
   <div class="abt-item-body">
-    <strong class="abt-item-name">Silicon Systems</strong>
+    <strong class="abt-item-name">Silicon &amp; Circuits</strong>
     <span class="abt-item-tags">Microelectronics · Digital IC · Architecture</span>
     <p class="abt-item-desc">Notes on digital circuits, CPU/GPU architecture, and silicon-level thinking.</p>
   </div>
@@ -37,9 +37,9 @@ date: 2026-06-04
 <div class="abt-item">
   <span class="abt-item-num">02</span>
   <div class="abt-item-body">
-    <strong class="abt-item-name">Digital Anatomy</strong>
+    <strong class="abt-item-name">Everyday Anatomy</strong>
     <span class="abt-item-tags">Tools · Data · Devices · Workflow</span>
-    <p class="abt-item-desc">Projects, scripts, data pipelines, and small systems for daily life.</p>
+    <p class="abt-item-desc">Teardowns of everyday devices, data pipelines, and tools — how they actually work.</p>
   </div>
 </div>
 

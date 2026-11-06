@@ -1,0 +1,7 @@
+{%- if theme.mermaid.enable %}
+  {{ next_data('mermaid', theme.mermaid, {
+    js: theme.vendors.mermaid
+  }) }}
+  {{ next_vendors('mermaid') }}
+  <script src="{{ url_for(theme.js) }}/third-party/tags/mermaid.js?v=20260830-mermaid-ui-5" defer></script>
+{%- endif %}

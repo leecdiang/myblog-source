@@ -1,0 +1,29 @@
+{% extends '_layout.njk' %}
+{% import '_macro/post-list.njk' as post_list with context %}
+{% import '_macro/sidebar.njk' as sidebar_template with context %}
+
+{% block title %}{{ __('title.category') }}: {{ page.category }} | {{ title }}{% endblock %}
+
+{% block class %}category{% endblock %}
+
+{% block content %}
+
+  <div class="post-block">
+    <div class="post-content">
+      <div class="cat-list-header">
+        <h1 class="cat-list-title">{{ page.category }}</h1>
+      </div>
+
+      <div class="cat-list">
+        {{ post_list.render(page.posts) }}
+      </div>
+    </div>
+  </div>
+
+  {%- include '_partials/pagination.njk' -%}
+
+{% endblock %}
+
+{% block sidebar %}
+  {{ sidebar_template.render(false) }}
+{% endblock %}

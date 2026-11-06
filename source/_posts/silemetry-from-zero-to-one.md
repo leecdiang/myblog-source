@@ -1,8 +1,9 @@
 ---
+lang: zh-CN
 title: 从散热测试想法到原生 macOS 应用：Silemetry 开发记录
 date: 2026-08-03 14:30:00
 categories:
-  - Digital Anatomy
+  - Everyday Anatomy
 etoc: true
 published: true
 tags:
@@ -100,20 +101,10 @@ Silemetry 是一个面向 Apple Silicon 的原生 macOS 遥测与持续负载测
 
 Silemetry 同时使用 Swift、Rust、C 和 Metal。并不是为了堆技术栈，而是每种语言各自解决最合适的问题：
 
-```text
-SwiftUI (Views)
-   ↓ 状态绑定
-TestCoordinator (@MainActor 状态机)
-   ├── TelemetryService (actor)
-   │      └── Rust TelemetryCore → IOReport / macmon
-   ├── CPUWorkloadManager
-   │      └── C pthread workers → NEON FMA
-   ├── GPUWorkloadManager
-   │      └── Metal compute shader
-   └── RunAccumulator / SampleArchive
-          ├── JSONL 原始样本
-          └── SwiftData RunRecord → History / Compare
-```
+<div style="margin:1.8rem 0;padding:1rem 1.1rem;background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:14px">
+<svg viewBox="0 0 900 640" role="img" aria-label="Silemetry 四语言架构分层"><text x="30" y="40" font-size="11" fill="#7b8b99" letter-spacing="2" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">SILEMETRY · LAYERED ARCHITECTURE</text><text x="30" y="64" font-size="11" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">不是堆技术栈，而是把 UI、状态机、采样、负载和存储的责任边界划清</text><polygon points="475.26,725 665.78,615 94.22000000000003,505 284.74,395" fill="#7aa6c6" stroke="rgba(255,255,255,.35)"/><polygon points="665.78,615 475.26,725 475.26,747 665.78,637" fill="#2b5578"/><polygon points="475.26,725 284.74,395 284.74,417 475.26,747" fill="#3f6f96"/><polygon points="94.22000000000003,505 284.74,395 284.74,417 94.22000000000003,527" fill="#3f6f96" opacity=".55"/><rect x="650" y="552" width="10" height="10" rx="2" fill="#3f6f96"/><text x="668" y="561" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">SwiftUI Views</text><text x="668" y="576" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">页面 · 路由 · 状态绑定</text><polygon points="483.92,670 691.76,550 68.24000000000001,430 276.08,310" fill="#bcd6e4" stroke="rgba(255,255,255,.35)"/><polygon points="691.76,550 483.92,670 483.92,692 691.76,572" fill="#6e8fa3"/><polygon points="483.92,670 276.08,310 276.08,332 483.92,692" fill="#8fb0c4"/><polygon points="68.24000000000001,430 276.08,310 276.08,332 68.24000000000001,452" fill="#8fb0c4" opacity=".55"/><rect x="650" y="482" width="10" height="10" rx="2" fill="#8fb0c4"/><text x="668" y="491" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">TestCoordinator</text><text x="668" y="506" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">@MainActor 状态机</text><polygon points="492.58,615 717.74,485 42.25999999999999,355 267.42,225" fill="#78b7ae" stroke="rgba(255,255,255,.35)"/><polygon points="717.74,485 492.58,615 492.58,637 717.74,507" fill="#1f5f5b"/><polygon points="492.58,615 267.42,225 267.42,247 492.58,637" fill="#2f7f7a"/><polygon points="42.25999999999999,355 267.42,225 267.42,247 42.25999999999999,377" fill="#2f7f7a" opacity=".55"/><rect x="650" y="412" width="10" height="10" rx="2" fill="#2f7f7a"/><text x="668" y="421" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">Services / Workloads</text><text x="668" y="436" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">Telemetry · CPU · GPU 管理</text><polygon points="501.24,560 743.72,420 16.28000000000003,280 258.76,140" fill="#d2ad72" stroke="rgba(255,255,255,.35)"/><polygon points="743.72,420 501.24,560 501.24,582 743.72,442" fill="#77551f"/><polygon points="501.24,560 258.76,140 258.76,162 501.24,582" fill="#9a7434"/><polygon points="16.28000000000003,280 258.76,140 258.76,162 16.28000000000003,302" fill="#9a7434" opacity=".55"/><rect x="650" y="342" width="10" height="10" rx="2" fill="#9a7434"/><text x="668" y="351" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">Rust / C / Metal</text><text x="668" y="366" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">采样 · 线程 · 计算</text><polygon points="509.9,505 769.7,355 -9.699999999999989,205 250.1,55" fill="#8fa7b6" stroke="rgba(255,255,255,.35)"/><polygon points="769.7,355 509.9,505 509.9,527 769.7,377" fill="#455c6c"/><polygon points="509.9,505 250.1,55 250.1,77 509.9,527" fill="#5c7383"/><polygon points="-9.699999999999989,205 250.1,55 250.1,77 -9.699999999999989,227" fill="#5c7383" opacity=".55"/><rect x="650" y="272" width="10" height="10" rx="2" fill="#5c7383"/><text x="668" y="281" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">JSONL / SwiftData</text><text x="668" y="296" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">原始样本 · 摘要索引</text><text x="30" y="616" font-size="10" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">跨语言边界统一走 C ABI；Rust 静态链接进 App，不启动外部进程。</text></svg>
+<p style="font-size:.78rem;line-height:1.7;color:var(--text-muted);text-align:center;margin:.55rem 0 0">图 1：Silemetry 的分层架构。UI、状态机、服务、采样与存储各自有明确边界。</p>
+</div>
 
 {% note info %}
 这种拆分的核心不是“多语言”，而是把 UI、状态机、采样、负载和存储之间的责任边界划清。跨语言边界统一通过 C ABI 连接，避免 Swift 直接依赖 Rust 内部类型。

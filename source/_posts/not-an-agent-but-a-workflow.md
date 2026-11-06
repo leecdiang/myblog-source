@@ -1,10 +1,11 @@
 ---
+lang: zh-CN
 title: 我搭的不是 Agent,而是一套工作方式
 date: 2026-06-11 13:33:00
 description: 关于 Main Agent、Code Lab、证据链、审批流,以及如何让一个不完美的模型参与长期任务。
 keywords: Agent架构,工作流设计,证据链,审批流,Validator,Obsidian看板,长期任务管理,OpenClaw,cost-aware
 categories:
-  - Digital Anatomy
+  - Everyday Anatomy
 image_width: max
 etoc: true
 tags:
@@ -15,6 +16,23 @@ tags:
   - 思考
   - DeepSeek
 ---
+<style>
+.v-arch{--a-front:#ffffff;--a-top:#f5f5f7;--a-side:#e8e8ed;--a-border:rgba(0,0,0,.08);--a-title:#1d1d1f;--a-sub:#6e6e73;--a-accent:#0071e3;--a-chip:rgba(0,0,0,.045);--a-shadow:rgba(0,0,0,.10)}
+@media (prefers-color-scheme: dark){.v-arch{--a-front:#1c1c1e;--a-top:#2c2c2e;--a-side:#141416;--a-border:rgba(255,255,255,.12);--a-title:#f5f5f7;--a-sub:#a1a1a6;--a-accent:#0a84ff;--a-chip:rgba(255,255,255,.08);--a-shadow:rgba(0,0,0,.45)}}
+.v-arch .a-front{fill:var(--a-front);stroke:var(--a-border);stroke-width:1}
+.v-arch .a-top{fill:var(--a-top)}
+.v-arch .a-side{fill:var(--a-side)}
+.v-arch .a-shadow{fill:var(--a-shadow);opacity:.18}
+.v-arch .a-title{fill:var(--a-title)}
+.v-arch .a-sub{fill:var(--a-sub)}
+.v-arch .a-chip{fill:var(--a-chip)}
+.v-arch .a-chip-text{fill:var(--a-title)}
+.v-arch .a-accent{fill:var(--a-accent)}
+.v-arch .a-spine{stroke:var(--a-border);stroke-width:1;stroke-dasharray:4 5}
+.v-arch .a-dot{fill:var(--a-accent)}
+.v-figure{padding:.6rem .7rem .45rem}
+</style>
+
 > **Abstract**  
 > This post is not a tutorial on building an agent. It is a reflection on turning AI from a chat interface into a personal workflow system. Through the deployment of Main Agent, Code Lab, evidence tracking, approval queues, validators, and Obsidian dashboards, I gradually realized that the real value of an agent is not full automation, but structured collaboration. A useful agent does not replace human judgment; it participates in a workflow where facts are traceable, decisions are explicit, and failures can be detected.
 
@@ -52,37 +70,10 @@ deadline 可能变，语言要求可能和学院要求不一样，官方页面�
 
 这个工作台后来长成了这样的结构:
 
-{% mermaid %}
-graph TD
-    A[Personal Workbench]
-
-    A --> B[Agent Layer]
-    B --> B1[Main Agent]
-    B1 --> B1a[长期规划 / 晨检 / 审批]
-    B1 --> B1b[策略 / 资料库维护]
-    B --> B2[Code Lab]
-    B2 --> B2a[代码 / 脚本 / Validator]
-    B2 --> B2b[Obsidian 生成逻辑]
-
-    A --> C[Evidence Layer]
-    C --> C1[source]
-    C --> C2[run]
-    C --> C3[claim]
-    C --> C4[approval]
-
-    A --> D[Control Layer]
-    D --> D1[Validator]
-    D1 --> D1a[检查格式 / 语义]
-    D1 --> D1b[生成文件健康状态]
-
-    A --> E[View Layer]
-    E --> E1[Obsidian / 可视化看板]
-    E --> E2[Mac 备忘录 / 轻提醒副本]
-
-    A --> F[Source of Truth]
-    F --> F1[OpenClaw Workspace]
-    F1 --> F1a[事实源 / 正式记录]
-{% endmermaid %}
+<div class="v-figure">
+<svg class="v-arch" viewBox="0 0 880 500" role="img" aria-label="PERSONAL WORKBENCH · LAYERED CONTROL"><text x="40" y="34" font-size="10.5" font-weight="600" fill="var(--a-sub)" letter-spacing="1.6" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">PERSONAL WORKBENCH · LAYERED CONTROL</text><text x="40" y="56" font-size="11" fill="var(--a-sub)" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Agent 只是其中一层；证据、控制与事实源决定了它能不能被信任</text><line class="a-spine" x1="48" y1="84" x2="48" y2="466"/><rect class="a-front" x="80" y="84" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="98" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="115" r="4"/><circle class="a-chip" cx="110" cy="115" r="14"/><text class="a-title" x="110" y="119" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">01</text><text class="a-title" x="136" y="110" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">View Layer</text><text class="a-sub" x="136" y="129" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Obsidian · Mac 备忘录</text><rect class="a-chip" x="670" y="102" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="119" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">只读视图</text><rect class="a-front" x="80" y="164" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="178" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="195" r="4"/><circle class="a-chip" cx="110" cy="195" r="14"/><text class="a-title" x="110" y="199" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">02</text><text class="a-title" x="136" y="190" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Agent Layer</text><text class="a-sub" x="136" y="209" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Main Agent · Code Lab</text><rect class="a-chip" x="670" y="182" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="199" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">职责与权限</text><rect class="a-front" x="80" y="244" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="258" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="275" r="4"/><circle class="a-chip" cx="110" cy="275" r="14"/><text class="a-title" x="110" y="279" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">03</text><text class="a-title" x="136" y="270" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Control Layer</text><text class="a-sub" x="136" y="289" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Validator · 健康检查</text><rect class="a-chip" x="670" y="262" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="279" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">格式与语义</text><rect class="a-front" x="80" y="324" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="338" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="355" r="4"/><circle class="a-chip" cx="110" cy="355" r="14"/><text class="a-title" x="110" y="359" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">04</text><text class="a-title" x="136" y="350" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Evidence Layer</text><text class="a-sub" x="136" y="369" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">source · run · claim · approval</text><rect class="a-chip" x="670" y="342" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="359" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">可追溯记录</text><rect class="a-front" x="80" y="404" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="418" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="435" r="4"/><circle class="a-chip" cx="110" cy="435" r="14"/><text class="a-title" x="110" y="439" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">05</text><text class="a-title" x="136" y="430" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Source of Truth</text><text class="a-sub" x="136" y="449" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">OpenClaw workspace</text><rect class="a-chip" x="670" y="422" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="439" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">正式事实源</text><text x="40" y="486" font-size="9.5" fill="var(--a-sub)" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">2D 分层：层级只由顺序和缩进表达，不用透视和阴影。</text></svg>
+<p class="v-caption">图 1：个人工作台的分层控制。Agent 只是其中一层，证据、控制与事实源决定它能否被信任。</p>
+</div>
 
 
 ```text

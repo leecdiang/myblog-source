@@ -1,4 +1,5 @@
 ---
+lang: zh-CN
 title: 八千里路
 date: 2026-06-06 01:00:00
 description: 两卷胶片走完青甘大环线。

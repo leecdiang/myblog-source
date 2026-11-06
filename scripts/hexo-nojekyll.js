@@ -14,6 +14,7 @@ hexo.extend.filter.register('after_generate', function () {
   
   if (!fs.existsSync(nojekyllPath)) {
     try {
+      fs.mkdirSync(publicDir, { recursive: true });
       fs.writeFileSync(nojekyllPath, '', 'utf8');
       this.log.info('[nojekyll] ✓ .nojekyll created');
     } catch (e) {

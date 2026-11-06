@@ -1,0 +1,118 @@
+{# 1. 继承 Next 的基础布局 #}
+{% extends '_layout.njk' %}
+
+{# 导入 NexT 的侧边栏渲染宏 #}
+{% import '_macro/sidebar.njk' as sidebar_template with context %}
+
+{# 2. 覆盖 "content" 块 #}
+{% block content %}
+  <div class="main-inner">
+    <div class="content-wrap">
+      <div class="content page-home-custom"> 
+
+        {# 
+           【视觉优化说明】：
+           已移除 index.md 的 page.content 渲染区块，
+           首页现在直接从 Silicon & Circuits 模块开始，确保与左侧卡片高度在视觉上更趋于对齐。
+        #}
+
+        {# ==========================================
+           模块一：Silicon & Circuits (硬核技术) 
+           ========================================== #}
+        <h2 id="silicon-circuits">Silicon & Circuits</h2>
+        <div class="custom-post-feed">
+          {# 匹配你在文章中设置的最新分类名 #}
+          {% set tech_cat = site.categories.findOne({name: 'Silicon & Circuits'}) %}
+          
+          {% if tech_cat and tech_cat.length > 0 %}
+            {% set tech_posts = tech_cat.posts.sort('date', -1).limit(5).toArray() %}
+            <ul class="home-minimal-list">
+              {% for post in tech_posts %}
+                <li>
+                  <span class="post-date">{{ date(post.date, 'YY-MM-DD') }}</span>
+                  <a class="post-link" href="{{ url_for(post.path) }}">{{ post.title }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p style="color: #999; font-size: 0.9em; padding-left: 10px;">
+              从逻辑门到硅基架构：我的硬核探索路线图 正在流片中...
+            </p>
+          {% endif %}
+        </div>
+        
+        <div style="text-align: right; margin-top: 15px;">
+          <a href="{{ url_for('/categories/Silicon-Circuits/') }}" class="glass-more-btn">
+            探索逻辑起点 ➔
+          </a>
+        </div>
+
+        <hr class="custom-hr">
+
+        {# ==========================================
+           模块二：Visual Narrative (摄影叙事) 
+           ========================================== #}
+        <h2 id="visual-narrative">Visual Narrative</h2>
+        <div class="custom-post-feed">
+          {% set gallery_cat = site.categories.findOne({name: 'Visual Narrative'}) %}
+          
+          {% if gallery_cat and gallery_cat.length > 0 %}
+            {% set gallery_posts = gallery_cat.posts.sort('date', -1).limit(5).toArray() %}
+            <ul class="home-minimal-list">
+              {% for post in gallery_posts %}
+                <li>
+                  <span class="post-date">{{ date(post.date, 'YY-MM-DD') }}</span>
+                  <a class="post-link" href="{{ url_for(post.path) }}">{{ post.title }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p style="color: #999; font-size: 0.9em; padding-left: 10px;">暂无影像记录，静请期待。</p>
+          {% endif %}
+        </div>
+        
+        <div style="text-align: right; margin-top: 15px;">
+          <a href="{{ url_for('/categories/Visual-Narrative/') }}" class="glass-more-btn">
+            我的帧空间 ➔
+          </a>
+        </div>
+
+        <hr class="custom-hr">
+
+        {# ==========================================
+           模块三：Digital Anatomy (数码评测解构) 
+           ========================================== #}
+        <h2 id="digital-anatomy">Digital Anatomy</h2>
+        <div class="custom-post-feed">
+          {% set anatomy_cat = site.categories.findOne({name: 'Digital Anatomy'}) %}
+          
+          {% if anatomy_cat and anatomy_cat.length > 0 %}
+            {% set anatomy_posts = anatomy_cat.posts.sort('date', -1).limit(4).toArray() %}
+            <ul class="home-minimal-list">
+              {% for post in anatomy_posts %}
+                <li>
+                  <span class="post-date">{{ date(post.date, 'YY-MM-DD') }}</span>
+                  <a class="post-link" href="{{ url_for(post.path) }}">{{ post.title }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p style="color: #999; font-size: 0.9em; padding-left: 10px;">暂无解构报告，实验室设备正在调试中...</p>
+          {% endif %}
+        </div>
+        
+        <div style="text-align: right; margin-top: 15px;">
+          <a href="{{ url_for('/categories/Digital-Anatomy/') }}" class="glass-more-btn">
+            深度解构报告 ➔
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{# 强行填充并渲染侧边栏，传入 false 表示首页不需要文章目录(TOC) #}
+{% block sidebar %}
+  {{ sidebar_template.render(false) }}
+{% endblock %}

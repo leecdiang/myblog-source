@@ -14,15 +14,15 @@ comments: false
   <div class="btc-archive-grid">
     <a href="/categories/Silicon-Circuits/" class="btc-archive-card">
       <div class="arc-num">01</div>
-      <h3 class="arc-name">Silicon Systems</h3>
+      <h3 class="arc-name">Silicon &amp; Circuits</h3>
       <p class="arc-tagline">Microelectronics · Digital IC · Architecture</p>
       <p class="arc-desc">关于数字集成电路、CPU/GPU 架构、软硬件协同与硅基系统思考的长期记录。</p>
     </a>
-    <a href="/categories/Digital-Anatomy/" class="btc-archive-card">
+    <a href="/categories/Everyday-Anatomy/" class="btc-archive-card">
       <div class="arc-num">02</div>
-      <h3 class="arc-name">Digital Anatomy</h3>
+      <h3 class="arc-name">Everyday Anatomy</h3>
       <p class="arc-tagline">Tools · Data · Devices · Workflow</p>
-      <p class="arc-desc">个人项目、数据处理管线、设备配置、效率工具与工作流。</p>
+      <p class="arc-desc">拆解日常器物与技术：设备、数据、工具与工作流的原理记录。</p>
     </a>
     <a href="/categories/Visual-Narrative/" class="btc-archive-card">
       <div class="arc-num">03</div>
@@ -40,7 +40,7 @@ comments: false
 
   <div class="btc-cards">
     <a href="/2026/04/05/Apple-Health-Pro/" class="btc-card">
-      <span class="btc-card-kicker">Digital-Anatomy</span>
+      <span class="btc-card-kicker">Everyday-Anatomy</span>
       <h3 class="btc-card-title">Apple Health Pro</h3>
       <p class="btc-card-desc">将 Apple Health 导出的 XML 数据转换为可分析的 CSV 格式，打通个人健康数据到 AI 训练的最后一步。</p>
       <span class="btc-card-date">2026-04</span>
@@ -52,7 +52,7 @@ comments: false
       <span class="btc-card-date">2026–07</span>
     </a>
     <a href="/2026/06/11/not-an-agent-but-a-workflow/" class="btc-card">
-      <span class="btc-card-kicker">Digital-Anatomy</span>
+      <span class="btc-card-kicker">Everyday-Anatomy</span>
       <h3 class="btc-card-title">我搭的不是 Agent,而是一套工作方式</h3>
       <p class="btc-card-desc">关于 Main Agent、Code Lab、evidence 链、审批流,以及如何让一个不完美的模型参与长期任务。</p>
       <span class="btc-card-date">2026-06</span>
@@ -60,21 +60,61 @@ comments: false
   </div>
 </section>
 
-<!-- ==================== CURRENT FOCUS ==================== -->
-<section class="btc-section">
-  <h2 class="btc-section-title">Current Focus</h2>
+<!-- ==================== EXPERIENCE ==================== -->
+<section class="btc-section btc-section--tight">
+  <h2 class="btc-section-title">Experience</h2>
 
-  <p class="btc-focus-text">
-    Currently building a personal archive around:<br>
-    <strong>microelectronics, architecture, data tools, and visual systems.</strong>
-  </p>
+  <ul class="btc-exp">
+    <li>
+      <span class="exp-year now">2026 — Now</span>
+      <span class="exp-body">
+        <strong>Wuxi Micro Innovation Integrated Circuit Design Co., Ltd.</strong>
+        <span class="exp-role">IC Hardware Intern · RDMA NIC</span>
+      </span>
+    </li>
+    <li>
+      <span class="exp-year">2024 — 2026</span>
+      <span class="exp-body">
+        <strong>UESTC ASH Studio</strong>
+        <span class="exp-role">President · 50+ members · 100+ media projects</span>
+      </span>
+    </li>
+    <li>
+      <span class="exp-year">2024 — 2025</span>
+      <span class="exp-body">
+        <strong>UESTC Fury Formula Student Electric</strong>
+        <span class="exp-role">Suspension &amp; Electrical Integration</span>
+      </span>
+    </li>
+    <li>
+      <span class="exp-year">2023 — 2027</span>
+      <span class="exp-body">
+        <strong>UESTC</strong>
+        <span class="exp-role">B.Eng. Microelectronics Science &amp; Engineering</span>
+      </span>
+    </li>
+  </ul>
+</section>
 
-  <ul class="btc-focus-list">
-    <li>Digital IC front-end learning</li>
-    <li>CPU / GPU architecture notes</li>
-    <li>Apple Health Pro data parser</li>
-    <li>Personal blog system refinement</li>
-    <li>Photography and visual archive</li>
+<!-- ==================== PAPERS ==================== -->
+<section class="btc-section btc-section--tight">
+  <h2 class="btc-section-title">Papers</h2>
+
+  <ul class="btc-papers">
+    <li>
+      <span class="pap-year">2026</span>
+      <span class="pap-body">
+        <a class="pap-title" href="https://arxiv.org/abs/2610.03228" target="_blank" rel="noopener">Phase-Scoped Query Layouts for Reference-Preserving Speculative Decoding</a>
+        <span class="pap-meta">Chengzhan Li · arXiv:2610.03228</span>
+      </span>
+    </li>
+    <li>
+      <span class="pap-year">2026</span>
+      <span class="pap-body">
+        <a class="pap-title" href="https://arxiv.org/abs/2607.04419" target="_blank" rel="noopener">Agent Step Value: Auditing Evaluation-Channel Sensitivity in Black-Box Agent Traces</a>
+        <span class="pap-meta">Andrew Zhang, Chengzhan Li · EMNLP 2026 REALM Workshop · arXiv:2607.04419</span>
+      </span>
+    </li>
   </ul>
 </section>
 

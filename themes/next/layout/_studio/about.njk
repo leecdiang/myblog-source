@@ -1,0 +1,61 @@
+<div class="about-layout about-editorial">
+  <aside class="about-profile" aria-label="个人资料">
+    <img class="about-avatar" src="{{ url_for(theme.avatar.url or '/images/avatar.jpg') }}" width="400" height="400" alt="雪地里戴着墨镜的 LEEcDiang" fetchpriority="high">
+    <h1 translate="no">LEEcDiang</h1>
+    <p class="about-real-name" translate="no">Chengzhan Li</p>
+    <p class="about-affiliation"><span translate="no" lang="en">University of Electronic Science and Technology of China</span><br><span translate="no" lang="en">Microelectronics Science and Engineering</span></p>
+    <div class="about-contact"><a href="mailto:simonlee820@gmail.com">simonlee820@gmail.com</a><a href="https://github.com/leecdiang" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a></div>
+    <nav class="about-section-nav" aria-label="关于页目录"><a href="#education">教育</a><a href="#experience">经历</a><a href="#research">研究</a><a href="#projects">项目</a><a href="#beyond-the-clock">关于网站</a></nav>
+  </aside>
+  <div class="about-details">
+    <section id="education" class="about-section">
+      <h2>教育</h2>
+      <div class="about-education" translate="no" lang="en"><div class="organization-heading"><span class="organization-mark"><img class="organization-logo organization-logo--vector" src="/images/organizations/uestc.svg?v=20261106-white" alt="电子科技大学校徽" width="36" height="36"></span><h3 translate="no" lang="en">University of Electronic Science and Technology of China</h3></div><div class="organization-description"><div class="organization-facts"><span>B.Eng. in Microelectronics Science and Engineering</span></div><p>My interests include digital IC front-end design, CPU / GPU architecture, and systems connecting chips with software tools.</p></div></div>
+    </section>
+    <section id="experience" class="about-section">
+      <h2>经历</h2>
+      <article class="about-experience" translate="no" lang="en"><div class="organization-heading"><span class="organization-mark"><img class="organization-logo organization-logo--vector" src="/images/organizations/mucse-mark.svg?v=20261106-clean" alt="沐创 MUCSE 标志" width="36" height="36"></span><h3 translate="no" lang="en">Wuxi Micro Innovation Integrated Circuit Design Co., Ltd.</h3></div><div class="organization-description"><div class="organization-facts"><span>IC Hardware Intern</span><time>Jun 2026 – Present</time></div><p>Contributing to RTL development, datapath debugging and board-level validation for a 400G RDMA NIC.</p></div></article>
+      <article class="about-experience" translate="no" lang="en"><div class="organization-heading"><span class="organization-mark"><img class="organization-logo organization-logo--vector" src="/images/organizations/fury-mark.svg" alt="Fury Racing" width="36" height="36"></span><h3 translate="no" lang="en">UESTC Fury Formula Student Electric Team</h3></div><div class="organization-description"><div class="organization-facts"><span>Mechanical / suspension development and electrical integration</span><time>2024–2025</time></div><p>Worked on suspension design, kinematic simulation, fabrication, vehicle testing and PCB / STM32 integration.</p></div></article>
+      <article class="about-experience" translate="no" lang="en"><div class="organization-heading"><span class="organization-mark"><img class="organization-logo organization-logo--vector" src="/images/organizations/ash-studio-adaptive.svg" alt="Ash Studio" width="36" height="36"></span><h3 translate="no" lang="en">Ash Studio</h3></div><div class="organization-description"><div class="organization-facts"><span>President</span><time>2023–2025</time></div><p>Led the photography team and campus media projects, coordinating shoots and team activities.</p></div></article>
+    </section>
+    <section id="research" class="about-section">
+      <h2>研究</h2>
+      <article class="research-feature research-feature--split">
+        <figure class="research-figure">
+          <a href="/images/research/asv-effect-anatomy.png" target="_blank" rel="noopener" aria-label="查看研究图大图"><img src="/images/research/asv-effect-anatomy.webp" width="1000" height="895" alt="ASV 附录散点图：直接增益与生成视图增益" loading="lazy"></a>
+          <figcaption><span>直接增益与生成视图增益</span><a href="/images/research/asv-effect-anatomy.png" target="_blank" rel="noopener">查看大图 ↗</a></figcaption>
+        </figure>
+        <div class="research-copy">
+          <p class="about-meta">REALM Workshop · EMNLP 2026</p>
+          <h3 translate="no">Agent Step Value</h3>
+          <p class="about-role">共同第一作者 · Poster</p>
+          <p>研究同一个智能体步骤在不同评估通道下，为什么会得到方向相反的奖励判断。</p>
+          <div class="about-entry-links"><a href="https://doi.org/10.18653/2026.realm-1.12" target="_blank" rel="noopener">DOI ↗</a><a href="/2026/10/14/agent-step-value/">阅读研究介绍</a><a href="https://arxiv.org/abs/2607.04419v5" target="_blank" rel="noopener">arXiv ↗</a></div>
+        </div>
+      </article>
+      <article class="research-feature research-feature--wide">
+        <div class="research-copy">
+          <p class="about-meta">HeteroSpec · arXiv:2610.03228</p>
+          <h3 id="heterospec-title" translate="no">Reference-Compatible Parallel Execution for Quantized LLM Inference</h3>
+          <p>研究量化语言模型并行执行的数值一致性，以及 CUDA / Vulkan 上执行布局与完整服务开销的关系。</p>
+          <div class="about-entry-links"><a href="https://arxiv.org/abs/2610.03228" target="_blank" rel="noopener">arXiv ↗</a></div>
+        </div>
+        <figure class="research-figure">
+          <a href="/images/research/heterospec-reference-execution.png" target="_blank" rel="noopener" aria-label="查看研究图大图"><img src="/images/research/heterospec-reference-execution.webp" width="1960" height="560" alt="HeteroSpec 方法图：参考约束、独立归约与局部执行分组" loading="lazy"></a>
+          <figcaption><span>保持参考数值行为的并行执行</span><a href="/images/research/heterospec-reference-execution.png" target="_blank" rel="noopener">查看大图 ↗</a></figcaption>
+        </figure>
+      </article>
+    </section>
+    <section id="projects" class="about-section">
+      <h2>项目</h2>
+      <article class="about-entry"><h3>Silemetry</h3><p class="about-meta">SwiftUI / Rust / C / Metal</p><p>面向 Apple Silicon 的 macOS 遥测与持续负载测试工具，记录温度、功耗、频率与 CPU / GPU 负载变化。</p><div class="about-entry-links"><a href="/2026/08/03/silemetry-from-zero-to-one/">开发记录</a><a href="https://github.com/leecdiang/Silemetry-mac" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a></div></article>
+      <article class="about-entry"><h3>EdgeControl</h3><p class="about-meta">macOS / Swift / 触控板手势</p><p>用触控板边缘手势调节音量与亮度，结合触觉反馈，并通过手势状态机减少误触。</p><div class="about-entry-links"><a href="/2026/08/30/edgecontrol-trackpad-edge-gestures/">开发记录</a><a href="https://github.com/leecdiang/EdgeControl" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a></div></article>
+      <article class="about-entry"><h3 translate="no">Apple Health Pro</h3><p class="about-meta">Python / macOS · Windows · Linux</p><p>Apple Health 导出数据转换工具，将 ZIP / XML 转为分类 CSV，支持来源与日期筛选、设备名隐藏及大文件分卷。</p><div class="about-entry-links"><a href="/2026/04/05/Apple-Health-Pro/">开发记录</a><a href="https://github.com/leecdiang/Apple-Health-Pro" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a></div></article>
+    </section>
+    <section id="beyond-the-clock" class="about-section">
+      <h2>Beyond the Clock</h2>
+      <p>在数字系统里，时钟定义节奏、顺序与同步。这个网站记录时钟两侧的事：电路与计算、日常工具，以及摄影和旅行。</p>
+      <div class="about-entry-links"><a href="/archives/">文章列表</a><a href="/photography/">摄影画廊</a></div>
+    </section>
+  </div>
+</div>
