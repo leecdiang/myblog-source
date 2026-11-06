@@ -1,6 +1,6 @@
 # Theme performance and dark reading pass
 
-Local preview only. No deployment was performed.
+Published to `https://leecdiang.com/` on 2026-11-06 after explicit authorization. GitHub Pages reached `built` at deployment commit `fa4237e1e6aa8d02fe8c91dd7ec4efcee4c1be6a`; six live pages and five key assets were checked, with the asset bytes matching this build. See `OPENCLAW-HANDOFF-2026-11-06.md` for maintenance and rollback identifiers.
 
 ## Measured resource changes
 
