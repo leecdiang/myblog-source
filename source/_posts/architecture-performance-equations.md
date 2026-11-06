@@ -79,12 +79,66 @@ $$I^* = \frac{P_{\text{peak}}}{B}$$
 所以 Roofline 适合回答“该往哪一类瓶颈找”，不适合单独预测“这个程序一定能跑到多少”。
 
 {% raw %}
-<div class="v-figure arch-map v-chart-scroll"><p class="v-scroll-hint">左右滑动查看完整芯片结构图；键盘聚焦后可用方向键。</p><div class="v-chart-viewport" tabindex="0" role="region" aria-label="可横向滚动的芯片结构图"><svg viewBox="0 0 900 470" role="img" aria-label="性能公式在真实芯片结构上的落点"><text x="26" y="30" font-size="20" class="v-ink">同一颗芯片，四种限制同时存在</text><text x="26" y="52" font-size="12" class="v-sub">这些公式各自指向不同的资源与等待来源。</text><rect x="48" y="72" width="804" height="330" rx="16" class="am-die"/><rect x="70" y="92" width="250" height="120" rx="10" class="am-block am-cpu"/><text x="86" y="114" font-size="13" class="v-ink">CPU cluster</text><rect x="86" y="126" width="46" height="42" rx="4" class="am-core"/><rect x="140" y="126" width="46" height="42" rx="4" class="am-core"/><rect x="194" y="126" width="46" height="42" rx="4" class="am-core"/><rect x="248" y="126" width="46" height="42" rx="4" class="am-core"/><text x="86" y="196" font-size="11" class="am-tag">Amdahl · CPI · 分支与依赖</text><rect x="338" y="92" width="250" height="120" rx="10" class="am-block am-gpu"/><text x="354" y="114" font-size="13" class="v-ink">GPU / SIMT</text><rect x="354" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="386" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="418" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="450" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="482" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="514" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="354" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="386" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="418" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="450" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="482" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="514" y="160" width="24" height="24" rx="3" class="am-core"/><text x="354" y="196" font-size="11" class="am-tag">Roofline · 并行度 · 占用率</text><rect x="606" y="92" width="228" height="120" rx="10" class="am-block am-matrix"/><text x="622" y="114" font-size="13" class="v-ink">Matrix / Vector</text><rect x="622" y="126" width="196" height="54" fill="none" stroke="var(--chart-amber)" stroke-width="1.1" opacity=".8"/><path d="M671 126V180M720 126V180M769 126V180M622 144H818M622 162H818" fill="none" stroke="var(--chart-amber)" stroke-width=".8" opacity=".55"/><text x="622" y="196" font-size="11" class="am-tag">P peak · 数据类型 · FMA</text><rect x="70" y="228" width="360" height="58" rx="8" class="am-block"/><text x="86" y="250" font-size="13" class="v-ink">L1 / L2 / 末级缓存</text><text x="86" y="270" font-size="11" class="v-sub">命中率决定真正流向 DRAM 的字节数</text><rect x="448" y="228" width="386" height="58" rx="8" class="am-block am-mem"/><text x="464" y="250" font-size="13" class="v-ink">内存控制器 · HBM / DDR PHY</text><text x="464" y="270" font-size="11" class="v-sub">持续带宽 B · 访存延迟 L · 读写比例</text><rect x="70" y="302" width="764" height="48" rx="8" class="am-block am-noc"/><text x="86" y="324" font-size="13" class="v-ink">片上互连 NoC</text><text x="196" y="324" font-size="11" class="v-sub">队列深度 / credit / MSHR / load-store queue</text><text x="650" y="324" font-size="11" class="am-tag">Little 定律 · BDP</text><text x="70" y="378" font-size="12" class="v-sub">同一个程序会同时受多层限制；优化前先找出当前的主导项。</text></svg></div><p class="v-caption">这是逻辑示意，不按任何芯片的物理布局绘制。缓存、内存控制器与互连的具体数量和位置随产品差异很大；箭头所指的是模型最直接作用的资源类型。</p>
+<div class="v-figure arch-map v-chart-scroll"><div class="arch-map-picker" role="group" aria-label="选择公式查看芯片落点"><button type="button" data-map="roofline" aria-pressed="true">Roofline</button><button type="button" data-map="amdahl" aria-pressed="false">Amdahl</button><button type="button" data-map="cpi" aria-pressed="false">CPI</button><button type="button" data-map="bdp" aria-pressed="false">BDP / Little</button></div><p class="arch-map-note" id="map-note">Roofline：计算单元、缓存与内存带宽共同决定屋顶。</p><p class="v-scroll-hint">左右滑动查看完整芯片结构图；键盘聚焦后可用方向键。</p><div class="v-chart-viewport" tabindex="0" role="region" aria-label="可横向滚动的芯片结构图"><svg viewBox="0 0 900 470" role="img" aria-label="性能公式在真实芯片结构上的落点"><text x="26" y="30" font-size="20" class="v-ink">同一颗芯片，四种限制同时存在</text><text x="26" y="52" font-size="12" class="v-sub">这些公式各自指向不同的资源与等待来源。</text><rect x="48" y="72" width="804" height="330" rx="16" class="am-die"/><rect x="70" y="92" width="250" height="120" rx="10" class="am-block am-cpu"/><text x="86" y="114" font-size="13" class="v-ink">CPU cluster</text><rect x="86" y="126" width="46" height="42" rx="4" class="am-core"/><rect x="140" y="126" width="46" height="42" rx="4" class="am-core"/><rect x="194" y="126" width="46" height="42" rx="4" class="am-core"/><rect x="248" y="126" width="46" height="42" rx="4" class="am-core"/><text x="86" y="196" font-size="11" class="am-tag">Amdahl · CPI · 分支与依赖</text><rect x="338" y="92" width="250" height="120" rx="10" class="am-block am-gpu"/><text x="354" y="114" font-size="13" class="v-ink">GPU / SIMT</text><rect x="354" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="386" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="418" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="450" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="482" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="514" y="128" width="24" height="24" rx="3" class="am-core"/><rect x="354" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="386" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="418" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="450" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="482" y="160" width="24" height="24" rx="3" class="am-core"/><rect x="514" y="160" width="24" height="24" rx="3" class="am-core"/><text x="354" y="196" font-size="11" class="am-tag">Roofline · 并行度 · 占用率</text><rect x="606" y="92" width="228" height="120" rx="10" class="am-block am-matrix"/><text x="622" y="114" font-size="13" class="v-ink">Matrix / Vector</text><rect x="622" y="126" width="196" height="54" fill="none" stroke="var(--chart-amber)" stroke-width="1.1" opacity=".8"/><path d="M671 126V180M720 126V180M769 126V180M622 144H818M622 162H818" fill="none" stroke="var(--chart-amber)" stroke-width=".8" opacity=".55"/><text x="622" y="196" font-size="11" class="am-tag">P peak · 数据类型 · FMA</text><rect x="70" y="228" width="360" height="58" rx="8" class="am-block am-cache"/><text x="86" y="250" font-size="13" class="v-ink">L1 / L2 / 末级缓存</text><text x="86" y="270" font-size="11" class="v-sub">命中率决定真正流向 DRAM 的字节数</text><rect x="448" y="228" width="386" height="58" rx="8" class="am-block am-mem"/><text x="464" y="250" font-size="13" class="v-ink">内存控制器 · HBM / DDR PHY</text><text x="464" y="270" font-size="11" class="v-sub">持续带宽 B · 访存延迟 L · 读写比例</text><rect x="70" y="302" width="764" height="48" rx="8" class="am-block am-noc"/><text x="86" y="324" font-size="13" class="v-ink">片上互连 NoC</text><text x="196" y="324" font-size="11" class="v-sub">队列深度 / credit / MSHR / load-store queue</text><text x="650" y="324" font-size="11" class="am-tag">Little 定律 · BDP</text><text x="70" y="378" font-size="12" class="v-sub">同一个程序会同时受多层限制；优化前先找出当前的主导项。</text></svg></div><p class="v-caption">这是逻辑示意，不按任何芯片的物理布局绘制。缓存、内存控制器与互连的具体数量和位置随产品差异很大；箭头所指的是模型最直接作用的资源类型。</p>
 </div>
 {% endraw %}
 
 
-## 3. Amdahl 定律：局部加速的整体回报
+## 3. 从 DRAM 到 L1：多级屋顶与 AMAT
+
+Roofline 里的 $B$ 不是整颗芯片唯一的带宽。L1、L2、末级缓存和 HBM 各有自己的持续带宽，工作负载的数据由哪一层供给，就该使用哪一层的屋檐：
+
+$$P_{\ell} \le \min\left(P_{\text{peak}},\; I B_{\ell}\right)$$
+
+同一段程序可以同时画在四层屋顶上。数据全部命中 L1 时，屋顶最高；流式访问 HBM 时，屋顶最低。分块和复用改变的是 $I$，也改变哪一层屋顶真正压住工作负载。
+
+{% raw %}
+<div class="v-figure arch-lab" id="multi-roofline-lab">
+  <div class="arch-lab-head"><div><p class="arch-kicker">INTERACTIVE MODEL · 02</p><p class="arch-title">多级 Roofline：同一负载，四层屋顶</p><p>切换 L1、L2、末级缓存与 HBM，比较同一工作负载在不同层级的带宽上限。</p></div></div>
+  <div class="arch-controls arch-controls--two">
+    <label>峰值算力 <output id="ml-peak-out">8.0 TFLOP/s</output><input id="ml-peak" type="range" min="1" max="16" step="0.5" value="8" aria-label="峰值算力，TFLOP 每秒"></label>
+    <label>运算强度 <output id="ml-int-out">8 FLOP/Byte</output><input id="ml-int" type="range" min="0.25" max="128" step="0.25" value="8" aria-label="运算强度，FLOP 每 Byte"></label>
+  </div>
+  <div class="arch-levels" role="group" aria-label="选择内存层级">
+    <button type="button" data-level="l1" aria-pressed="false">L1 · 2000 GB/s</button>
+    <button type="button" data-level="l2" aria-pressed="false">L2 · 800 GB/s</button>
+    <button type="button" data-level="llc" aria-pressed="false">LLC · 300 GB/s</button>
+    <button type="button" data-level="hbm" aria-pressed="true">HBM · 100 GB/s</button>
+  </div>
+  <div class="arch-plot-wrap"><svg id="ml-plot" viewBox="0 0 720 340" role="img" aria-label="多级 Roofline 交互图"><g class="ml-grid"><path d="M75 40V300H680M75 187H680M75 74H680"/></g><path id="ml-roof-l1" class="ml-roof ml-l1"/><path id="ml-roof-l2" class="ml-roof ml-l2"/><path id="ml-roof-llc" class="ml-roof ml-llc"/><path id="ml-roof-hbm" class="ml-roof ml-hbm"/><circle id="ml-dot" class="ml-dot" r="7"/><text id="ml-point-label" x="0" y="0">HBM</text><text x="375" y="326" text-anchor="middle">运算强度（FLOP/Byte，对数刻度）</text><text transform="translate(20 170) rotate(-90)" text-anchor="middle">吞吐（TFLOP/s，对数刻度）</text><text x="75" y="318" text-anchor="middle">0.25</text><text x="208" y="318" text-anchor="middle">1</text><text x="342" y="318" text-anchor="middle">4</text><text x="475" y="318" text-anchor="middle">16</text><text x="608" y="318" text-anchor="middle">64</text><text x="675" y="318" text-anchor="middle">128</text><text x="42" y="304">0.1</text><text x="42" y="191">1</text><text x="42" y="78">10</text></svg></div>
+  <p class="arch-result" id="ml-result" aria-live="polite"></p>
+  <p class="v-caption">带宽为教学示例，不对应具体产品。实际应使用该层级、该访问模式的持续带宽，而不是接口标称值。</p>
+</div>
+{% endraw %}
+
+Roofline 描述稳态吞吐上限，单次访问要等多久则是另一个问题。设命中时间为 $t_{\text{hit}}$，缺失率为 $m$，一次缺失的代价为 $t_{\text{miss}}$，则：
+
+$$AMAT = t_{\text{hit}} + m \times t_{\text{miss}}$$
+
+多级缓存可以继续展开：
+
+$$AMAT_{L1} = t_{L1} + m_{L1}\left(t_{L2} + m_{L2} t_{\text{mem}}\right)$$
+
+{% raw %}
+<div class="v-figure arch-lab" id="amat-lab">
+  <div class="arch-lab-head"><div><p class="arch-kicker">INTERACTIVE MODEL · 03</p><p class="arch-title">AMAT：一次访问的平均代价</p><p>调节命中时间、缺失率与缺失代价，观察平均访存时间由哪一项主导。</p></div></div>
+  <div class="arch-controls arch-controls--three">
+    <label>命中时间 <output id="amat-hit-val">1.0 ns</output><input id="amat-hit" type="range" min="0.5" max="5" step="0.1" value="1" aria-label="命中时间，纳秒"></label>
+    <label>缺失率 <output id="amat-miss-val">5.0%</output><input id="amat-miss" type="range" min="0.001" max="0.2" step="0.001" value="0.05" aria-label="缺失率"></label>
+    <label>缺失代价 <output id="amat-pen-val">100 ns</output><input id="amat-penalty" type="range" min="20" max="400" step="5" value="100" aria-label="缺失代价，纳秒"></label>
+  </div>
+  <div class="mem-bars" id="amat-bars">
+    <div class="mem-bar-row"><span>命中时间</span><div class="mem-bar"><i id="amat-hit-bar"></i></div><b id="amat-hit-cost"></b></div>
+    <div class="mem-bar-row"><span>缺失代价</span><div class="mem-bar mem-bar--alt"><i id="amat-miss-bar"></i></div><b id="amat-miss-cost"></b></div>
+  </div>
+  <p class="arch-result" id="amat-result" aria-live="polite"></p>
+  <p class="v-caption">单级近似：AMAT = 命中时间 + 缺失率 × 缺失代价。真实多级缓存会把缺失代价继续展开为下一级的命中与缺失。</p>
+</div>
+{% endraw %}
+
+AMAT 与 Roofline 描述同一套存储系统的两个侧面。AMAT 决定一次访问平均要等多久，Roofline 决定大量访问持续进行时，带宽和算力哪个先到顶。缓存命中率提高，既降低 AMAT，也可能把工作负载推向更高的 Roofline 层级。
+
+## 4. Amdahl 定律：局部加速的整体回报
 
 假设原始运行时间中，有比例 $s$ 无法被某种优化加速，其余比例 $1-s$ 获得 $k$ 倍加速。整体加速比为：
 
@@ -109,7 +163,7 @@ $$S = \frac{1}{s + \frac{1-s}{k}}$$
 
 强尺度扩展下还要考虑 Gustafson 定律：若问题规模随处理器数量一起增大，固定串行比例的假设不再适用。它说明“固定工作量加速”与“固定时间完成更大工作量”是两个不同问题。
 
-## 4. CPU 时间方程：指令、周期与频率
+## 5. CPU 时间方程：指令、周期与频率
 
 对一个程序，常见的 CPU 性能分解为：
 
@@ -125,7 +179,7 @@ CPI 会随程序和微架构变化。 同一颗 CPU 跑两个程序、甚至同�
 
 对加速器，单一 CPI 往往不如每周期完成多少向量、矩阵 tile 或事务来得直观。选指标时应贴近硬件实际执行粒度。
 
-## 5. 延迟和带宽：管道里需要多少数据？
+## 6. 延迟和带宽：管道里需要多少数据？
 
 带宽描述单位时间可以通过多少数据，延迟描述一次传输或访问要等多久。带宽和延迟是两项独立规格。延迟为 $L$ 秒、目标吞吐为 $B$ Byte/s 时，要让链路保持满载，平均需要在途的数据量：
 
@@ -164,7 +218,7 @@ $$N = \lambda W$$
 {% endraw %}
 
 
-## 6. 一个公式解释不了的地方
+## 7. 一个公式解释不了的地方
 
 公式把复杂系统压成几个变量，优点是能快速定位量级与上限，代价是忽略了一些细节。读模型时，建议顺手追问四件事：
 
@@ -175,7 +229,7 @@ $$N = \lambda W$$
 
 对于真实芯片分析，先用公式提出可证伪的判断，再用性能计数器和微基准验证。若 Roofline 判断受限于 DRAM，应查看实际读写流量、缓存命中和带宽；若 Amdahl 估计串行段占比高，应逐阶段计时；若 CPI 上升，进一步拆解前端、后端、分支和内存停顿，不要把 CPI 本身当作原因。
 
-## 7. 从问题映射到结构
+## 8. 从问题映射到结构
 
 | 观察到的现象 | 可先检查的模型 | 可能的代码方向 | 可能的硬件结构 |
 |---|---|---|---|
@@ -187,7 +241,7 @@ $$N = \lambda W$$
 
 最后一行可以写成 $T = T_{\text{fixed}} + T_{\text{work}}$。当工作量很小时，固定开销主导；把执行单元峰值提高十倍，对这类场景几乎没有帮助。这也是为什么性能优化必须从端到端时间开始，不要从规格表上最高的数字开始。
 
-## 8. 记住模型各自的边界
+## 9. 记住模型各自的边界
 
 - **Roofline** 看计算与数据搬运的上限关系；不负责解释所有低于上限的原因。
 - **Amdahl** 看固定工作量下的局部加速回报；并行问题规模扩大时要换一种扩展模型。
@@ -253,6 +307,64 @@ $$N = \lambda W$$
   }
   [mb,ml,mn,ms].forEach(function(el){el&&el.addEventListener('input',mem)});
   mem();
+var mlPeak=$('ml-peak'), mlInt=$('ml-int');
+  var mlLevels={l1:2000,l2:800,llc:300,hbm:100};
+  var mlNames={l1:'L1',l2:'L2',llc:'LLC',hbm:'HBM'};
+  var mlActive='hbm';
+  function mlX(v){return 75+(Math.log2(v/.25)/9)*600}
+  function mlY(v){return 300-(Math.log10(v/.1)/Math.log10(200))*260}
+  function mlRoof(){
+    if(!mlPeak||!mlInt)return;
+    var p=+mlPeak.value, I=+mlInt.value, best=Infinity, bestName='计算';
+    Object.keys(mlLevels).forEach(function(k){
+      var b=mlLevels[k], knee=p*1000/b, path;
+      if(knee<=.25){path='M'+mlX(.25)+' '+mlY(p)+' L'+mlX(128)+' '+mlY(p)}
+      else if(knee>=128){path='M'+mlX(.25)+' '+mlY(.25*b/1000)+' L'+mlX(128)+' '+mlY(128*b/1000)}
+      else{path='M'+mlX(.25)+' '+mlY(.25*b/1000)+' L'+mlX(knee)+' '+mlY(p)+' L'+mlX(128)+' '+mlY(p)}
+      var el=$('ml-roof-'+k); if(el){el.setAttribute('d',path);el.classList.toggle('is-active',k===mlActive)}
+      var perf=Math.min(p,I*b/1000);
+      if(perf<best){best=perf;bestName=mlNames[k]}
+    });
+    var activePerf=Math.min(p,I*mlLevels[mlActive]/1000);
+    var dot=$('ml-dot'); if(dot){dot.setAttribute('cx',mlX(I));dot.setAttribute('cy',mlY(Math.max(.1,Math.min(20,activePerf))))}
+    var label=$('ml-point-label'); if(label){label.setAttribute('x',Math.min(620,mlX(I)+10));label.setAttribute('y',mlY(Math.max(.1,Math.min(20,activePerf)))-12);label.textContent=mlNames[mlActive]+' '+activePerf.toFixed(2)+' TFLOP/s'}
+    $('ml-peak-out').textContent=p.toFixed(1)+' TFLOP/s';
+    $('ml-int-out').textContent=(I%1?I.toFixed(2):I.toFixed(0))+' FLOP/Byte';
+    $('ml-result').textContent='当前 I='+(I%1?I.toFixed(2):I.toFixed(0))+'，'+mlNames[mlActive]+' 屋顶约 '+activePerf.toFixed(2)+' TFLOP/s；四层中最低的是 '+bestName+'（'+best.toFixed(2)+' TFLOP/s）。';
+  }
+  [mlPeak,mlInt].forEach(function(el){el&&el.addEventListener('input',mlRoof)});
+  document.querySelectorAll('#multi-roofline-lab [data-level]').forEach(function(btn){btn.addEventListener('click',function(){mlActive=btn.dataset.level;document.querySelectorAll('#multi-roofline-lab [data-level]').forEach(function(b){b.setAttribute('aria-pressed',String(b===btn))});mlRoof()})});
+  if(mlPeak) mlRoof();
+  var ah=$('amat-hit'), amr=$('amat-miss'), ap=$('amat-penalty');
+  function amat(){
+    if(!ah||!amr||!ap)return;
+    var h=+ah.value,m=+amr.value,p=+ap.value,cost=m*p,total=h+cost;
+    $('amat-hit-val').textContent=h.toFixed(1)+' ns';
+    $('amat-miss-val').textContent=(m*100).toFixed(1)+'%';
+    $('amat-pen-val').textContent=p+' ns';
+    $('amat-hit-cost').textContent=h.toFixed(1)+' ns';
+    $('amat-miss-cost').textContent=cost.toFixed(1)+' ns';
+    $('amat-hit-bar').style.width=(h/total*100)+'%';
+    $('amat-miss-bar').style.width=(cost/total*100)+'%';
+    $('amat-result').textContent='AMAT = '+h.toFixed(1)+' ns + '+(m*100).toFixed(1)+'% × '+p+' ns = '+total.toFixed(2)+' ns；缺失代价占 '+(cost/total*100).toFixed(0)+'%。';
+  }
+  [ah,amr,ap].forEach(function(el){el&&el.addEventListener('input',amat)});
+  if(ah) amat();
+  var archMap=document.querySelector('.arch-map');
+  if(archMap){
+    var mapNotes={roofline:'Roofline：计算单元、缓存与内存带宽共同决定屋顶。',amdahl:'Amdahl：多核或专用单元加速，串行路径决定上限。',cpi:'CPI：前端供给、执行端口与缓存停顿共同累积周期。',bdp:'BDP / Little：MSHR、队列与 NoC credit 决定在途请求。'};
+    var mapButtons=document.querySelectorAll('.arch-map-picker [data-map]');
+    function mapSelect(key){
+      archMap.dataset.mapActive=key;
+      var targets={roofline:'.am-gpu,.am-matrix,.am-mem,.am-cache',amdahl:'.am-cpu',cpi:'.am-cpu',bdp:'.am-mem,.am-noc'};
+      document.querySelectorAll('.arch-map .am-block,.arch-map .am-core,.arch-map .am-tag').forEach(function(el){el.style.opacity='.25';el.style.strokeWidth='1.2'});
+      document.querySelectorAll(targets[key]||'').forEach(function(el){el.style.opacity='1';el.style.strokeWidth='2.5'});
+      mapButtons.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.map===key))});
+      var note=$('map-note');if(note)note.textContent=mapNotes[key]||'';
+    }
+    mapButtons.forEach(function(b){b.addEventListener('click',function(){mapSelect(b.dataset.map)})});
+    mapSelect('roofline');
+  }
   roof();amdahl();
 })();
 </script>
