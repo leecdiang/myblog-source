@@ -1,0 +1,147 @@
+{
+  "verified_at": "2026-11-07T23:06:27.999315+08:00",
+  "release_source_commit": "4feeda3604fee1e0d7399ab12ec94a499856e947",
+  "published_commit": "459774cf001313e7ebd2ac0ab5a878f8c32e716a",
+  "pages_build": "built",
+  "live_security_policy_version": "2026-11-07",
+  "live_http_verification": [
+    {
+      "path": "/",
+      "status": 200,
+      "exit": 0,
+      "server": "cloudflare",
+      "cache": "HIT",
+      "security_header_names": [
+        "content-security-policy",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "permissions-policy",
+        "referrer-policy"
+      ],
+      "security_version": true
+    },
+    {
+      "path": "/archives/",
+      "status": 200,
+      "exit": 0,
+      "server": "cloudflare",
+      "cache": "HIT",
+      "security_header_names": [
+        "content-security-policy",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "permissions-policy",
+        "referrer-policy"
+      ],
+      "security_version": true
+    },
+    {
+      "path": "/2026/11/06/architecture-performance-equations/",
+      "status": 200,
+      "exit": 0,
+      "server": "cloudflare",
+      "cache": "HIT",
+      "security_header_names": [
+        "content-security-policy",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "permissions-policy",
+        "referrer-policy"
+      ],
+      "security_version": true
+    },
+    {
+      "path": "/assets/studio/core.436a5ba09573.js",
+      "status": 200,
+      "exit": 0,
+      "server": "cloudflare",
+      "cache": "HIT",
+      "security_header_names": [
+        "content-security-policy",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "permissions-policy",
+        "referrer-policy"
+      ],
+      "asset_matches_local": true
+    },
+    {
+      "path": "/assets/studio/style.14b05e6ce331.css",
+      "status": 200,
+      "exit": 0,
+      "server": "cloudflare",
+      "cache": "HIT",
+      "security_header_names": [
+        "content-security-policy",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "permissions-policy",
+        "referrer-policy"
+      ],
+      "asset_matches_local": true
+    },
+    {
+      "path": "/admin/",
+      "status": 403,
+      "exit": 0,
+      "server": "cloudflare",
+      "cache": null,
+      "security_header_names": [
+        "content-security-policy",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "permissions-policy",
+        "referrer-policy"
+      ]
+    },
+    {
+      "path": "/.git/HEAD",
+      "status": 403,
+      "exit": 0,
+      "server": "cloudflare",
+      "cache": null,
+      "security_header_names": [
+        "content-security-policy",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "permissions-policy",
+        "referrer-policy"
+      ]
+    },
+    {
+      "path": "/.env",
+      "status": 403,
+      "exit": 0,
+      "server": "cloudflare",
+      "cache": null,
+      "security_header_names": [
+        "content-security-policy",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "permissions-policy",
+        "referrer-policy"
+      ]
+    }
+  ],
+  "browser_checks": {
+    "home": true,
+    "theme_switch": true,
+    "archive_search": true,
+    "interactive_model": true,
+    "static_formulas_on_sample_article": 64,
+    "mermaid_diagrams_on_sample_article": 2,
+    "reported_console_errors": 0
+  },
+  "pending": [
+    "User completion of Cloudflare two-factor setup.",
+    "Registrar 2FA and DNSSEC not verified."
+  ]
+}
