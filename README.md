@@ -86,6 +86,10 @@ curl --noproxy '*' -I http://localhost:4000/
 
 使用 `./node_modules/.bin/hexo`，本机 `npx hexo` 曾卡在 npm exec。先确认基线无 ERROR，再做修改；修改后重新构建。
 
+构建后运行 `npm run check:content`，检查 Atom 类型与静态内容、已修复公式、摄影图片属性、内容语言、分享封面、文章 microdata 和核心栏目 sitemap。检查脚本位于 `tools/check-content-output.py`，使用 Python 标准库。浏览器中的图形坐标、交互和主题仍需实际复查。加载与数学静态输出另用 `npm run check:loading` 检查。
+
+`studio-math-prerender.js` 使用当前锁定的 MathJax 在构建时生成 CHTML、辅助 MathML 和 `data-tex` 源码，阅读页无需加载客户端排版器；公开正文仍从原始 Markdown 维护。站内导航保留完整文档加载，在链接意图出现时预取目标页及必要样式，使用 150ms 离场与 420ms 入场衔接；背景的四个原始 WebP 版本按原字节嵌入公共样式，不缩尺寸、不二次压缩，首帧显示并保持呼吸相位。归档筛选、目录、标签页、控件及弹层共用短时动效；键盘操作及减少动态效果设置即时更新。后退恢复时清理离场状态，避免页面停在透明状态。 本地审查记录见 `docs/continuity-2026-11-07.json`；更早的加载速度对比保留在 `docs/loading-motion-2026-11-07.json`，其中背景与转场策略已被本轮替换。
+
 至少检查：文章标题/简介、目录、图表、公式、图片和引用跳转。深浅两色都要目视检查；手机宽度检查表格和图表是否仅在容器内滚动、页面是否横向溢出。只看配置不能声称完成两种主题的视觉验收。
 
 样式改动后检查 `public/css/main.css` 确有新增选择器；必要时 `./node_modules/.bin/hexo generate --force`。水印插件可能把 PNG 转为 JPEG，应核验生成 HTML 中的最终图片路径，而非只查 Markdown 原图名。
@@ -138,7 +142,7 @@ IndexNow 成功表示提交已接收，不保证已收录。Google/Bing 实际�
 - 首页：`themes/next/layout/_studio/home.njk`，桌面图文分栏、手机独立照片与介绍；摄影 `/photography/`、文章 `/archives/` 是独立页面。
 - 公共布局：`themes/next/layout/_layout-studio.njk`；样式：`source/css/studio.css`；主题切换、归档筛选：`source/js/studio.js`。
 - 画廊收录 Visual Narrative 分类中声明了 `image_width` 的摄影文章；读取已有正文首图和描述。
-- 初次访问跟随系统；右上角按钮切换浅色/深色，选择会在页面间保留。Links 页保留天象仪。
+- 首次进入站点和刷新页面时跟随系统，忽略旧版永久保存的手动主题。右上角保留原有按钮，本次浏览的选择以 sessionStorage 在站内页面间共享；导航、前进后退、切回标签页保持当前选择。新一轮进入、刷新或系统主题变化时恢复跟随。主题初始化在公共样式前内联执行，避免跳页首帧配色错误；不写入永久主题偏好。Links 页保留天象仪。
 - 本地首页 `?portrait=mono` 可以对照黑白效果，仅在 localhost / 127.0.0.1 生效；照片源文件没有修改。
 - 完整改版前备份与回退说明：`/Users/lee/myblog-backups/2026-11-05-design/README.md`。回退脚本会先保存当前版本，再恢复旧文件。`studio_design: false` 可临时切回旧主题外观。
 - 预览：`./node_modules/.bin/hexo generate --force` 后运行 `./node_modules/.bin/hexo server -p 4187 -s`，访问 `http://127.0.0.1:4187/`。此操作不会发布线上。

@@ -1,0 +1,553 @@
+{
+  "date": "2026-11-07",
+  "timezone": "Asia/Shanghai",
+  "publication": "Published to https://leecdiang.com/ at d50d3ec57996e35d8b8a1c8a217a166c884f51ad; Pages built. Approved midpoint About dark background and website-theme-aware Ash logo; see publication-2026-11-07.json for live checks.",
+  "preview": "http://localhost:4000/",
+  "scope": "Immediate decorative artwork and coherent interaction/navigation motion.",
+  "background": {
+    "strategy": "Four original WebP files embedded byte-for-byte in the shared hashed stylesheet. No resizing or re-encoding. HTML layers remain ready before script execution, without a delayed load/idle artwork gate or separate artwork request.",
+    "originals_preserved": true,
+    "embedded_webp_bytes": [
+      40626,
+      18250,
+      115976,
+      86074
+    ],
+    "embedded_webp_total_bytes": 260926,
+    "shared_stylesheet_gzip_bytes": 289156,
+    "stylesheet": "/assets/studio/style.52c0b1e4a64b.css",
+    "quality_correction": "The previous 480px/270px derivatives visibly removed the original texture. Restored the original 1672px/941px artwork, verified every embedded image byte against its source. This increases the cached shared stylesheet size; earlier low-resolution performance numbers do not describe this build.",
+    "about_tonal_adjustment": "About-only dark screen blend with #0c1116 floor and rgba(29,38,49,.32) reading plane; approved midpoint. Original embedded WebP bytes remain unchanged."
+  },
+  "motion": {
+    "navigation": "Intent warms the next native document and its critical head assets. Content stays visible while warming; prepared pages use a 150ms departure, then a 420ms incoming animation. A 900ms warm deadline keeps slow navigation moving and retains incoming motion.",
+    "native_links": "Same-page anchors, downloads, external links and modifier clicks use their original behavior. No SPA replacement.",
+    "history": "BFCache pageshow cancels outgoing animations and restores visibility.",
+    "interactions": "Archive filters, TOC expansion, photo/link hover, copy feedback, model controls, theme colors, menus and modal overlays. Existing chart redraw behavior is retained.",
+    "reduced_motion": "Navigation/feedback use immediate updates; CSS disables new motion and chip-map/memory transitions. Keyboard interactions use immediate state changes.",
+    "first_entry": "Direct visits and reloads have no added entrance animation.",
+    "ambient": "Negative animation delay derives from a session epoch to avoid restarting drift on every document."
+  },
+  "continuity_qa": {
+    "results": [
+      {
+        "width": 390,
+        "color": "light",
+        "path": "/about/",
+        "first": {
+          "color": "light",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0.95",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 390,
+        "color": "light",
+        "path": "/archives/",
+        "first": {
+          "color": "light",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0.95",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 390,
+        "color": "light",
+        "path": "/photography/",
+        "first": {
+          "color": "light",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0.95",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 390,
+        "color": "dark",
+        "path": "/about/",
+        "first": {
+          "color": "dark",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0.68",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 390,
+        "color": "dark",
+        "path": "/archives/",
+        "first": {
+          "color": "dark",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0.68",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 390,
+        "color": "dark",
+        "path": "/photography/",
+        "first": {
+          "color": "dark",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0.68",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 1440,
+        "color": "light",
+        "path": "/about/",
+        "first": {
+          "color": "light",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "1",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 1440,
+        "color": "light",
+        "path": "/archives/",
+        "first": {
+          "color": "light",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "1",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 1440,
+        "color": "light",
+        "path": "/photography/",
+        "first": {
+          "color": "light",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "1",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 1440,
+        "color": "dark",
+        "path": "/about/",
+        "first": {
+          "color": "dark",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0.82",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 1440,
+        "color": "dark",
+        "path": "/archives/",
+        "first": {
+          "color": "dark",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0.82",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "width": 1440,
+        "color": "dark",
+        "path": "/photography/",
+        "first": {
+          "color": "dark",
+          "entry": true,
+          "animations": [
+            "studio-content-enter"
+          ],
+          "backgrounds": [
+            {
+              "embedded": true,
+              "opacity": "0",
+              "ready": true
+            },
+            {
+              "embedded": true,
+              "opacity": "0.82",
+              "ready": true
+            }
+          ]
+        },
+        "departure": {
+          "leaving": true,
+          "opacity": "0"
+        },
+        "back": "visible"
+      },
+      {
+        "slowWarmTimeout": "incoming animation retained"
+      },
+      {
+        "mode": "reduce",
+        "entry": false
+      },
+      {
+        "mode": "keyboard",
+        "entry": false
+      },
+      {
+        "escape": "cancels pending route"
+      },
+      {
+        "rapidChoice": "latest route wins"
+      },
+      {
+        "theme": {
+          "color": "dark",
+          "l": "0",
+          "d": "0.82"
+        }
+      },
+      {
+        "toc": "animated pointer, rapid reversal, native keyboard"
+      },
+      {
+        "anchor": "native hash preserved"
+      },
+      {
+        "filter": "animated and reset restored"
+      }
+    ],
+    "errors": []
+  },
+  "interaction_qa": {
+    "results": [
+      {
+        "model": "slider result and reset feedback, chip map feedback"
+      },
+      {
+        "reducedMotion": "model feedback and chip transitions disabled"
+      },
+      {
+        "copy": "actual clipboard action feedback"
+      },
+      {
+        "popover": "pointer menu, keyboard dismissal, focus restored"
+      },
+      {
+        "color": "dark",
+        "bg": "linear-gradient(160deg, rgba(34, 44, 53, 0.62), rgba(17, 26, 36, 0.54) 45%, rgba(10, 17, 25, 0.5))"
+      },
+      {
+        "color": "light",
+        "bg": "radial-gradient(70% 45% at 12% 0%, rgba(226, 181, 111, 0.14), rgba(0, 0, 0, 0) 72%), linear-gradient(160deg, rgba(255, 255, 255, 0.43), rgba(240, 248, 252, 0.24) 45%, rgba(223, 237, 246, 0.18))"
+      }
+    ],
+    "errors": []
+  },
+  "validation": "Chrome desktop 1440x900 and mobile viewport 390x900; 12 route/theme/viewport combinations, slow response, Escape, rapid target changes, history, reduced motion, keyboard, native anchor, archive reset, model/copy/modal/theme behavior. npm check:content and check:loading passed.",
+  "limits": "Local Chrome checks and simulated delay; no new live-site, physical-phone, Safari/Firefox or field-performance measurement claim.",
+  "source_backup": "/Users/lee/myblog-backups/2026-11-07/continuity-012435",
+  "background_quality_qa": {
+    "style": "/assets/studio/style.80b48238568b.css",
+    "assets": [
+      {
+        "variant": "light-landscape",
+        "file": "halo-light-landscape-v9.webp",
+        "bytes": 40626,
+        "sha256": "805b70e54be065ae96d0f50a80358493f4e2e3bb1d69b48a7e5787b9db556e36"
+      },
+      {
+        "variant": "light-portrait",
+        "file": "halo-light-portrait-v9.webp",
+        "bytes": 18250,
+        "sha256": "6de7087a4230b7f01c2bd656b7811143ac1d67d9398c5a973b3f46a066c895c5"
+      },
+      {
+        "variant": "dark-landscape",
+        "file": "halo-dark-landscape-v2.webp",
+        "bytes": 115976,
+        "sha256": "9a2f760e2c343842ac1182627d82a65eafeab29e22f4c658fb5e52e05c735757"
+      },
+      {
+        "variant": "dark-portrait",
+        "file": "halo-dark-portrait-v2.webp",
+        "bytes": 86074,
+        "sha256": "b9ea8155fec9f5f85b56a8322da2a4b2591b566961109a2f8465a36a36100bf1"
+      }
+    ],
+    "styleGzipBytes": 287442,
+    "cases": [
+      {
+        "width": 390,
+        "color": "light",
+        "firstFrame": {
+          "theme": "light",
+          "ready": true,
+          "embedded": true,
+          "opacity": "0.95"
+        },
+        "decoded": {
+          "width": 941,
+          "height": 1672
+        },
+        "lateArtworkRequests": 0
+      },
+      {
+        "width": 390,
+        "color": "dark",
+        "firstFrame": {
+          "theme": "dark",
+          "ready": true,
+          "embedded": true,
+          "opacity": "0.68"
+        },
+        "decoded": {
+          "width": 941,
+          "height": 1671
+        },
+        "lateArtworkRequests": 0
+      },
+      {
+        "width": 1440,
+        "color": "light",
+        "firstFrame": {
+          "theme": "light",
+          "ready": true,
+          "embedded": true,
+          "opacity": "1"
+        },
+        "decoded": {
+          "width": 1672,
+          "height": 941
+        },
+        "lateArtworkRequests": 0
+      },
+      {
+        "width": 1440,
+        "color": "dark",
+        "firstFrame": {
+          "theme": "dark",
+          "ready": true,
+          "embedded": true,
+          "opacity": "0.82"
+        },
+        "decoded": {
+          "width": 1672,
+          "height": 941
+        },
+        "lateArtworkRequests": 0
+      },
+      {
+        "navigation": "/about/",
+        "incomingAnimation": true
+      },
+      {
+        "navigation": "/archives/",
+        "incomingAnimation": true
+      },
+      {
+        "navigation": "/photography/",
+        "incomingAnimation": true
+      }
+    ],
+    "errors": []
+  },
+  "background_quality_backup": "/Users/lee/myblog-backups/2026-11-07/background-quality-013853",
+  "publication_report": "publication-2026-11-07.json",
+  "theme_behavior": "Fresh entry and reload follow system preference and ignore legacy localStorage. Manual choice is shared in sessionStorage across same-origin internal navigation. Restored and visible documents resync to the latest visit choice; back/forward must not restore outdated page-specific colors. A system preference change resets to system. Original binary button retained."
+}

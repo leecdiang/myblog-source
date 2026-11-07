@@ -7,9 +7,9 @@
 
 {% block content %}
 
-  {% if theme.studio_design %}<div class="reading-layout"><div class="reading-main">{% endif %}
+  {% if theme.studio_design %}<div class="reading-layout"><aside class="reading-toc" aria-label="文章目录"><details><summary>文章目录</summary><div class="toc-scroll" lang="{{ page.lang or 'zh-CN' }}">{{ toc(page.content, {list_number: false, max_depth: 3}) }}</div><a class="reading-top" href="#main-content">回到文章开头 ↑</a></details></aside><div class="reading-main">{% endif %}
   {{ partial('_macro/post.njk', {post: page}) }}
-  {% if theme.studio_design %}</div><aside class="reading-toc" aria-label="文章目录"><details open><summary>文章目录</summary><div class="toc-scroll" lang="{{ page.lang or 'zh-CN' }}">{{ toc(page.content, {list_number: false, max_depth: 3}) }}</div><a class="reading-top" href="#main-content">回到文章开头 ↑</a></details></aside></div>{% endif %}
+  {% if theme.studio_design %}</div></div>{% endif %}
 
 {% endblock %}
 

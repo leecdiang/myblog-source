@@ -9,6 +9,8 @@
     "clean": "hexo clean",
     "deploy": "hexo deploy",
     "server": "hexo server --ip 127.0.0.1",
+    "check:content": "python3 tools/check-content-output.py",
+    "check:loading": "python3 tools/check-loading-output.py",
     "audit": "npm audit --omit=dev",
     "check:security": "node --test tools/security-regression.test.cjs && python3 tools/check-security-output.py"
   },

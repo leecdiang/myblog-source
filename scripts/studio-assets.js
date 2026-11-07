@@ -8,6 +8,7 @@ const {minify} = require('terser');
 const root = hexo.base_dir;
 let manifest = {};
 let assets = [];
+let themeBootstrap = '';
 
 // Ship only the SVG glyphs used by this site, retaining the existing fa-* API.
 function iconCSS() {
@@ -42,19 +43,36 @@ function iconCSS() {
 hexo.extend.filter.register('before_generate', async () => {
   manifest = {};
   assets = [];
+  const bootstrap = await minify(fs.readFileSync(path.join(root, 'source/js/studio-theme-state.js'), 'utf8'), {
+    compress: {passes: 2}, mangle: true
+  });
+  themeBootstrap = bootstrap.code;
   function add(name, extension, content) {
     const hash = crypto.createHash('sha256').update(content).digest('hex').slice(0, 12);
     const route = `assets/studio/${name}.${hash}.${extension}`;
     manifest[name] = '/' + route;
     assets.push({path: route, data: content});
   }
+  // Keep the original artwork byte-for-byte: shrinking it erases its texture.
+  // Embedding preserves first-paint availability without a late image request.
+  let ambientCSS = ':root{';
+  for (const [name, file] of Object.entries({
+    'light-landscape': 'halo-light-landscape-v9.webp',
+    'light-portrait': 'halo-light-portrait-v9.webp',
+    'dark-landscape': 'halo-dark-landscape-v2.webp',
+    'dark-portrait': 'halo-dark-portrait-v2.webp'
+  })) {
+    const buffer = fs.readFileSync(path.join(root, 'source/images/ambient', file));
+    ambientCSS += `--ambient-${name}:url("data:image/webp;base64,${buffer.toString('base64')}");`;
+  }
+  ambientCSS += '}';
   const css = new CleanCSS({level: 1, rebase: false}).minify(
-    fs.readFileSync(path.join(root, 'source/css/studio.css'), 'utf8') + '\n' + iconCSS()
+    fs.readFileSync(path.join(root, 'source/css/studio.css'), 'utf8') + '\n' + iconCSS() + '\n' + ambientCSS
   );
   if (css.errors.length) throw new Error(css.errors.join('\n'));
   add('style', 'css', css.styles);
   const bundles = {
-    core: ['source/js/site-language.js', 'source/js/studio-motion.js', 'source/js/studio.js'],
+    core: ['source/js/site-language.js', 'source/js/studio-motion.js', 'source/js/studio-navigation.js', 'source/js/studio.js'],
     content: ['themes/next/source/js/config.js', 'themes/next/source/js/utils.js'],
     orrery: ['source/js/studio-orrery-loader.js']
   };
@@ -81,6 +99,7 @@ hexo.extend.generator.register('studio-assets', () => {
   return output;
 });
 hexo.extend.helper.register('studio_asset', name => manifest[name]);
+hexo.extend.helper.register('studio_theme_bootstrap', () => themeBootstrap);
 hexo.extend.helper.register('studio_has_math', page => {
   if (page.mathjax === false) return false;
   if (page.mathjax === true) return true;

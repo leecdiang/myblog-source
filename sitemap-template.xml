@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   {% for post in posts %}
-  {% if post.layout == 'post' %}
+  {% if post.layout == 'post' or post.path == 'about/index.html' or post.path == 'archives/index.html' or post.path == 'photography/index.html' or post.path == 'links/index.html' or post.path == 'categories/index.html' %}
   <url>
     <loc>{{ post.permalink | uriencode }}</loc>
     {% if post.updated %}
@@ -17,7 +17,6 @@
 
   <url>
     <loc>{{ config.url }}/</loc>
-    <lastmod>{{ sNow | formatDate }}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>

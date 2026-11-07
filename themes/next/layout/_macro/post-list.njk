@@ -2,9 +2,9 @@
 {%- for post in posts.toArray() %}
   <a class="cat-list-item" href="{{ url_for(post.path) }}" itemprop="url">
     <span class="cat-list-date">{{ date(post.date, 'YYYY-MM-DD') }}</span>
-    <span class="cat-list-link" itemprop="name">{{ post.title or __('post.untitled') }}</span>
+    <span class="cat-list-link" lang="{{ post.lang }}" itemprop="name">{{ post.title or __('post.untitled') }}</span>
     {%- if post.description %}
-    <span class="cat-list-desc">{{ post.description }}</span>
+    <span class="cat-list-desc" lang="{{ post.lang }}">{{ post.description }}</span>
     {%- endif %}
   </a>
 {%- endfor %}

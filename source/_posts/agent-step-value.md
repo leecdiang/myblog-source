@@ -1,4 +1,5 @@
 ---
+lang: en
 title: "Agent Step Value: When the evaluator changes the value of a step"
 date: 2026-10-14 15:26:00
 categories:
@@ -256,7 +257,7 @@ This study covers 100 PubMed tasks, one actor workflow, and the observed configu
 
 The recording below walks through the audit, the retrieval checks, and the source-only follow-up in about four and a half minutes. All five figures above come from the paper; the explanation follows the workshop slides.
 
-<video controls preload="metadata" playsinline poster="/2026/10/14/agent-step-value/talk-poster.jpg" style="width:100%;height:auto;border-radius:12px;">
+<video controls preload="none" playsinline width="967" height="544" poster="/2026/10/14/agent-step-value/talk-poster.jpg" style="width:100%;height:auto;aspect-ratio:967/544;border-radius:12px;">
   <source src="/2026/10/14/agent-step-value/asv-realm-2026-talk-web.mp4" type="video/mp4">
   Your browser does not support embedded video. <a href="/2026/10/14/agent-step-value/asv-realm-2026-talk-web.mp4">Download the presentation recording.</a>
 </video>

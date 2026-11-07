@@ -1,5 +1,6 @@
 ---
 title: LINKS
+description: 朋友的网站，以及常用的研究资料与工具。
 date: 2025-10-11 12:00:00
 type: "links"
 comments: false

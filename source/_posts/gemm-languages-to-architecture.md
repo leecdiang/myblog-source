@@ -123,7 +123,7 @@ def benchmark(fn, repeat):
         t0 = time.perf_counter()
         fn()
         samples.append(time.perf_counter() - t0)
-    return statistics.median(samples)
+    return np.asarray(samples) * 1e3
 
 np.testing.assert_allclose(
     python_loop(), numpy_blas(), rtol=1e-10, atol=1e-10
@@ -133,9 +133,13 @@ for name, fn, repeat in [
     ("Python loop", python_loop, 3),
     ("NumPy @", numpy_blas, 50),
 ]:
-    t = benchmark(fn, repeat)
-    gflops = (2 * N**3) / t / 1e9
-    print(f"{name:12s}: {t*1e3:9.3f} ms | {gflops:8.3f} GFLOP/s")
+    samples_ms = benchmark(fn, repeat)
+    median_ms = statistics.median(samples_ms)
+    q25, q75 = np.percentile(samples_ms, [25, 75], method="linear")
+    gflops = (2 * N**3) / median_ms / 1e6
+    print(f"{name}: repeats={repeat}, median_ms={median_ms:.3f}, "
+          f"iqr_ms={q75-q25:.3f}, min_ms={min(samples_ms):.3f}, "
+          f"max_ms={max(samples_ms):.3f}, median_gflops={gflops:.3f}")
 ```
 
 运行前可以限制 BLAS 线程数，让单线程比较更容易解释：
@@ -537,7 +541,7 @@ CPU 上的 Blocking 是在软件中安排数据复用；专用加速器则可以
 
 首先统一输入的维度、FP64 精度、存储布局和线程数量；再区分是否包含内存分配、JIT 首次编译、数据打包或 CPU/GPU 数据传输；之后才是计时与性能分析。
 
-多次运行应报告中位数和离散程度，并保留编译器版本、编译选项及 BLAS 后端信息。对于 CPU，可以结合 `perf` 或其他性能计数器观察周期数、指令数、缓存行为和硬件资源利用情况。
+多次运行应报告中位数和离散程度，并保留编译器版本、编译选项及 BLAS 后端信息。下载附件中的 C 与 Python 脚本默认各重复 5 次，均输出原始样本、`repeats`、`median_ms`、`iqr_ms`、`min_ms`、`max_ms`、`best_ms` 和按中位耗时计算的 `median_gflops`。IQR 为第 75 与第 25 百分位数之差，按排序后位置 `(n-1)×q` 线性插值；`best_ms` 单独表示最小耗时。运行环境写入标准错误流，可与结果一并保存；附件 README 给出完整命令。对于 CPU，可以结合 `perf` 或其他性能计数器观察周期数、指令数、缓存行为和硬件资源利用情况。
 
 计算吞吐通常使用：
 

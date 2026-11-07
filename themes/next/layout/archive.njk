@@ -40,7 +40,7 @@
             <h2 id="archive-year-{{ year }}">{{ year }} <span>{{ post_count(year) }} 篇</span></h2>
             <ul class="btc-archive-list">
         {% endif %}
-              <li{% if theme.studio_design %} data-section="{{ studio_section(post) }}"{% endif %}>
+              <li{% if theme.studio_design %} data-section="{{ studio_section(post) }}" data-search-tags="{% for tag in post.tags.toArray() %}{{ tag.name | escape }} {% endfor %}"{% endif %}>
                 <a class="btc-archive-row" href="{{ url_for(post.link or post.path) }}">
                   <time datetime="{{ moment(post.date).format() }}" aria-label="{{ date(post.date, 'YYYY年MM月DD日') }}">{{ date(post.date, 'MM.DD') }}</time>
                   <span class="archive-copy" lang="{{ post.lang or 'zh-CN' }}"><span class="btc-archive-title">{{ post.title or __('post.untitled') }}{% if post.link %} <i class="fa fa-external-link-alt" aria-label="外部文章"></i>{% endif %}</span>{% if theme.studio_design and post.description %}<span class="archive-excerpt">{{ post.description }}</span>{% endif %}</span>

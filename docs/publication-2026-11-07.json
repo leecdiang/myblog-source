@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-07",
+  "timezone": "Asia/Shanghai",
+  "site": "https://leecdiang.com/",
+  "commit": "d50d3ec57996e35d8b8a1c8a217a166c884f51ad",
+  "previous_commit": "a96126390418fd26d17225e0f549d705ba4448b5",
+  "pages_status": "built",
+  "pages_build_updated_at": "2026-11-07T05:58:52Z",
+  "stylesheet": "/assets/studio/style.52c0b1e4a64b.css",
+  "core": "/assets/studio/core.ae3ac3a45b5e.js",
+  "reviewed_output_matches_deployment": true,
+  "scope": "About dark artwork uses the approved midpoint shadow lift (#0c1116 screen floor and rgba(29,38,49,.32) reading plane). Ash Studio uses its unchanged original SVG as a mask colored by the selected website theme: light brown #402712, dark beige #dcc9b1. Original artwork bytes, logo geometry, theme and navigation runtime unchanged.",
+  "validation": {
+    "live_theme_states": 12,
+    "widths": [
+      390,
+      1440
+    ],
+    "system_themes": [
+      "light",
+      "dark"
+    ],
+    "website_theme_sequence": [
+      "light",
+      "dark",
+      "light"
+    ],
+    "visible_logo_pixels_verified": true,
+    "logo_dimensions_px": {
+      "mobile": 30,
+      "desktop": 36
+    },
+    "live_stylesheet_equals_generated": true,
+    "live_svg_equals_original": true,
+    "navigation_theme_smoke": "retained About to Archives and back; uplift remains About-only",
+    "javascript_errors": [],
+    "native_safari": "Fresh live About loaded the new accessible Ash mark; native theme button changed light to dark and back. Native screenshot was too small for detailed visual assessment; visual and pixel assertions use Chrome."
+  },
+  "theme_behavior": "Fresh entry and reload follow system preference and ignore legacy localStorage. Manual choice is shared in sessionStorage across same-origin internal navigation. Restored and visible documents resync to the latest visit choice; back/forward must not restore outdated page-specific colors. A system preference change resets to system. Original binary button retained.",
+  "qa_artifacts": "/Users/lee/Documents/ChatGPT/leecdiang.com/work/qa/about-midpoint-ash-20261107/release",
+  "previous_publication": {
+    "date": "2026-11-07",
+    "timezone": "Asia/Shanghai",
+    "site": "https://leecdiang.com/",
+    "commit": "a96126390418fd26d17225e0f549d705ba4448b5",
+    "previous_commit": "0c0d58f236b74ad2cdfe38f512d3c4b33b4d48f8",
+    "pages_status": "built",
+    "pages_build_updated_at": "2026-11-07T05:26:02Z",
+    "stylesheet": "/assets/studio/style.355e9e821708.css",
+    "core": "/assets/studio/core.ae3ac3a45b5e.js",
+    "reviewed_output_matches_deployment": true,
+    "scope": "Homepage About retains a filled 4px corner button; Articles and Photography are text links with fine underlines. Shared 44px target heights and responsive spacing; no theme/navigation runtime change.",
+    "validation": {
+      "live_layout_cases": 20,
+      "widths": [
+        320,
+        390,
+        701,
+        768,
+        1440
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "languages": [
+        "zh",
+        "en"
+      ],
+      "live_stylesheet_equals_generated": true,
+      "navigation_theme_smoke": "dark retained to About and back; refresh resets to system light",
+      "javascript_errors": []
+    },
+    "theme_behavior": "Fresh entry and reload follow system preference and ignore legacy localStorage. Manual choice is shared in sessionStorage across same-origin internal navigation. Restored and visible documents resync to the latest visit choice; back/forward must not restore outdated page-specific colors. A system preference change resets to system. Original binary button retained.",
+    "qa_artifacts": "/Users/lee/Documents/ChatGPT/leecdiang.com/work/qa/home-actions-simple-20261107/release",
+    "previous_functional_release": {
+      "commit": "0c0d58f236b74ad2cdfe38f512d3c4b33b4d48f8",
+      "validation": {
+        "sitewide_route_history_native_keyboard_reduced_motion_cases": 4,
+        "first_document_theme_snapshots": 24,
+        "theme_cycles": 44,
+        "theme_states": 132,
+        "lazy_orrery_panel_canvas_and_menu_cases": 2,
+        "navigation_checks": 21,
+        "byte_identical_original_backgrounds": 4,
+        "background_viewport_theme_cases": 4,
+        "javascript_errors": []
+      },
+      "core": "/assets/studio/core.ae3ac3a45b5e.js"
+    },
+    "limits": "Chrome desktop/mobile viewport simulations; no physical-phone or Safari/Firefox claim."
+  },
+  "limits": "Chrome desktop/mobile viewport simulations; native Safari HTML/theme-toggle smoke only. No physical-phone or Firefox claim."
+}

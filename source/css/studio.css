@@ -376,8 +376,8 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 @media(min-width:701px) and (prefers-reduced-motion:no-preference){
  .studio-halo{--halo-scale:1.11;--halo-x:2.4%;--halo-y:-1.4%;--halo-duration:12s}
  .studio-halo.studio-reading{--halo-scale:1.04;--halo-x:.8%;--halo-y:-.5%;--halo-duration:24s}
- :root[data-color=light] .studio-halo .ambient-art--light.is-ready img,
- :root[data-color=dark] .studio-halo .ambient-art--dark.is-ready img{animation:studio-halo-drift var(--halo-duration) ease-in-out infinite alternate;transform-origin:35% 50%}
+ :root[data-color=light] .studio-halo .ambient-art--light.is-ready,
+ :root[data-color=dark] .studio-halo .ambient-art--dark.is-ready{animation:studio-halo-drift var(--halo-duration) ease-in-out infinite alternate;animation-delay:var(--halo-phase,0ms);transform-origin:35% 50%}
 }
 @keyframes studio-halo-drift{
  from{transform:scale(1.012) translate3d(0,0,0)}
@@ -441,7 +441,6 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .archive-empty button{min-height:44px;padding:8px 16px;margin-top:16px;border:1px solid var(--line);border-radius:3px;background:var(--paper);color:var(--heading);cursor:pointer}
 .archive-reset:focus-visible,.archive-empty button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .btc-archive-row:focus-visible{background:transparent;outline-offset:5px}
-.btc-archive-row:focus-visible .btc-archive-title{text-decoration:underline;text-underline-offset:4px}
 .links-directory .friend-card,.links-directory .btc-link-card{min-width:0}
 .links-directory .friend-copy,.links-directory .btc-link-copy{min-width:0;overflow-wrap:anywhere}
 .links-directory .friend-arrow,.links-directory .btc-link-arrow{transition:transform var(--ui-duration) var(--ui-ease),color var(--ui-duration) var(--ui-ease)}
@@ -449,7 +448,6 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .post-title,.organization-heading h3{ text-wrap:pretty }
 @media(hover:hover) and (pointer:fine){
  .language-toggle:hover{background:var(--surface);border-color:var(--line)}
- .btc-archive-row:hover .btc-archive-title{text-decoration:underline;text-underline-offset:4px}
  .links-directory .friend-card:hover .friend-arrow,.links-directory .btc-link-card:hover .btc-link-arrow{transform:translate(2px,-2px);color:var(--accent)}
  .about-section-nav a:hover{color:var(--heading);text-decoration:underline;text-underline-offset:6px}
 }
@@ -479,7 +477,6 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
  .archive-categories button:hover{background:var(--state-hover);color:var(--heading)}
  .archive-categories button[aria-pressed=true]:hover{background:var(--state-selected)}
  .btc-archive-row:hover::before{opacity:1}
- .btc-archive-row:hover .btc-archive-title{text-decoration-thickness:1px;text-decoration-color:var(--state-line);text-underline-offset:5px}
  .theme-toggle:hover,.language-toggle:hover{background:var(--state-hover);border-color:transparent}
 }
 :root[data-input=keyboard] .archive-categories button,:root[data-input=keyboard] .btc-archive-row::before{transition:none}
@@ -612,3 +609,144 @@ body .btc-orrery-modal :is(button,input,select):focus-visible{outline:2px solid 
 @media(max-width:420px){.post-body .arch-controls--four{grid-template-columns:1fr}}
 
 @media(max-width:700px){.post-body .arch-map .v-chart-viewport svg{min-width:720px}}
+
+/* V2: multi-level roofline, AMAT, formula-linked chip map */
+.post-body .arch-controls--three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.post-body .arch-levels{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.post-body .arch-levels button{min-height:36px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font-size:11px;cursor:pointer}
+.post-body .arch-levels button:hover{border-color:var(--accent);color:var(--accent)}
+.post-body .arch-levels button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.post-body #ml-plot{display:block;min-width:600px;width:100%;height:auto;padding:10px 0}
+.post-body #ml-plot text{fill:var(--muted);font:11px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace}
+.post-body #ml-plot .ml-grid path{fill:none;stroke:var(--figure-line);stroke-width:1}
+.post-body #ml-plot .ml-roof{fill:none;stroke-width:1.6;opacity:.32;stroke-linecap:round}
+.post-body #ml-plot .ml-l1{stroke:var(--chart-blue)}
+.post-body #ml-plot .ml-l2{stroke:var(--chart-teal)}
+.post-body #ml-plot .ml-llc{stroke:var(--chart-amber)}
+.post-body #ml-plot .ml-hbm{stroke:var(--chart-red)}
+.post-body #ml-plot .ml-roof.is-active{stroke-width:3.2;opacity:1}
+.post-body #ml-plot .ml-dot{fill:var(--chart-red);stroke:var(--paper);stroke-width:3}
+.post-body #ml-plot #ml-point-label{fill:var(--heading);font-weight:600}
+.post-body #amat-bars .mem-bar:first-child i{background:var(--chart-blue)}
+.post-body #amat-bars .mem-bar--alt i{background:var(--chart-red)}
+.post-body .arch-map-picker{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 8px}
+.post-body .arch-map-picker button{min-height:34px;padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font-size:11px;cursor:pointer}
+.post-body .arch-map-picker button:hover{border-color:var(--accent);color:var(--accent)}
+.post-body .arch-map-picker button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.post-body .arch-map-note{margin:0 0 8px;color:var(--muted);font-size:12px;line-height:1.6}
+.post-body .arch-map[data-map-active] .am-block,.post-body .arch-map[data-map-active] .am-core,.post-body .arch-map[data-map-active] .am-tag{opacity:.25;transition:opacity .2s ease}
+.post-body .arch-map[data-map-active="roofline"] .am-gpu,.post-body .arch-map[data-map-active="roofline"] .am-matrix,.post-body .arch-map[data-map-active="roofline"] .am-mem,.post-body .arch-map[data-map-active="roofline"] .am-cache{opacity:1;stroke-width:2.5}
+.post-body .arch-map[data-map-active="amdahl"] .am-cpu{opacity:1;stroke-width:2.5}
+.post-body .arch-map[data-map-active="cpi"] .am-cpu{opacity:1;stroke-width:2.5}
+.post-body .arch-map[data-map-active="bdp"] .am-mem,.post-body .arch-map[data-map-active="bdp"] .am-noc{opacity:1;stroke-width:2.5}
+.post-body .arch-map[data-map-active] .am-block[class*="am-"][style]{transition:opacity .2s ease}
+@media(prefers-reduced-motion:no-preference){.post-body .arch-map[data-map-active="roofline"] .am-gpu,.post-body .arch-map[data-map-active="roofline"] .am-matrix,.post-body .arch-map[data-map-active="roofline"] .am-mem,.post-body .arch-map[data-map-active="amdahl"] .am-cpu,.post-body .arch-map[data-map-active="cpi"] .am-cpu,.post-body .arch-map[data-map-active="bdp"] .am-mem,.post-body .arch-map[data-map-active="bdp"] .am-noc{stroke-dasharray:7 5;animation:am-flow 1.4s linear infinite}}
+@keyframes am-flow{to{stroke-dashoffset:-24}}
+@media(max-width:700px){.post-body .arch-controls--three{grid-template-columns:1fr}.post-body .arch-levels button{font-size:10px;padding:6px 8px}.post-body .arch-map-picker button{font-size:10px;padding:5px 9px}}
+
+/* V3 dark chip map contrast */
+:root[data-color=dark] .post-body .arch-map .am-die{fill:rgba(23,31,43,.62);stroke:rgba(178,195,216,.30)}
+:root[data-color=dark] .post-body .arch-map .am-block{fill:rgba(39,53,69,.88);stroke:rgba(145,189,233,.62);stroke-width:1.4}
+:root[data-color=dark] .post-body .arch-map .am-core{fill:rgba(145,189,233,.16);stroke:rgba(178,195,216,.38)}
+:root[data-color=dark] .post-body .arch-map .am-cache{fill:rgba(39,53,69,.94)}
+
+/* Reading geometry is shared across palettes. */
+:root[data-color] body.studio-reading .reading-main .post-body{font-size:18px;line-height:1.9}
+:root[data-color] body.studio-reading .post-body>p{margin-bottom:1.45em}
+:root[data-color] body.studio-reading :is(.post-meta-container,.post-description,.reading-breadcrumb,.reading-byline){font-size:13px}
+:root[data-color] body.studio-reading .reading-toc,:root[data-color] body.studio-reading .reading-toc .toc-scroll a{font-size:13px}
+:root[data-color] body.studio-reading .post-body :is(pre,code,table){font-size:14px}
+@media(min-width:1100px){:root[data-color] body.studio-reading .studio-main.post{max-width:1046px}:root[data-color] body.studio-reading .reading-layout{grid-template-columns:minmax(0,700px) minmax(0,210px);gap:48px}}
+@media(max-width:700px){:root[data-color] body.studio-reading .reading-main .post-body{font-size:16px}}
+.home-latest{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:26px 0 0;font-size:12px;line-height:1.65;color:var(--muted);max-width:36em}
+.home-latest time{font-variant-numeric:tabular-nums}.home-latest-title{grid-column:1/-1;color:var(--ink);text-wrap:pretty}
+@media(max-width:700px){.studio-home .home-latest{margin-top:18px;font-size:11px;color:#dce5ee}.studio-home .home-latest-title{color:#edf1f6}}
+.post-body .arch-preset{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:16px;font-size:12px;color:var(--muted)}
+.post-body .arch-preset select{min-height:44px;max-width:100%;padding:8px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:6px;font:inherit}
+.post-body .arch-flow-table{font-size:12px}.post-body .arch-flow-table caption{text-align:left;font-size:12px;color:var(--muted);padding-bottom:8px}
+.post-body #ml-plot .ml-dot{fill:var(--paper)}
+.post-body #ml-plot .ml-dot.ml-l1{stroke:var(--chart-blue)}.post-body #ml-plot .ml-dot.ml-l2{stroke:var(--chart-teal)}.post-body #ml-plot .ml-dot.ml-llc{stroke:var(--chart-amber)}.post-body #ml-plot .ml-dot.ml-hbm{stroke:var(--chart-red)}
+.photo-original{display:block;width:fit-content;max-width:100%;margin:22px auto;color:var(--muted);font-size:12px;text-align:center}
+.post-body .photo-original img{margin:0 auto 6px}.photo-original-label{display:block;padding:4px}
+.error-page{max-width:700px;margin:50px auto 90px}.error-code{font:14px/1.5 ui-monospace,monospace;color:var(--muted)}.error-page h1{font-size:36px}.error-page nav{display:flex;flex-wrap:wrap;gap:24px;margin-top:28px}
+
+body.studio-reading .post-copyright a{overflow-wrap:anywhere;word-break:break-word}
+@media(min-width:701px) and (max-width:1099px){.archive-reading-plane::before,.about-editorial .about-details::before{left:-24px;right:-24px}}
+.post-body :is(.arch-plot-wrap,.table-container,mjx-container[display="true"]):focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* A portable document hand-off, including browsers without View Transitions. */
+@view-transition{navigation:none}
+@keyframes studio-content-enter{from{opacity:0;transform:translate3d(0,14px,0)}to{opacity:1;transform:none}}
+:root[data-route-enter] .studio-main{animation:studio-content-enter 420ms cubic-bezier(.22,1,.36,1) both}
+:root[data-route-leaving] .studio-main{pointer-events:none}
+:root[data-theme-changing] :is(body,.studio-content-plane,.post-body .v-figure,.archive-search input,.theme-toggle,.language-toggle){transition:background-color 180ms ease,color 160ms ease,border-color 160ms ease}
+:root[data-theme-changing] .post-body :is(.v-ink,.v-sub,.v-muted){transition:fill 160ms ease}
+.home-photo picture{display:contents}
+@media(prefers-reduced-motion:reduce){
+ @view-transition{navigation:none}
+ ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
+}
+
+/* Put the TOC in source order before the article, reserving its first-paint space. */
+@media(min-width:1100px){.reading-main{grid-column:1;grid-row:1}.reading-toc{grid-column:2;grid-row:1}}
+@media(max-width:1099px){.reading-layout{flex-direction:column}}
+
+/* One atmosphere, present from the stylesheet's first frame. */
+.ambient-art{background-size:cover;background-position:left center;background-repeat:no-repeat}
+.ambient-art--light{background-image:var(--ambient-light-landscape)}
+.ambient-art--dark{background-image:var(--ambient-dark-landscape)}
+@media(orientation:portrait){.ambient-art--light{background-image:var(--ambient-light-portrait)}.ambient-art--dark{background-image:var(--ambient-dark-portrait)}}
+:root{--motion-fast:150ms;--motion-medium:240ms;--motion-ease:cubic-bezier(.22,1,.36,1)}
+.studio-header nav a,.studio-footer a,.home-actions a,.glass-pill,.btn,.photo-series-item figure,.research-figure>a{transition:transform var(--motion-medium) var(--motion-ease),color var(--motion-fast) ease,background-color var(--motion-fast) ease,border-color var(--motion-fast) ease,box-shadow var(--motion-medium) ease}
+.home-actions span,.photo-series-item>div>span span{display:inline-block;transition:transform var(--motion-medium) var(--motion-ease)}
+.reading-toc summary{list-style:none;display:flex;align-items:center;gap:9px}
+.reading-toc summary::-webkit-details-marker{display:none}
+.reading-toc summary::before{content:'';width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform var(--motion-medium) var(--motion-ease);flex:0 0 auto}
+.reading-toc details[open] summary::before{transform:rotate(45deg)}
+@media(hover:hover) and (pointer:fine){
+ .studio-header nav a:hover,.studio-footer a:hover{transform:translateY(-2px)}
+ .home-actions a:hover{opacity:1;transform:translateY(-2px)}
+ .home-actions a:hover span{transform:translate(3px,-3px)}
+ .photo-series-item:hover figure img{transform:scale(1.025)}
+ .photo-series-item:hover>div>span span{transform:translate(3px,-3px)}
+ .glass-pill:hover,.btn:hover{transform:translateY(-2px);border-color:var(--accent)}
+ .research-figure>a:hover{transform:translateY(-2px);box-shadow:0 8px 22px -16px var(--accent)}
+}
+:root[data-input=pointer] :is(.glass-pill,.btn,.arch-reset,.arch-levels button,.arch-map-picker button):active{transform:scale(.975)}
+:root[data-input=keyboard] .reading-toc summary::before{transition:none}
+@media(prefers-reduced-motion:reduce){
+ :root[data-route-enter] .studio-main{animation:none!important}
+ .studio-header nav a,.studio-footer a,.home-actions a,.home-actions span,.glass-pill,.btn,.photo-series-item figure,.photo-series-item figure img,.photo-series-item>div>span span,.research-figure>a,.reading-toc summary::before{transition:none!important;transform:none!important}
+}
+
+:root[data-input=keyboard] :is(.arch-map .am-block,.arch-map .am-core,.arch-map .am-tag,.arch-amdahl-track span,.mem-bar i){transition:none!important}
+@media(prefers-reduced-motion:reduce){.arch-map .am-block,.arch-map .am-core,.arch-map .am-tag,.mem-bar i{transition:none!important}}
+
+/* Keep one primary action; the other entrances remain simple text links. */
+:root .studio-home .home-actions{gap:24px}
+:root .studio-home .home-actions a{min-height:44px;gap:12px;padding:10px 0;line-height:1.4;white-space:nowrap}
+:root .studio-home .home-actions a.home-primary{padding:10px 16px;border-radius:4px}
+:root .studio-home .home-actions span{margin-left:0}
+@media(min-width:701px) and (max-width:1000px){
+ :root .studio-home .home-actions{gap:20px;font-size:12px}
+ :root .studio-home .home-actions a{gap:8px}
+ :root .studio-home .home-actions a.home-primary{padding-left:12px;padding-right:12px}
+}
+@media(max-width:700px){
+ :root .studio-home .home-actions{gap:20px}
+ :root .studio-home .home-actions a{gap:8px}
+ :root .studio-home .home-actions a.home-primary,:root[data-color=dark] .studio-home .home-actions a.home-primary{padding:10px 12px;background:#e4ebf5;color:#142d50;border:1px solid #e4ebf5;border-radius:4px}
+}
+@media(max-width:360px){
+ :root .studio-home .home-actions{gap:14px;font-size:11px}
+ :root .studio-home .home-actions a{gap:6px}
+ :root .studio-home .home-actions a.home-primary,:root[data-color=dark] .studio-home .home-actions a.home-primary{padding-left:10px;padding-right:10px}
+}
+
+/* About in dark mode: lift the artwork's shadow floor, retaining its grain. */
+.studio-about .ambient-art--dark{background-color:#0c1116;background-blend-mode:screen}
+:root[data-color=dark] .studio-about .about-editorial .about-details{--reading-plane:rgba(29,38,49,.32)}
+
+/* This monochrome mark follows the selected page theme, including manual toggles. */
+.studio-about .organization-mark .organization-logo--ash{color:#402712;background:currentColor;-webkit-mask:url('/images/organizations/ash-studio.svg') center/contain no-repeat;mask:url('/images/organizations/ash-studio.svg') center/contain no-repeat}
+:root[data-color=dark] .studio-about .organization-logo--ash{color:#dcc9b1}

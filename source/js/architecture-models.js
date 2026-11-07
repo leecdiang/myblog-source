@@ -5,17 +5,17 @@
     if(!peak||!bw||!intensity)return;
     var p=+peak.value, b=+bw.value, i=+intensity.value, ridge=p*1000/b;
     var x=function(v){return 75+(Math.log2(v/.25)/8)*605};
-    var y=function(v){return 270-(Math.log10(v/.1)/2)*230};
+    var y=function(v){return 270-Math.log10(v/.005)/Math.log10(8/.005)*230};
     var roof=$('rf-roof'), band=$('rf-band'), dot=$('rf-dot');
     var knee=Math.max(.25,Math.min(64,ridge));
-    roof.setAttribute('d','M'+x(.25)+' '+y(Math.min(10,.25*b/1000))+' L'+x(knee)+' '+y(Math.min(10,knee*b/1000))+' L'+x(64)+' '+y(Math.min(p,64*b/1000)));
-    band.setAttribute('d','M'+x(.25)+' 270 L'+x(.25)+' '+y(Math.min(10,.25*b/1000))+' L'+x(knee)+' '+y(Math.min(10,knee*b/1000))+' L'+x(knee)+' 270 Z');
-    $('rf-ridge').setAttribute('x1',x(knee));$('rf-ridge').setAttribute('x2',x(knee));
-    $('rf-ridge-label').setAttribute('x',Math.min(650,Math.max(110,x(knee))));$('rf-ridge-label').setAttribute('y',52);$('rf-ridge-label').textContent='ridge '+ridge.toFixed(1)+' FLOP/Byte';
-    var perf=Math.min(p,i*b/1000);dot.setAttribute('cx',x(i));dot.setAttribute('cy',y(Math.max(.1,Math.min(10,perf))));
-    $('rf-point-label').setAttribute('x',Math.min(600,x(i)+10));$('rf-point-label').setAttribute('y',y(Math.max(.1,Math.min(10,perf)))-12);$('rf-point-label').textContent=perf.toFixed(2)+' TFLOP/s 上界';
+    roof.setAttribute('d','M'+x(.25)+' '+y(Math.min(p,.25*b/1000))+' L'+x(knee)+' '+y(Math.min(p,knee*b/1000))+' L'+x(64)+' '+y(Math.min(p,64*b/1000)));
+    band.setAttribute('d','M'+x(.25)+' 270 L'+x(.25)+' '+y(Math.min(p,.25*b/1000))+' L'+x(knee)+' '+y(Math.min(p,knee*b/1000))+' L'+x(knee)+' 270 Z');
+    $('rf-ridge').style.display=ridge<.25||ridge>64?'none':'';$('rf-ridge').setAttribute('x1',x(knee));$('rf-ridge').setAttribute('x2',x(knee));
+    $('rf-ridge-label').setAttribute('x',Math.min(650,Math.max(110,x(knee))));$('rf-ridge-label').setAttribute('y',52);$('rf-ridge-label').textContent='ridge '+ridge.toFixed(1)+' FLOP/Byte'+(ridge<.25||ridge>64?'（图外）':'');
+    var perf=Math.min(p,i*b/1000);dot.setAttribute('cx',x(i));dot.setAttribute('cy',y(perf));
+    $('rf-point-label').setAttribute('x',Math.min(600,x(i)+10));$('rf-point-label').setAttribute('y',y(perf)-12);$('rf-point-label').textContent=perf.toPrecision(3)+' TFLOP/s 上界';
     $('rf-peak-out').textContent=p.toFixed(1)+' TFLOP/s';$('rf-bw-out').textContent=b+' GB/s';$('rf-int-out').textContent=i.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')+' FLOP/Byte';
-    $('rf-result').textContent='当前工作负载的 Roofline 上界约为 '+perf.toFixed(2)+' TFLOP/s，受'+(i<ridge?'带宽':'计算')+'屋顶限制。ridge point ≈ '+ridge.toFixed(1)+' FLOP/Byte。';
+    $('rf-result').textContent='当前工作负载的 Roofline 上界约为 '+perf.toPrecision(3)+' TFLOP/s，受'+(i<ridge?'带宽':'计算')+'屋顶限制。ridge point ≈ '+ridge.toFixed(1)+' FLOP/Byte。';
   }
   [peak,bw,intensity].forEach(function(el){el&&el.addEventListener('input',roof)});
   var ams=$('am-s'), amk=$('am-k');
@@ -31,7 +31,7 @@
     if(!mb||!ml||!mn||!ms)return;
     var B=+mb.value,L=+ml.value,N=+mn.value,S=+ms.value;
     var bdp=B*L, have=N*S, ach=Math.min(B,N*S/L), util=B?ach/B*100:0;
-    var fmt=function(v){return v>=1024?(v/1024).toFixed(1)+' KB':v.toFixed(0)+' B'};
+    var fmt=function(v){return v>=1000?(v/1000).toFixed(1)+' KB':v.toFixed(0)+' B'};
     $('mem-bw-out').textContent=B+' GB/s';
     $('mem-lat-out').textContent=L+' ns';
     $('mem-n-out').textContent=N;
@@ -44,32 +44,39 @@
   }
   [mb,ml,mn,ms].forEach(function(el){el&&el.addEventListener('input',mem)});
   mem();
-var mlPeak=$('ml-peak'), mlInt=$('ml-int');
+  var mlPeak=$('ml-peak'), mlInt=$('ml-int'), mlPreset=$('ml-preset');
   var mlLevels={l1:2000,l2:800,llc:300,hbm:100};
   var mlNames={l1:'L1',l2:'L2',llc:'LLC',hbm:'HBM'};
+  var mlReuse={stream:[1,1,1,1],llc:[1,1,1,16],l2:[1,1,8,64]};
   var mlActive='hbm';
-  function mlX(v){return 75+(Math.log2(v/.25)/9)*600}
-  function mlY(v){return 300-(Math.log10(v/.1)/Math.log10(200))*260}
+  function mlX(v){return 75+Math.log2(v/.25)/15*600}
+  function mlY(v){return 280-Math.log10(v/.005)/Math.log10(24/.005)*240}
   function mlRoof(){
-    if(!mlPeak||!mlInt)return;
-    var p=+mlPeak.value, I=+mlInt.value, best=Infinity, bestName='计算';
-    Object.keys(mlLevels).forEach(function(k){
+    if(!mlPeak||!mlInt||!mlPreset)return;
+    var p=+mlPeak.value, I=+mlInt.value, ratios=mlReuse[mlPreset.value];
+    var best=p, limits=[], rows=[];
+    Object.keys(mlLevels).forEach(function(k,index){
       var b=mlLevels[k], knee=p*1000/b, path;
-      if(knee<=.25){path='M'+mlX(.25)+' '+mlY(p)+' L'+mlX(128)+' '+mlY(p)}
-      else if(knee>=128){path='M'+mlX(.25)+' '+mlY(.25*b/1000)+' L'+mlX(128)+' '+mlY(128*b/1000)}
-      else{path='M'+mlX(.25)+' '+mlY(.25*b/1000)+' L'+mlX(knee)+' '+mlY(p)+' L'+mlX(128)+' '+mlY(p)}
-      var el=$('ml-roof-'+k); if(el){el.setAttribute('d',path);el.classList.toggle('is-active',k===mlActive)}
-      var perf=Math.min(p,I*b/1000);
-      if(perf<best){best=perf;bestName=mlNames[k]}
+      var x0=.25, x1=8192;
+      if(knee<=x0){path='M'+mlX(x0)+' '+mlY(p)+' L'+mlX(x1)+' '+mlY(p)}
+      else if(knee>=x1){path='M'+mlX(x0)+' '+mlY(x0*b/1000)+' L'+mlX(x1)+' '+mlY(x1*b/1000)}
+      else{path='M'+mlX(x0)+' '+mlY(x0*b/1000)+' L'+mlX(knee)+' '+mlY(p)+' L'+mlX(x1)+' '+mlY(p)}
+      var el=$('ml-roof-'+k);el.setAttribute('d',path);el.classList.toggle('is-active',k===mlActive);
+      var layerI=I*ratios[index], perf=Math.min(p,layerI*b/1000);
+      best=Math.min(best,perf);limits.push({key:k,perf:perf});
+      var dot=$('ml-dot-'+k);dot.setAttribute('cx',mlX(layerI));dot.setAttribute('cy',mlY(perf));
+      dot.setAttribute('r',k===mlActive?7:4);dot.setAttribute('aria-label',mlNames[k]+': I='+layerI+', 上界 '+perf.toPrecision(3)+' TFLOP/s');
+      rows.push('<tr><th scope="row">'+mlNames[k]+'</th><td>'+(1000/layerI).toFixed(3)+'</td><td>'+layerI.toFixed(2)+'</td><td>'+perf.toPrecision(3)+'</td></tr>');
+      if(k===mlActive){
+        var label=$('ml-point-label');label.setAttribute('x',Math.min(460,mlX(layerI)+10));label.setAttribute('y',mlY(perf)-12);label.textContent=mlNames[k]+' '+perf.toPrecision(3)+' TFLOP/s';
+      }
     });
-    var activePerf=Math.min(p,I*mlLevels[mlActive]/1000);
-    var dot=$('ml-dot'); if(dot){dot.setAttribute('cx',mlX(I));dot.setAttribute('cy',mlY(Math.max(.1,Math.min(20,activePerf))))}
-    var label=$('ml-point-label'); if(label){label.setAttribute('x',Math.min(620,mlX(I)+10));label.setAttribute('y',mlY(Math.max(.1,Math.min(20,activePerf)))-12);label.textContent=mlNames[mlActive]+' '+activePerf.toFixed(2)+' TFLOP/s'}
-    $('ml-peak-out').textContent=p.toFixed(1)+' TFLOP/s';
-    $('ml-int-out').textContent=(I%1?I.toFixed(2):I.toFixed(0))+' FLOP/Byte';
-    $('ml-result').textContent='当前 I='+(I%1?I.toFixed(2):I.toFixed(0))+'，'+mlNames[mlActive]+' 屋顶约 '+activePerf.toFixed(2)+' TFLOP/s；四层中最低的是 '+bestName+'（'+best.toFixed(2)+' TFLOP/s）。';
+    $('ml-flows').innerHTML=rows.join('');
+    $('ml-peak-out').textContent=p.toFixed(1)+' TFLOP/s';$('ml-int-out').textContent=I.toFixed(2)+' FLOP/Byte';
+    var bound=best===p?'计算峰值':limits.filter(function(l){return Math.abs(l.perf-best)<1e-10}).map(function(l){return mlNames[l.key]}).join(' / ');
+    $('ml-result').textContent='各层使用 I=W/Q，简化整体上界为 '+best.toPrecision(3)+' TFLOP/s，限制项：'+bound+'。'+(mlPreset.value==='stream'?'当前假设各层流量相同，适合比较带宽上界；不代表所有真实程序。':'缓存复用减少下层流量，因此四层工作点的横坐标不同。');
   }
-  [mlPeak,mlInt].forEach(function(el){el&&el.addEventListener('input',mlRoof)});
+  [mlPeak,mlInt,mlPreset].forEach(function(el){el&&el.addEventListener('input',mlRoof)});
   document.querySelectorAll('#multi-roofline-lab [data-level]').forEach(function(btn){btn.addEventListener('click',function(){mlActive=btn.dataset.level;document.querySelectorAll('#multi-roofline-lab [data-level]').forEach(function(b){b.setAttribute('aria-pressed',String(b===btn))});mlRoof()})});
   if(mlPeak) mlRoof();
   var ah=$('amat-hit'), amr=$('amat-miss'), ap=$('amat-penalty');

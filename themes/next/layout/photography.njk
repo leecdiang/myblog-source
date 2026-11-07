@@ -6,7 +6,7 @@
 <header class="section-heading gallery-heading"><h1>摄影</h1><p>{{ stories.length }} 组作品</p></header>
 <div class="photo-series">
 {% for story in stories %}
-<a class="photo-series-item" href="{{ url_for(story.path) }}"><figure><img src="{{ story.cover }}" alt="{{ escape_html(story.title) }}" width="{{ story.width }}" height="{{ story.height }}" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async"></figure><div><h2>{{ story.title }}</h2><span>{{ date(story.date, 'YYYY') }} <span aria-hidden="true">↗</span></span></div><p>{{ story.description }}</p></a>
+<a class="photo-series-item" lang="{{ story.lang }}" href="{{ url_for(story.path) }}"><figure><img src="{{ story.cover }}" alt="{{ escape_html(story.title) }}" width="{{ story.width }}" height="{{ story.height }}" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async"></figure><div><h2>{{ story.title }}</h2><span>{{ date(story.date, 'YYYY') }} <span aria-hidden="true">↗</span></span></div><p>{{ story.description }}</p></a>
 {% endfor %}
 </div>
 {% endblock %}

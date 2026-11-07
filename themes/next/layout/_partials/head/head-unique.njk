@@ -2,7 +2,7 @@
   {%- if theme.open_graph.options %}
     {{ open_graph(theme.open_graph.options) }}
   {%- else %}
-    {{ open_graph() }}
+    {{ open_graph(studio_social(page)) }}
   {%- endif %}
 {%- endif %}
 

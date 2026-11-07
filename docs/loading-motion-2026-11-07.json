@@ -1,0 +1,235 @@
+{
+  "date": "2026-11-07",
+  "timezone": "Asia/Shanghai",
+  "state": "local-preview-only",
+  "public_version_unchanged": "a46b37c46d52077c041345d0f6ce514ff0019837",
+  "preview": "http://localhost:4000/",
+  "conditions": "Chrome, cold cache, DPR 1, 100ms latency, 200000 B/s down, 100000 B/s up, CPU 4x throttle, gzip, 6s after DOMContentLoaded observation",
+  "measurement_scope": "Completed-request encoded bytes including response headers within the observation window; not total site size. Local simulated-network samples, not field or live-site measurements. Three-run medians except archives (one diagnostic run).",
+  "comparison": [
+    {
+      "page": "home-mobile",
+      "samples": 3,
+      "before": {
+        "lcp": 860,
+        "cls": 0,
+        "transferBytes": 126249,
+        "requestCount": 5
+      },
+      "after": {
+        "lcp": 644,
+        "cls": 0,
+        "transferBytes": 84498,
+        "requestCount": 5
+      },
+      "transfer_reduction_percent": 33.1
+    },
+    {
+      "page": "home-desktop",
+      "samples": 3,
+      "before": {
+        "lcp": 780,
+        "cls": 0,
+        "transferBytes": 232858,
+        "requestCount": 7
+      },
+      "after": {
+        "lcp": 608,
+        "cls": 0,
+        "transferBytes": 117347,
+        "requestCount": 6
+      },
+      "transfer_reduction_percent": 49.6
+    },
+    {
+      "page": "performance",
+      "samples": 3,
+      "before": {
+        "lcp": 692,
+        "cls": 0.7247095409939854,
+        "transferBytes": 520226,
+        "requestCount": 15
+      },
+      "after": {
+        "lcp": 648,
+        "cls": 0,
+        "transferBytes": 175289,
+        "requestCount": 13
+      },
+      "transfer_reduction_percent": 66.3
+    },
+    {
+      "page": "asv",
+      "samples": 3,
+      "before": {
+        "lcp": 696,
+        "cls": 0.2987906578426717,
+        "transferBytes": 644990,
+        "requestCount": 27
+      },
+      "after": {
+        "lcp": 600,
+        "cls": 0,
+        "transferBytes": 297531,
+        "requestCount": 24
+      },
+      "transfer_reduction_percent": 53.9
+    },
+    {
+      "page": "archives",
+      "samples": 1,
+      "before": {
+        "lcp": 656,
+        "cls": 0,
+        "transferBytes": 149021,
+        "requestCount": 6
+      },
+      "after": {
+        "lcp": 516,
+        "cls": 0,
+        "transferBytes": 63266,
+        "requestCount": 5
+      },
+      "transfer_reduction_percent": 57.5
+    }
+  ],
+  "changes": [
+    "179 mathematical expressions in 7 articles are typeset during the build using the locked MathJax version. Two math-enabled articles with zero expressions now omit both the client parser and math CSS. Assistive MathML and original TeX attributes are retained.",
+    "Portrait crops preserve the existing mobile framing; responsive images and mutually exclusive preload hints reduce transferred bytes.",
+    "Decorative backgrounds load after primary content; alternate palettes warm only on theme-control intent, respecting data saver and slow networks.",
+    "TOC markup precedes the article and starts collapsed on narrow layouts, avoiding the initial open/close shifts. Desktop TOC still opens.",
+    "The ASV video reserves its actual 967x544 aspect ratio, preloads no video, and uses native playback on demand.",
+    "Native cross-document View Transitions provide 200ms page continuity; archive filters use a bounded 190ms compositor animation. Keyboard and reduced-motion use immediate state changes. Theme changes use a brief color transition."
+  ],
+  "tradeoffs": [
+    "Static formulas do not ship the MathJax right-click tools menu; TeX is retained in data-tex and equations retain assistive MathML.",
+    "Cross-document transitions require browser support; ordinary native navigation remains the fallback.",
+    "No field CWV, real phone, Safari/Firefox or screen-reader claims are made."
+  ],
+  "verification": {
+    "results": [
+      {
+        "path": "/2026/06/28/ai-compute-interconnect-part1-communication-wall/",
+        "count": 19,
+        "expected": 19,
+        "mml": 19,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "path": "/2026/06/28/ai-compute-interconnect-part3-smart-nic-chip/",
+        "count": 2,
+        "expected": 2,
+        "mml": 2,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "path": "/2026/10/14/agent-step-value/",
+        "count": 8,
+        "expected": 8,
+        "mml": 8,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "path": "/2026/11/01/film-emulation-pipelines/",
+        "count": 18,
+        "expected": 18,
+        "mml": 18,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "path": "/2026/11/01/motorcycle-cylinders-displacement-vibration/",
+        "count": 34,
+        "expected": 34,
+        "mml": 34,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "path": "/2026/11/03/gemm-languages-to-architecture/",
+        "count": 34,
+        "expected": 34,
+        "mml": 34,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "path": "/2026/11/04/why-x86-is-a-mess/",
+        "count": 0,
+        "expected": 0,
+        "mml": 0,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "path": "/2026/11/05/flow-control-from-pfc-to-backpressure/",
+        "count": 0,
+        "expected": 0,
+        "mml": 0,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "path": "/2026/11/06/architecture-performance-equations/",
+        "count": 64,
+        "expected": 64,
+        "mml": 64,
+        "badGlyphs": [],
+        "errors": 0,
+        "overflow": false
+      },
+      {
+        "models": "interactive after static typesetting"
+      },
+      {
+        "navigation": "native transition and preserved semantics",
+        "filters": "pointer animation; keyboard/reduced motion immediate"
+      }
+    ],
+    "errors": []
+  },
+  "navigation_and_video": [
+    {
+      "reduced": false,
+      "transition": true,
+      "animations": [
+        "-ua-view-transition-group-anim-root",
+        "-ua-view-transition-group-anim-studio-header",
+        "studio-page-in",
+        "studio-page-out"
+      ]
+    },
+    {
+      "reduced": true,
+      "transition": false
+    },
+    {
+      "video": {
+        "w": 967,
+        "h": 544,
+        "duration": 264.2,
+        "paused": false
+      },
+      "mediaRequestedAfterPlay": 1
+    }
+  ],
+  "source_backup": "/Users/lee/myblog-backups/2026-11-06/load-motion-235139",
+  "references": [
+    "https://developer.chrome.com/docs/web-platform/view-transitions/cross-document",
+    "https://web.dev/articles/optimize-lcp",
+    "https://docs.mathjax.org/en/v3.2/server/components.html"
+  ],
+  "measurement_stage": "Historical performance pass before the continuity refinement. Its delayed-artwork strategy and native View Transition behavior are superseded by continuity-2026-11-07.json. Timing/byte comparisons are measurements of that earlier stage, not remeasurements of the current preview.",
+  "continuity_refinement": "continuity-2026-11-07.json"
+}

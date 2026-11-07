@@ -1,9 +1,7 @@
 (() => {
   const picker = document.getElementById('color-mode');
   const mq = matchMedia('(prefers-color-scheme: dark)');
-  let preference = 'system';
-  try { preference = localStorage.getItem('leecdiang-color') || 'system'; } catch {}
-  if (!['system','light','dark'].includes(preference)) preference='system';
+  const themeState = window.StudioThemeState;
 
   // Keep the existing orrery's media-query palette in sync with manual selection.
   const orreryMedia=[];
@@ -22,8 +20,10 @@
   }
   window.StudioTheme={refreshOrreryStyles};
   function applyTheme() {
+    const preference=themeState.preference;
     const mode=preference==='system'?(mq.matches?'dark':'light'):preference;
     document.documentElement.dataset.color=mode;
+    document.documentElement.dataset.themePreference=preference;
     const label=window.StudioLanguage.t(mode==='dark'?'切换到浅色主题':'切换到深色主题');
     picker.setAttribute('aria-label',label);
     picker.title=label;
@@ -31,9 +31,19 @@
     document.querySelector('meta[name="theme-color"]').content=getComputedStyle(document.documentElement).getPropertyValue('--paper').trim() || (mode==='dark'?'#0c121b':'#ffffff');
     window.dispatchEvent(new Event('studio:theme'));
   }
-  picker.addEventListener('click',()=>{preference=document.documentElement.dataset.color==='dark'?'light':'dark';try{localStorage.setItem('leecdiang-color',preference)}catch{}applyTheme()});
-  mq.addEventListener('change',()=>{if(preference==='system')applyTheme()});
-  window.addEventListener('storage',e=>{if(e.key==='leecdiang-color'){preference=['light','dark'].includes(e.newValue)?e.newValue:'system';applyTheme()}});
+  let themeTransitionTimer;
+  picker.addEventListener('click',()=>{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){clearTimeout(themeTransitionTimer);document.documentElement.dataset.themeChanging='';themeTransitionTimer=setTimeout(()=>delete document.documentElement.dataset.themeChanging,240)}themeState.select(document.documentElement.dataset.color==='dark'?'light':'dark');applyTheme()});
+  // Internal navigation and restored pages share the active visit's selection.
+  function followSystem() {
+    clearTimeout(themeTransitionTimer);
+    delete document.documentElement.dataset.themeChanging;
+    themeState.select('system');
+    applyTheme();
+  }
+  function restoreVisit() { themeState.sync(); applyTheme(); }
+  mq.addEventListener('change',followSystem);
+  window.addEventListener('pageshow',event=>{if(event.persisted)restoreVisit()});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')restoreVisit()});
   window.addEventListener('studio:language',applyTheme);
   refreshOrreryStyles();
   // A local-only visual comparison. The source photograph is never modified.
@@ -46,6 +56,11 @@
       NexT.utils.registerVideoIframe();
       if(window.CONFIG?.exturl)NexT.utils.registerExtURL();
     }
+    document.querySelectorAll('.post-body .arch-plot-wrap,.post-body .table-container,.post-body mjx-container[display="true"]').forEach(view=>{
+      const update=()=>{const scrollable=view.scrollWidth>view.clientWidth+1;view.tabIndex=scrollable?0:-1;if(view.classList.contains('arch-plot-wrap'))view.closest('.v-figure').dataset.scrollable=String(scrollable);};
+      update();
+      if(window.ResizeObserver)new ResizeObserver(update).observe(view);
+    });
     document.querySelectorAll('img[data-src]').forEach(img=>{img.loading='lazy';img.decoding='async';if(img.dataset.srcset)img.srcset=img.dataset.srcset;img.src=img.dataset.src;});
     const copyStatus = document.createElement('span');
     copyStatus.className = 'sr-only';
@@ -64,13 +79,13 @@
       copyStatus.textContent = window.StudioLanguage.t(copyMessage);
     });
     const toc=document.querySelector('.reading-toc details');
-    if(toc){if(!toc.querySelector('.toc-scroll a'))toc.parentElement.hidden=true;else if(innerWidth<1100)toc.open=false;}
+    if(toc){if(!toc.querySelector('.toc-scroll a'))toc.parentElement.hidden=true;else toc.open=innerWidth>=1100;}
     const heading = document.querySelector('.btc-archive-heading');
     if (heading) {
       const form = document.createElement('form');
       form.className = 'archive-search';
       form.setAttribute('role', 'search');
-      form.innerHTML = '<label for="archive-query">查找文章</label><div class="archive-search-field"><input id="archive-query" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="例如：芯片、摄影、2026…"><button type="button" class="archive-reset" hidden>清除筛选</button></div><output data-site-dynamic aria-live="polite" aria-atomic="true"></output>';
+      form.innerHTML = '<label for="archive-query" class="sr-only">查找文章</label><div class="archive-search-field"><input id="archive-query" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="查找文章"><button type="button" class="archive-reset" hidden>清除筛选</button></div><output data-site-dynamic aria-live="polite" aria-atomic="true"></output>';
       heading.append(form);
       window.StudioLanguage.apply(form);
       const empty = document.createElement('div');
@@ -84,11 +99,26 @@
       const output = form.querySelector('output');
       const categoryNav = document.querySelector('.archive-categories');
       const buttons = [...document.querySelectorAll('.archive-categories button')];
-      const groups = [...document.querySelectorAll('.btc-archive-year')];
+      // Normalize both sides once: full-width letters, case and separators are equivalent.
+      const normalizeSearch = text => text.normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}\s]+/gu, ' ').trim();
+      const sectionTerms = new Map(buttons.map(button => [button.dataset.section,
+        [...button.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join(' ')
+      ]));
       const items = [...document.querySelectorAll('.btc-archive-list li')].map(row => ({
         row,
         section: row.dataset.section,
-        search: window.StudioLanguage.searchTerms(row.textContent + ' ' + row.querySelector('time').dateTime + ' ' + (buttons.find(button => button.dataset.section === row.dataset.section)?.textContent || '')).toLowerCase()
+        // Index article metadata, excluding UI counters and the timestamp's time zone.
+        search: normalizeSearch(window.StudioLanguage.searchTerms([
+          row.querySelector('.btc-archive-title').textContent,
+          row.querySelector('.archive-excerpt')?.textContent || '',
+          row.querySelector('.btc-archive-category')?.textContent || '',
+          row.dataset.searchTags || '',
+          row.querySelector('time').dateTime.slice(0, 10),
+          sectionTerms.get(row.dataset.section) || ''
+        ].join(' ')))
+      }));
+      const groups = [...document.querySelectorAll('.btc-archive-year')].map(group => ({
+        group, count: group.querySelector('h2 span'), rows: [...group.querySelectorAll('li')]
       }));
       let selected = 'all';
       function readURL() {
@@ -97,21 +127,22 @@
         input.value = params.get('q') || '';
       }
       function filterArticles(historyMode) {
-        const query = input.value.trim().toLowerCase();
+        const query = input.value.trim();
+        const terms = normalizeSearch(query).split(' ').filter(Boolean);
         let count = 0;
         for (const item of items) {
-          item.row.hidden = !(item.search.includes(query) && (selected === 'all' || item.section === selected));
+          item.row.hidden = !(terms.every(term => item.search.includes(term)) && (selected === 'all' || item.section === selected));
           if (!item.row.hidden) count++;
         }
-        for (const group of groups) {
-          const visible = [...group.querySelectorAll('li')].filter(row => !row.hidden).length;
+        for (const {group, count, rows} of groups) {
+          const visible = rows.filter(row => !row.hidden).length;
           group.hidden = !visible;
-          group.querySelector('h2 span').dataset.siteDynamic='';
-          group.querySelector('h2 span').textContent = window.StudioLanguage.t(visible + ' 篇');
+          count.dataset.siteDynamic = '';
+          count.textContent = window.StudioLanguage.t(visible + ' 篇');
         }
         buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.section === selected)));
         reset.hidden = !query && selected === 'all';
-        output.textContent = window.StudioLanguage.t('找到 ' + count + ' 篇文章');
+        output.textContent = query ? window.StudioLanguage.t('找到 ' + count + ' 篇文章') : '';
         empty.hidden = count !== 0;
         if (historyMode) {
           const url = new URL(location.href);
@@ -120,16 +151,23 @@
           if (url.href !== location.href) history[historyMode + 'State'](null, '', url);
         }
       }
-      form.addEventListener('submit', event => event.preventDefault());
-      input.addEventListener('input', () => filterArticles('replace'));
+      let composing = false;
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!composing) filterArticles('replace');
+      });
+      input.addEventListener('compositionstart', () => { composing = true; });
+      input.addEventListener('compositionend', () => { composing = false; filterArticles('replace'); });
+      input.addEventListener('input', event => {
+        if (!composing && !event.isComposing) filterArticles('replace');
+      });
       buttons.forEach(button => button.addEventListener('click', () => {
-        selected = button.dataset.section;
-        filterArticles('push');
+        const mutate=()=>{selected=button.dataset.section;filterArticles('push')};
+        if(window.StudioMotion)window.StudioMotion.transitionList(document.querySelector('.btc-archive-index'),mutate);else mutate();
       }));
       reset.addEventListener('click', () => {
-        input.value = '';
-        selected = 'all';
-        filterArticles('push');
+        const mutate=()=>{input.value='';selected='all';filterArticles('push')};
+        if(window.StudioMotion)window.StudioMotion.transitionList(document.querySelector('.btc-archive-index'),mutate);else mutate();
         input.focus();
       });
       empty.querySelector('button').addEventListener('click', () => reset.click());

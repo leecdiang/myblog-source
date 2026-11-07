@@ -28,6 +28,6 @@ hexo.extend.helper.register('studio_photo_stories', function () {
     if (cover.startsWith('/') && !cover.startsWith('//')) {
       try { dimensions = imageSize(fs.readFileSync(path.join(hexo.public_dir, decodeURIComponent(cover)))); } catch {}
     }
-    return {title: post.title, path: post.path, date: post.date, description: post.description || '', cover, width: dimensions.width, height: dimensions.height};
+    return {title: post.title, path: post.path, date: post.date, description: post.description || '', lang: post.lang || 'zh-CN', cover, width: dimensions.width, height: dimensions.height};
   });
 });

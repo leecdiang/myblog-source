@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <script>(function(){var p='system';try{p=localStorage.getItem('leecdiang-color')||'system'}catch(e){}if(!['light','dark','system'].includes(p))p='system';document.documentElement.dataset.color=p==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;})();</script>
+  <script>{{ studio_theme_bootstrap() | safe }}</script>
   <script>(function(){var l;try{l=localStorage.getItem('leecdiang-language')}catch(e){}if(l!=='zh'&&l!=='en')l=/^zh\b/i.test(navigator.language||'zh')?'zh':'en';document.documentElement.dataset.language=l;document.documentElement.lang=l==='zh'?'zh-CN':'en';})();</script>
-  <script>(function(){var r=document.documentElement;var dark=r.dataset.color==="dark";var portrait=matchMedia("(orientation: portrait)").matches;var home=location.pathname.replace(/\/index\.html$/,"/")==="/";if(home&&innerWidth<=700)return;var m={dark:{l:"/images/ambient/halo-dark-landscape-v2.webp",p:"/images/ambient/halo-dark-portrait-v2.webp"},light:{l:"/images/ambient/halo-light-landscape-v9.webp",p:"/images/ambient/halo-light-portrait-v9.webp"}};var h=(dark?m.dark:m.light)[portrait?"p":"l"];var l=document.createElement("link");l.rel="preload";l.as="image";l.setAttribute("fetchpriority","high");l.href=h;document.head.appendChild(l)})();</script>
+
+  <script>(function(){try{var r=document.documentElement,k='studio-route-entry',v=JSON.parse(sessionStorage.getItem(k)||'null');sessionStorage.removeItem(k);if(v&&Date.now()-v.at<8000&&v.path===location.pathname+location.search&&!location.hash&&!matchMedia('(prefers-reduced-motion: reduce)').matches)r.dataset.routeEnter='';var e=Number(sessionStorage.getItem('studio-halo-epoch'))||Date.now();sessionStorage.setItem('studio-halo-epoch',e);r.style.setProperty('--halo-phase',-((Date.now()-e)%48000)+'ms')}catch(e){}})();</script>
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
@@ -24,13 +25,11 @@
   {% if page.content and 'v-chart-viewport' in page.content %}<script defer src="/js/visual-diagrams.js"></script>{% endif %}
   <script defer src="{{ studio_asset('core') }}"></script>
   {% if page.path === 'links/index.html' %}<script defer src="{{ studio_asset('orrery') }}"></script>{% endif %}
-  {% if page.layout === 'homepage' %}<link rel="preload" as="image" href="/images/home-portrait-1280.webp" imagesrcset="/images/home-portrait-640.webp 640w, /images/home-portrait-1280.webp 1280w, /images/home-portrait-1920.webp 1920w" imagesizes="(max-width: 700px) calc(151svh - 193px), (max-width: 1000px) 50vw, 560px">{% endif %}
+  {% if page.layout === 'homepage' %}<link rel="preload" as="image" href="/images/home-portrait-1280.webp" imagesrcset="/images/home-portrait-640.webp 640w, /images/home-portrait-1280.webp 1280w, /images/home-portrait-1920.webp 1920w" media="not all and (max-width:700px) and (max-aspect-ratio:3/4)" imagesizes="(max-width: 700px) calc(151svh - 193px), (max-width: 1000px) 50vw, 560px">{% endif %}
+{% if page.layout === 'homepage' %}<link rel="preload" as="image" href="/images/home-portrait-mobile-768.webp" imagesrcset="/images/home-portrait-mobile-480.webp 480w, /images/home-portrait-mobile-768.webp 768w, /images/home-portrait-mobile-1080.webp 1080w, /images/home-portrait-mobile-1440.webp 1440w" imagesizes="max(408px, calc(85svh - 109px))" media="(max-width:700px) and (max-aspect-ratio:3/4)" fetchpriority="high">{% endif %}
 </head>
-<body class="studio-site studio-halo{% if is_post() %} studio-reading{% endif %}{% if page.layout === 'homepage' %} studio-home{% endif %}">
-  <div class="ambient-halo" aria-hidden="true">
-    <picture class="ambient-art ambient-art--light"><source media="(orientation: portrait)" data-srcset="/images/ambient/halo-light-portrait-v9.webp"><img data-ambient-src="/images/ambient/halo-light-landscape-v9.webp" width="1672" height="941" alt="" decoding="async" fetchpriority="low"></picture>
-    <picture class="ambient-art ambient-art--dark"><source media="(orientation: portrait)" data-srcset="/images/ambient/halo-dark-portrait-v2.webp"><img data-ambient-src="/images/ambient/halo-dark-landscape-v2.webp" width="1672" height="941" alt="" decoding="async" fetchpriority="low"></picture>
-  </div>
+<body class="studio-site studio-halo{% if page.path === 'about/index.html' %} studio-about{% endif %}{% if is_post() %} studio-reading{% endif %}{% if page.layout === 'homepage' %} studio-home{% endif %}">
+  <div class="ambient-halo" aria-hidden="true"><div class="ambient-art ambient-art--light is-ready"></div><div class="ambient-art ambient-art--dark is-ready"></div></div>
   <a class="skip-link" href="#main-content">跳到正文</a>
   <header class="studio-header">
     <a class="studio-brand" href="/" translate="no" aria-label="LEEcDiang 首页">LEEcDiang<span>.</span></a>

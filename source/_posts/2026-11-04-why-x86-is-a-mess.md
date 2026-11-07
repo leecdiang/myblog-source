@@ -1,4 +1,5 @@
 ---
+lang: zh-CN
 title: "为什么我觉得 X86 指令集 就是一坨狗屎"
 slug: why-x86-is-a-mess
 permalink: 2026/11/04/why-x86-is-a-mess/
