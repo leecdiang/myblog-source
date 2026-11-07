@@ -136,13 +136,6 @@ category_generator:
   order_by: -date
 
 
-# hexo-admin authentification
-admin:
-  username: LCZ
-  password_hash: $2a$10$VfzCjQaCyfPpKhl5heR8CurgCrQJO/fBhYXIjaK/H9og0qlENegdG
-  secret: ECHO
-
-
 # Markdown-it 配置
 markdown:
   render:
@@ -188,3 +181,8 @@ indexnow:
   key: "9a3afc6a3c4f484d8ebf008614d16815"
   keyLocation: "https://leecdiang.com/9a3afc6a3c4f484d8ebf008614d16815.txt"
 
+
+# Preview is local-only; there is no web administration endpoint.
+server:
+  ip: 127.0.0.1
+  port: 4000

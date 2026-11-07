@@ -23,3 +23,11 @@ source/_posts/**/*.png
 source/_posts/**/*.heic
 source/_posts/**/*.gif
 source/_posts/**/*.webp
+
+# Local credentials must never enter the source repository.
+.env
+.env.*
+!.env.example
+_config.local.yml
+*.pem
+*.key

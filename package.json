@@ -8,34 +8,40 @@
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
-    "server": "hexo server"
+    "server": "hexo server --ip 127.0.0.1",
+    "audit": "npm audit --omit=dev",
+    "check:security": "node --test tools/security-regression.test.cjs && python3 tools/check-security-output.py"
   },
   "hexo": {
-    "version": "8.1.1"
+    "version": "8.1.2"
   },
   "dependencies": {
-    "hexo": "^8.0.0",
-    "hexo-admin": "^2.3.0",
+    "hexo": "^8.1.2",
     "hexo-deployer-git": "^4.0.0",
     "hexo-generator-archive": "^2.0.0",
-    "hexo-generator-baidu-sitemap": "^0.1.9",
     "hexo-generator-category": "^2.0.0",
     "hexo-generator-feed": "^4.0.0",
     "hexo-generator-index": "^4.0.0",
     "hexo-generator-sitemap": "^3.0.1",
     "hexo-generator-tag": "^2.0.0",
     "hexo-renderer-ejs": "^2.0.0",
-    "hexo-renderer-markdown-it": "^7.1.1",
+    "hexo-renderer-markdown-it": "file:vendor/hexo-renderer-markdown-it",
     "hexo-renderer-stylus": "^3.0.1",
     "hexo-server": "^3.0.0",
-    "hexo-symbols-count-time": "^0.7.1",
     "hexo-theme-landscape": "^1.0.0",
     "markdown-it-mark": "^4.0.0",
-    "sharp": "^0.34.5"
+    "sharp": "^0.35.5",
+    "cheerio": "^1.2.0",
+    "image-size": "^2.1.0",
+    "deepmerge": "file:vendor/deepmerge-safe"
   },
   "devDependencies": {
     "clean-css": "^5.3.3",
     "mathjax": "^3.2.2",
     "terser": "^5.44.1"
+  },
+  "overrides": {
+    "markdown-it": "^15.0.3",
+    "deepmerge": "$deepmerge"
   }
 }
