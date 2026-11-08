@@ -1,6 +1,19 @@
 # Beyond the Clock · 博客维护指南
 
-本文档记录当前已验证的流程，更新于 2026-11-06。
+本文档记录当前已验证的流程，更新于 2026-11-08。
+
+
+## 以后写文章直接从这里开始：固定模板与组件路径（2026-11-08）
+
+**不必再从聊天记录和旧 ZIP 搜索博客模板。** 按顺序阅读仓库里的这些固定文件：
+
+- **完整写作/UI 规范（已归档到仓库）**：[`docs/blog-authoring/BLOG_AUTHORING_GUIDE_FOR_AI.md`](docs/blog-authoring/BLOG_AUTHORING_GUIDE_FOR_AI.md)。
+- **目录与原始包来源、图标/图表路径**：[`docs/blog-authoring/README.md`](docs/blog-authoring/README.md)。
+- **博文模板**：[`source/_posts/writing-template.md`](source/_posts/writing-template.md)；创建骨架：[`scaffolds/post.md`](scaffolds/post.md)。
+- **图表/卡片规范**：[`source/_visuals/README.md`](source/_visuals/README.md)；现成组件：[`source/_visuals/templates/figure.html`](source/_visuals/templates/figure.html) 和 [`matrix.html`](source/_visuals/templates/matrix.html)。
+- **运行时实现**：`scripts/visual-svg.js`、`source/js/visual-diagrams.js`、`source/css/studio.css`、`theme-assets/fontawesome/`。
+
+2026-11-05 的原始 Library 归档仍在 `/blog-writing-ui-guide-for-ai-2026-11-05.zip` 与 `/blog-template-ui-kit-2026-11-05.zip`；它们只是历史快照，**以当前主仓库实现为准**。新文章只从上述仓库路径读取，不重复寻找 ZIP，亦不可用 ZIP 整包覆盖已更新的主题。
 
 ## 当前维护入口（2026-11-06）
 

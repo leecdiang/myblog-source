@@ -36,7 +36,16 @@ for file in sorted((ROOT / 'public').rglob('*.html')):
     assert len(policies) == 1, file
     policy = dict(part.strip().split(' ', 1) for part in policies[0].split(';'))
     assert policy['default-src'] == "'self'", file
-    assert policy['object-src'] == policy['base-uri'] == policy['frame-src'] == "'none'", file
+    assert policy['object-src'] == policy['base-uri'] == "'none'", file
+    iframe_article = file.relative_to(ROOT / 'public').as_posix() == '2026/11/08/llm-inference-from-token-to-cluster/index.html'
+    assert policy['frame-src'] == ("'self'" if iframe_article else "'none'"), file
+    if iframe_article:
+        frames = [a for tag, a in page.tags if tag == 'iframe']
+        assert len(frames) == 2 and all(
+            frame.get('sandbox') == 'allow-scripts'
+            and frame.get('src', '').startswith('./interactive/inference-lab.html?tab=')
+            for frame in frames
+        ), (file, frames)
     assert "'unsafe-inline'" not in policy['script-src'] and "'unsafe-eval'" not in policy['script-src'], file
     assert any(t == 'meta' and a.get('name') == 'referrer' and a.get('content') == 'strict-origin-when-cross-origin' for t, a in page.tags), file
     first_script = next((i for i, (t, _) in enumerate(page.tags) if t == 'script'), len(page.tags))

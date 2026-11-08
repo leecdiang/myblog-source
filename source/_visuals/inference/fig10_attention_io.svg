@@ -1,0 +1,114 @@
+<svg role="img" aria-label="Attention 访存示意：显式存取大注意力矩阵，与分块、在线 softmax 的片上处理进行对照。" xmlns:xlink="http://www.w3.org/1999/xlink" width="690.12pt" height="419.76pt" viewBox="0 0 690.12 419.76" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style></defs><g id="fig10_attention_io-figure_1"><g id="fig10_attention_io-patch_1"><path d="M 0 419.76 
+L 690.12 419.76 
+L 690.12 0 
+L 0 0 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig10_attention_io-axes_1"><g id="fig10_attention_io-patch_2"><path d="M 38.718 163.8648 
+L 154.782 163.8648 
+Q 159.246 163.8648 159.246 159.4296 
+L 159.246 102.3264 
+Q 159.246 97.8912 154.782 97.8912 
+L 38.718 97.8912 
+Q 34.254 97.8912 34.254 102.3264 
+L 34.254 159.4296 
+Q 34.254 163.8648 38.718 163.8648 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig10_attention_io-patch_3"><path d="M 194.958 163.8648 
+L 319.392 163.8648 
+Q 323.856 163.8648 323.856 159.4296 
+L 323.856 102.3264 
+Q 323.856 97.8912 319.392 97.8912 
+L 194.958 97.8912 
+Q 190.494 97.8912 190.494 102.3264 
+L 190.494 159.4296 
+Q 190.494 163.8648 194.958 163.8648 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--surface-soft); stroke: var(--chart-amber); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig10_attention_io-patch_4"><path d="M 359.568 163.8648 
+L 472.842 163.8648 
+Q 477.306 163.8648 477.306 159.4296 
+L 477.306 102.3264 
+Q 477.306 97.8912 472.842 97.8912 
+L 359.568 97.8912 
+Q 355.104 97.8912 355.104 102.3264 
+L 355.104 159.4296 
+Q 355.104 163.8648 359.568 163.8648 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--surface-soft); stroke: var(--chart-amber); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig10_attention_io-patch_5"><path d="M 513.018 163.8648 
+L 631.872 163.8648 
+Q 636.336 163.8648 636.336 159.4296 
+L 636.336 102.3264 
+Q 636.336 97.8912 631.872 97.8912 
+L 513.018 97.8912 
+Q 508.554 97.8912 508.554 102.3264 
+L 508.554 159.4296 
+Q 508.554 163.8648 513.018 163.8648 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig10_attention_io-patch_6"><path d="M 160.128501 131.1552 
+Q 174.86816 131.1552 187.930769 131.1552 
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 183.130769 128.7552 
+L 187.930769 131.1552 
+L 183.130769 133.5552 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig10_attention_io-patch_7"><path d="M 324.738501 131.1552 
+Q 339.47816 131.1552 352.540769 131.1552 
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 347.740769 128.7552 
+L 352.540769 131.1552 
+L 347.740769 133.5552 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig10_attention_io-patch_8"><path d="M 478.188501 131.1552 
+Q 492.92816 131.1552 505.990769 131.1552 
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 501.190769 128.7552 
+L 505.990769 131.1552 
+L 501.190769 133.5552 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig10_attention_io-patch_9"><path d="M 38.718 341.2728 
+L 154.782 341.2728 
+Q 159.246 341.2728 159.246 336.8376 
+L 159.246 276.9624 
+Q 159.246 272.5272 154.782 272.5272 
+L 38.718 272.5272 
+Q 34.254 272.5272 34.254 276.9624 
+L 34.254 336.8376 
+Q 34.254 341.2728 38.718 341.2728 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig10_attention_io-patch_10"><path d="M 194.958 346.8168 
+L 464.472 346.8168 
+Q 468.936 346.8168 468.936 342.3816 
+L 468.936 271.4184 
+Q 468.936 266.9832 464.472 266.9832 
+L 194.958 266.9832 
+Q 190.494 266.9832 190.494 271.4184 
+L 190.494 342.3816 
+Q 190.494 346.8168 194.958 346.8168 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig10_attention_io-patch_11"><path d="M 513.018 341.2728 
+L 631.872 341.2728 
+Q 636.336 341.2728 636.336 336.8376 
+L 636.336 276.9624 
+Q 636.336 272.5272 631.872 272.5272 
+L 513.018 272.5272 
+Q 508.554 272.5272 508.554 276.9624 
+L 508.554 336.8376 
+Q 508.554 341.2728 513.018 341.2728 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig10_attention_io-patch_12"><path d="M 160.128501 306.9 
+Q 174.86816 306.9 187.930769 306.9 
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 183.130769 304.5 
+L 187.930769 306.9 
+L 183.130769 309.3 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig10_attention_io-patch_13"><path d="M 469.820034 306.9 
+Q 488.745362 306.9 505.99364 306.9 
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 501.19364 304.5 
+L 505.99364 306.9 
+L 501.19364 309.3 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig10_attention_io-patch_14"><path d="M 393.785807 347.037117 
+Q 331.11098 402.131022 269.695751 348.146047 
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: none; stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/><path d="M 271.716427 353.117653 
+L 269.695751 348.146047 
+L 274.885442 349.51247 
+z
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: var(--chart-teal); stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig10_attention_io-line2d_1"><path d="M 32.301 212.652 
+L 641.358 212.652 
+" clip-path="url(#fig10_attention_io-p87704160bb)" style="fill: none; stroke: var(--divider); stroke-linecap: square"/></g><g id="fig10_attention_io-text_1"><text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="29.79" y="35.244" transform="rotate(-0 29.79 35.244)">Prefill attention IO: avoid materializing the large intermediate matrix</text></g><g id="fig10_attention_io-text_2"><text style="font-weight: 500; font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--chart-blue)" x="29.79" y="74.052" transform="rotate(-0 29.79 74.052)">Materialized intermediates</text></g><g id="fig10_attention_io-text_3"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="96.75" y="124.62585" transform="rotate(-0 96.75 124.62585)">Q, K, V</text></g><g id="fig10_attention_io-text_4"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="96.75" y="147.608507" transform="rotate(-0 96.75 147.608507)">read from HBM</text></g><g id="fig10_attention_io-text_5"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="257.175" y="124.62585" transform="rotate(-0 257.175 124.62585)">Scores / softmax</text></g><g id="fig10_attention_io-text_6"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="257.175" y="147.608507" transform="rotate(-0 257.175 147.608507)">large N × N arrays</text></g><g id="fig10_attention_io-text_7"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="416.205" y="124.62585" transform="rotate(-0 416.205 124.62585)">Read back</text></g><g id="fig10_attention_io-text_8"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="416.205" y="147.608507" transform="rotate(-0 416.205 147.608507)">form weighted V</text></g><g id="fig10_attention_io-text_9"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="572.445" y="124.62585" transform="rotate(-0 572.445 124.62585)">Output</text></g><g id="fig10_attention_io-text_10"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="572.445" y="147.608507" transform="rotate(-0 572.445 147.608507)">write to HBM</text></g><g id="fig10_attention_io-text_11"><text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="331.11" y="186.5952" transform="rotate(-0 331.11 186.5952)">HBM writes + reads of intermediate attention matrices</text></g><g id="fig10_attention_io-text_12"><text style="font-weight: 500; font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--chart-teal)" x="29.79" y="240.372" transform="rotate(-0 29.79 240.372)">Tiled attention with online softmax</text></g><g id="fig10_attention_io-text_13"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="96.75" y="300.23205" transform="rotate(-0 96.75 300.23205)">Q, K, V tiles</text></g><g id="fig10_attention_io-text_14"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="96.75" y="324.240347" transform="rotate(-0 96.75 324.240347)">read as needed</text></g><g id="fig10_attention_io-text_15"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="329.715" y="298.56885" transform="rotate(-0 329.715 298.56885)">On-chip tile computation</text></g><g id="fig10_attention_io-text_16"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="329.715" y="326.679707" transform="rotate(-0 329.715 326.679707)">update running softmax statistics + output</text></g><g id="fig10_attention_io-text_17"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="572.445" y="300.23205" transform="rotate(-0 572.445 300.23205)">Output</text></g><g id="fig10_attention_io-text_18"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="572.445" y="324.240347" transform="rotate(-0 572.445 324.240347)">write to HBM</text></g><g id="fig10_attention_io-text_19"><text style="font-size: 9.6px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-muted)" x="35.37" y="393.3864" transform="rotate(-0 35.37 393.3864)">N prompt positions. Not to scale; Q/K/V traffic and other costs remain. Based on the FlashAttention mechanism.</text></g></g></g><defs><clipPath id="fig10_attention_io-p87704160bb"><rect x="15.84" y="15.84" width="658.44" height="388.08"/></clipPath></defs></svg>

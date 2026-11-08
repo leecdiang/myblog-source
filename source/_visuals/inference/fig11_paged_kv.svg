@@ -1,0 +1,180 @@
+<svg role="img" aria-label="Paged KV 的逻辑块、块表与非连续物理块示意；两条请求按需使用空闲块。" xmlns:xlink="http://www.w3.org/1999/xlink" width="690.12pt" height="441.936pt" viewBox="0 0 690.12 441.936" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style></defs><g id="fig11_paged_kv-figure_1"><g id="fig11_paged_kv-patch_1"><path d="M 0 441.936 
+L 690.12 441.936 
+L 690.12 0 
+L 0 0 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig11_paged_kv-axes_1"><g id="fig11_paged_kv-patch_2"><path d="M 37.044 180.4968 
+L 77.22 180.4968 
+Q 80.01 180.4968 80.01 177.7248 
+L 80.01 136.6992 
+Q 80.01 133.9272 77.22 133.9272 
+L 37.044 133.9272 
+Q 34.254 133.9272 34.254 136.6992 
+L 34.254 177.7248 
+Q 34.254 180.4968 37.044 180.4968 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_3"><path d="M 87.822 180.4968 
+L 127.998 180.4968 
+Q 130.788 180.4968 130.788 177.7248 
+L 130.788 136.6992 
+Q 130.788 133.9272 127.998 133.9272 
+L 87.822 133.9272 
+Q 85.032 133.9272 85.032 136.6992 
+L 85.032 177.7248 
+Q 85.032 180.4968 87.822 180.4968 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_4"><path d="M 138.6 180.4968 
+L 178.776 180.4968 
+Q 181.566 180.4968 181.566 177.7248 
+L 181.566 136.6992 
+Q 181.566 133.9272 178.776 133.9272 
+L 138.6 133.9272 
+Q 135.81 133.9272 135.81 136.6992 
+L 135.81 177.7248 
+Q 135.81 180.4968 138.6 180.4968 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_5"><path d="M 196.402588 157.212 
+Q 216.720678 157.212 235.361718 157.212 
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: none; stroke: var(--chart-blue); stroke-width: 1.5; stroke-linecap: round"/><path d="M 230.561718 154.812 
+L 235.361718 157.212 
+L 230.561718 159.612 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--chart-blue); stroke: var(--chart-blue); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig11_paged_kv-patch_6"><path d="M 37.044 296.9208 
+L 77.22 296.9208 
+Q 80.01 296.9208 80.01 294.1488 
+L 80.01 253.1232 
+Q 80.01 250.3512 77.22 250.3512 
+L 37.044 250.3512 
+Q 34.254 250.3512 34.254 253.1232 
+L 34.254 294.1488 
+Q 34.254 296.9208 37.044 296.9208 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_7"><path d="M 87.822 296.9208 
+L 127.998 296.9208 
+Q 130.788 296.9208 130.788 294.1488 
+L 130.788 253.1232 
+Q 130.788 250.3512 127.998 250.3512 
+L 87.822 250.3512 
+Q 85.032 250.3512 85.032 253.1232 
+L 85.032 294.1488 
+Q 85.032 296.9208 87.822 296.9208 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_8"><path d="M 196.402588 273.636 
+Q 216.720678 273.636 235.361718 273.636 
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: none; stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/><path d="M 230.561718 271.236 
+L 235.361718 273.636 
+L 230.561718 276.036 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--chart-teal); stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig11_paged_kv-patch_9"><path d="M 245.178 186.0408 
+L 377.982 186.0408 
+Q 382.446 186.0408 382.446 181.6056 
+L 382.446 132.8184 
+Q 382.446 128.3832 377.982 128.3832 
+L 245.178 128.3832 
+Q 240.714 128.3832 240.714 132.8184 
+L 240.714 181.6056 
+Q 240.714 186.0408 245.178 186.0408 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_10"><path d="M 245.178 302.4648 
+L 377.982 302.4648 
+Q 382.446 302.4648 382.446 298.0296 
+L 382.446 249.2424 
+Q 382.446 244.8072 377.982 244.8072 
+L 245.178 244.8072 
+Q 240.714 244.8072 240.714 249.2424 
+L 240.714 298.0296 
+Q 240.714 302.4648 245.178 302.4648 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_11"><path d="M 383.330374 157.212 
+Q 405.045591 157.212 425.083757 157.212 
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: none; stroke: var(--chart-blue); stroke-width: 1.5; stroke-linecap: round"/><path d="M 420.283757 154.812 
+L 425.083757 157.212 
+L 420.283757 159.612 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--chart-blue); stroke: var(--chart-blue); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig11_paged_kv-patch_12"><path d="M 383.330374 273.636 
+Q 405.045591 273.636 425.083757 273.636 
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: none; stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/><path d="M 420.283757 271.236 
+L 425.083757 273.636 
+L 420.283757 276.036 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--chart-teal); stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig11_paged_kv-patch_13"><path d="M 444.384 144.4608 
+L 524.736 144.4608 
+Q 527.526 144.4608 527.526 141.6888 
+L 527.526 95.1192 
+Q 527.526 92.3472 524.736 92.3472 
+L 444.384 92.3472 
+Q 441.594 92.3472 441.594 95.1192 
+L 441.594 141.6888 
+Q 441.594 144.4608 444.384 144.4608 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_14"><path d="M 542.034 144.4608 
+L 622.386 144.4608 
+Q 625.176 144.4608 625.176 141.6888 
+L 625.176 95.1192 
+Q 625.176 92.3472 622.386 92.3472 
+L 542.034 92.3472 
+Q 539.244 92.3472 539.244 95.1192 
+L 539.244 141.6888 
+Q 539.244 144.4608 542.034 144.4608 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_15"><path d="M 444.384 206.5536 
+L 524.736 206.5536 
+Q 527.526 206.5536 527.526 203.7816 
+L 527.526 157.212 
+Q 527.526 154.44 524.736 154.44 
+L 444.384 154.44 
+Q 441.594 154.44 441.594 157.212 
+L 441.594 203.7816 
+Q 441.594 206.5536 444.384 206.5536 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--text-muted); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_16"><path d="M 542.034 206.5536 
+L 622.386 206.5536 
+Q 625.176 206.5536 625.176 203.7816 
+L 625.176 157.212 
+Q 625.176 154.44 622.386 154.44 
+L 542.034 154.44 
+Q 539.244 154.44 539.244 157.212 
+L 539.244 203.7816 
+Q 539.244 206.5536 542.034 206.5536 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_17"><path d="M 444.384 268.6464 
+L 524.736 268.6464 
+Q 527.526 268.6464 527.526 265.8744 
+L 527.526 219.3048 
+Q 527.526 216.5328 524.736 216.5328 
+L 444.384 216.5328 
+Q 441.594 216.5328 441.594 219.3048 
+L 441.594 265.8744 
+Q 441.594 268.6464 444.384 268.6464 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--text-muted); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_18"><path d="M 542.034 268.6464 
+L 622.386 268.6464 
+Q 625.176 268.6464 625.176 265.8744 
+L 625.176 219.3048 
+Q 625.176 216.5328 622.386 216.5328 
+L 542.034 216.5328 
+Q 539.244 216.5328 539.244 219.3048 
+L 539.244 265.8744 
+Q 539.244 268.6464 542.034 268.6464 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_19"><path d="M 444.384 330.7392 
+L 524.736 330.7392 
+Q 527.526 330.7392 527.526 327.9672 
+L 527.526 281.3976 
+Q 527.526 278.6256 524.736 278.6256 
+L 444.384 278.6256 
+Q 441.594 278.6256 441.594 281.3976 
+L 441.594 327.9672 
+Q 441.594 330.7392 444.384 330.7392 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--text-muted); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-patch_20"><path d="M 542.034 330.7392 
+L 622.386 330.7392 
+Q 625.176 330.7392 625.176 327.9672 
+L 625.176 281.3976 
+Q 625.176 278.6256 622.386 278.6256 
+L 542.034 278.6256 
+Q 539.244 278.6256 539.244 281.3976 
+L 539.244 327.9672 
+Q 539.244 330.7392 542.034 330.7392 
+z
+" clip-path="url(#fig11_paged_kv-p3e1441bfb5)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.4; stroke-linejoin: miter"/></g><g id="fig11_paged_kv-text_1"><text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="29.79" y="35.244" transform="rotate(-0 29.79 35.244)">Paged KV: logical order does not require contiguous storage</text></g><g id="fig11_paged_kv-text_2"><text style="font-weight: 500; font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="35.37" y="71.28" transform="rotate(-0 35.37 71.28)">Logical blocks</text></g><g id="fig11_paged_kv-text_3"><text style="font-weight: 500; font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="255.78" y="71.28" transform="rotate(-0 255.78 71.28)">Block table</text></g><g id="fig11_paged_kv-text_4"><text style="font-weight: 500; font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="451.08" y="71.28" transform="rotate(-0 451.08 71.28)">Physical KV slots</text></g><g id="fig11_paged_kv-text_5"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--chart-blue)" x="35.37" y="118.404" transform="rotate(-0 35.37 118.404)">Request A</text></g><g id="fig11_paged_kv-text_6"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-blue)" x="57.132" y="160.52325" transform="rotate(-0 57.132 160.52325)">0</text></g><g id="fig11_paged_kv-text_7"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-blue)" x="107.91" y="160.52325" transform="rotate(-0 107.91 160.52325)">1</text></g><g id="fig11_paged_kv-text_8"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-blue)" x="158.688" y="160.52325" transform="rotate(-0 158.688 160.52325)">2</text></g><g id="fig11_paged_kv-text_9"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--chart-teal)" x="35.37" y="234.828" transform="rotate(-0 35.37 234.828)">Request B</text></g><g id="fig11_paged_kv-text_10"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-teal)" x="57.132" y="276.94725" transform="rotate(-0 57.132 276.94725)">0</text></g><g id="fig11_paged_kv-text_11"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-teal)" x="107.91" y="276.94725" transform="rotate(-0 107.91 276.94725)">1</text></g><g id="fig11_paged_kv-text_12"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="311.58" y="152.20725" transform="rotate(-0 311.58 152.20725)">A: 0→5, 1→1, 2→7</text></g><g id="fig11_paged_kv-text_13"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="311.58" y="172.112987" transform="rotate(-0 311.58 172.112987)">logical → physical</text></g><g id="fig11_paged_kv-text_14"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="311.58" y="268.63125" transform="rotate(-0 311.58 268.63125)">B: 0→3, 1→0</text></g><g id="fig11_paged_kv-text_15"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="311.58" y="288.536987" transform="rotate(-0 311.58 288.536987)">logical → physical</text></g><g id="fig11_paged_kv-text_16"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="484.56" y="111.738575" transform="rotate(-0 484.56 111.738575)">slot 0</text></g><g id="fig11_paged_kv-text_17"><text style="font-weight: 500; font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-teal)" x="484.56" y="131.556481" transform="rotate(-0 484.56 131.556481)">B1</text></g><g id="fig11_paged_kv-text_18"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="582.21" y="111.738575" transform="rotate(-0 582.21 111.738575)">slot 1</text></g><g id="fig11_paged_kv-text_19"><text style="font-weight: 500; font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-blue)" x="582.21" y="131.556481" transform="rotate(-0 582.21 131.556481)">A1</text></g><g id="fig11_paged_kv-text_20"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="484.56" y="173.831375" transform="rotate(-0 484.56 173.831375)">slot 2</text></g><g id="fig11_paged_kv-text_21"><text style="font-weight: 500; font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="484.56" y="193.649281" transform="rotate(-0 484.56 193.649281)">free</text></g><g id="fig11_paged_kv-text_22"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="582.21" y="173.831375" transform="rotate(-0 582.21 173.831375)">slot 3</text></g><g id="fig11_paged_kv-text_23"><text style="font-weight: 500; font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-teal)" x="582.21" y="193.649281" transform="rotate(-0 582.21 193.649281)">B0</text></g><g id="fig11_paged_kv-text_24"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="484.56" y="235.924175" transform="rotate(-0 484.56 235.924175)">slot 4</text></g><g id="fig11_paged_kv-text_25"><text style="font-weight: 500; font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="484.56" y="255.742081" transform="rotate(-0 484.56 255.742081)">free</text></g><g id="fig11_paged_kv-text_26"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="582.21" y="235.924175" transform="rotate(-0 582.21 235.924175)">slot 5</text></g><g id="fig11_paged_kv-text_27"><text style="font-weight: 500; font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-blue)" x="582.21" y="255.742081" transform="rotate(-0 582.21 255.742081)">A0</text></g><g id="fig11_paged_kv-text_28"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="484.56" y="298.016975" transform="rotate(-0 484.56 298.016975)">slot 6</text></g><g id="fig11_paged_kv-text_29"><text style="font-weight: 500; font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="484.56" y="317.834881" transform="rotate(-0 484.56 317.834881)">free</text></g><g id="fig11_paged_kv-text_30"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="582.21" y="298.016975" transform="rotate(-0 582.21 298.016975)">slot 7</text></g><g id="fig11_paged_kv-text_31"><text style="font-weight: 500; font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--chart-blue)" x="582.21" y="317.834881" transform="rotate(-0 582.21 317.834881)">A2</text></g><g id="fig11_paged_kv-text_32"><text style="font-size: 11.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="35.37" y="377.8632" transform="rotate(-0 35.37 377.8632)">A grows → allocate a free slot → append its slot ID to A's block table</text></g><g id="fig11_paged_kv-text_33"><text style="font-size: 9.6px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-muted)" x="35.37" y="412.236" transform="rotate(-0 35.37 412.236)">Illustration of block mapping only. Real implementations also manage block sizes, sharing, metadata and reclamation.</text></g></g></g><defs><clipPath id="fig11_paged_kv-p3e1441bfb5"><rect x="15.84" y="15.84" width="658.44" height="410.256"/></clipPath></defs></svg>

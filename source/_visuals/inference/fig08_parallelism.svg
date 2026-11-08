@@ -1,0 +1,190 @@
+<svg role="img" aria-label="数据、张量、流水线和专家并行分割不同对象，通信与容量代价不同。" xmlns:xlink="http://www.w3.org/1999/xlink" width="871.92pt" height="593.415687pt" viewBox="0 0 871.92 593.415687" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style></defs><g id="fig08_parallelism-figure_1"><g id="fig08_parallelism-patch_1"><path d="M 0 593.415687 
+L 871.92 593.415687 
+L 871.92 0 
+L 0 0 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig08_parallelism-axes_1"><g id="fig08_parallelism-patch_2"><path d="M 36.977867 144.1807 
+L 127.666133 144.1807 
+Q 133.121067 144.1807 133.121067 139.0979 
+L 133.121067 95.8941 
+Q 133.121067 90.8113 127.666133 90.8113 
+L 36.977867 90.8113 
+Q 31.522933 90.8113 31.522933 95.8941 
+L 31.522933 139.0979 
+Q 31.522933 144.1807 36.977867 144.1807 
+z
+" clip-path="url(#fig08_parallelism-p00615ba5e8)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_3"><path d="M 36.977867 236.30645 
+L 127.666133 236.30645 
+Q 133.121067 236.30645 133.121067 231.22365 
+L 133.121067 188.01985 
+Q 133.121067 182.93705 127.666133 182.93705 
+L 36.977867 182.93705 
+Q 31.522933 182.93705 31.522933 188.01985 
+L 31.522933 231.22365 
+Q 31.522933 236.30645 36.977867 236.30645 
+z
+" clip-path="url(#fig08_parallelism-p00615ba5e8)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_4"><path d="M 190.397867 144.1807 
+L 386.775467 144.1807 
+Q 392.2304 144.1807 392.2304 139.0979 
+L 392.2304 95.8941 
+Q 392.2304 90.8113 386.775467 90.8113 
+L 190.397867 90.8113 
+Q 184.942933 90.8113 184.942933 95.8941 
+L 184.942933 139.0979 
+Q 184.942933 144.1807 190.397867 144.1807 
+z
+" clip-path="url(#fig08_parallelism-p00615ba5e8)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_5"><path d="M 190.397867 236.30645 
+L 386.775467 236.30645 
+Q 392.2304 236.30645 392.2304 231.22365 
+L 392.2304 188.01985 
+Q 392.2304 182.93705 386.775467 182.93705 
+L 190.397867 182.93705 
+Q 184.942933 182.93705 184.942933 188.01985 
+L 184.942933 231.22365 
+Q 184.942933 236.30645 190.397867 236.30645 
+z
+" clip-path="url(#fig08_parallelism-p00615ba5e8)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_6"><path d="M 133.758319 117.496 
+Q 159.03342 117.496 182.63147 117.496 
+" clip-path="url(#fig08_parallelism-p00615ba5e8)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 177.83147 115.096 
+L 182.63147 117.496 
+L 177.83147 119.896 
+z
+" clip-path="url(#fig08_parallelism-p00615ba5e8)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-patch_7"><path d="M 133.758319 209.62175 
+Q 159.03342 209.62175 182.63147 209.62175 
+" clip-path="url(#fig08_parallelism-p00615ba5e8)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 177.83147 207.22175 
+L 182.63147 209.62175 
+L 177.83147 212.02175 
+z
+" clip-path="url(#fig08_parallelism-p00615ba5e8)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-text_1"><text style="font-weight: 500; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="22.658667" y="38.07725" transform="rotate(-0 22.658667 38.07725)">Data parallelism: different requests</text></g><g id="fig08_parallelism-text_2"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="82.322" y="120.80725" transform="rotate(-0 82.322 120.80725)">Request A</text></g><g id="fig08_parallelism-text_3"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="82.322" y="212.933" transform="rotate(-0 82.322 212.933)">Request B</text></g><g id="fig08_parallelism-text_4"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="288.586667" y="120.80725" transform="rotate(-0 288.586667 120.80725)">Complete model replica 1</text></g><g id="fig08_parallelism-text_5"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="288.586667" y="212.933" transform="rotate(-0 288.586667 212.933)">Complete model replica 2</text></g></g><g id="fig08_parallelism-axes_2"><g id="fig08_parallelism-patch_8"><path d="M 471.5072 144.1807 
+L 626.9728 144.1807 
+Q 632.427733 144.1807 632.427733 139.0979 
+L 632.427733 95.8941 
+Q 632.427733 90.8113 626.9728 90.8113 
+L 471.5072 90.8113 
+Q 466.052267 90.8113 466.052267 95.8941 
+L 466.052267 139.0979 
+Q 466.052267 144.1807 471.5072 144.1807 
+z
+" clip-path="url(#fig08_parallelism-p6052515a32)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_9"><path d="M 669.248533 144.1807 
+L 824.714133 144.1807 
+Q 830.169067 144.1807 830.169067 139.0979 
+L 830.169067 95.8941 
+Q 830.169067 90.8113 824.714133 90.8113 
+L 669.248533 90.8113 
+Q 663.7936 90.8113 663.7936 95.8941 
+L 663.7936 139.0979 
+Q 663.7936 144.1807 669.248533 144.1807 
+z
+" clip-path="url(#fig08_parallelism-p6052515a32)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_10"><path d="M 556.740533 242.65995 
+L 719.0248 242.65995 
+Q 724.479733 242.65995 724.479733 237.57715 
+L 724.479733 194.37335 
+Q 724.479733 189.29055 719.0248 189.29055 
+L 556.740533 189.29055 
+Q 551.2856 189.29055 551.2856 194.37335 
+L 551.2856 237.57715 
+Q 551.2856 242.65995 556.740533 242.65995 
+z
+" clip-path="url(#fig08_parallelism-p6052515a32)" style="fill: var(--surface-soft); stroke: var(--chart-amber); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_11"><path d="M 550.877662 144.054456 
+Q 583.333706 166.735885 614.415104 188.456664 
+" clip-path="url(#fig08_parallelism-p6052515a32)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 611.855411 183.739888 
+L 614.415104 188.456664 
+L 609.105868 187.674353 
+z
+" clip-path="url(#fig08_parallelism-p6052515a32)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-patch_12"><path d="M 745.220274 143.856685 
+Q 702.661066 166.735052 661.579005 188.819355 
+" clip-path="url(#fig08_parallelism-p6052515a32)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 666.943218 188.660534 
+L 661.579005 188.819355 
+L 664.670476 184.432692 
+z
+" clip-path="url(#fig08_parallelism-p6052515a32)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-text_6"><text style="font-weight: 500; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="453.778667" y="38.07725" transform="rotate(-0 453.778667 38.07725)">Tensor parallelism: split an operator</text></g><g id="fig08_parallelism-text_7"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="549.24" y="120.80725" transform="rotate(-0 549.24 120.80725)">W shard 1</text></g><g id="fig08_parallelism-text_8"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="746.981333" y="120.80725" transform="rotate(-0 746.981333 120.80725)">W shard 2</text></g><g id="fig08_parallelism-text_9"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="637.882667" y="219.2865" transform="rotate(-0 637.882667 219.2865)">Collective result</text></g><g id="fig08_parallelism-text_10"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="651.52" y="73.0215" transform="rotate(-0 651.52 73.0215)">same token batch</text></g></g><g id="fig08_parallelism-axes_3"><g id="fig08_parallelism-patch_13"><path d="M 36.977867 436.20445 
+L 192.443467 436.20445 
+Q 197.8984 436.20445 197.8984 431.12165 
+L 197.8984 375.21085 
+Q 197.8984 370.12805 192.443467 370.12805 
+L 36.977867 370.12805 
+Q 31.522933 370.12805 31.522933 375.21085 
+L 31.522933 431.12165 
+Q 31.522933 436.20445 36.977867 436.20445 
+z
+" clip-path="url(#fig08_parallelism-p172641c508)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_14"><path d="M 244.9472 436.20445 
+L 400.4128 436.20445 
+Q 405.867733 436.20445 405.867733 431.12165 
+L 405.867733 375.21085 
+Q 405.867733 370.12805 400.4128 370.12805 
+L 244.9472 370.12805 
+Q 239.492267 370.12805 239.492267 375.21085 
+L 239.492267 431.12165 
+Q 239.492267 436.20445 244.9472 436.20445 
+z
+" clip-path="url(#fig08_parallelism-p172641c508)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_15"><path d="M 198.53378 403.16625 
+Q 218.693922 403.16625 237.177013 403.16625 
+" clip-path="url(#fig08_parallelism-p172641c508)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 232.377013 400.76625 
+L 237.177013 403.16625 
+L 232.377013 405.56625 
+z
+" clip-path="url(#fig08_parallelism-p172641c508)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-text_11"><text style="font-weight: 500; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="22.658667" y="314.21725" transform="rotate(-0 22.658667 314.21725)">Pipeline parallelism: split layers</text></g><g id="fig08_parallelism-text_12"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="114.710667" y="396.94725" transform="rotate(-0 114.710667 396.94725)">GPU 0</text></g><g id="fig08_parallelism-text_13"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="114.710667" y="419.848137" transform="rotate(-0 114.710667 419.848137)">layers 0 ... 15</text></g><g id="fig08_parallelism-text_14"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="322.68" y="396.94725" transform="rotate(-0 322.68 396.94725)">GPU 1</text></g><g id="fig08_parallelism-text_15"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="322.68" y="419.848137" transform="rotate(-0 322.68 419.848137)">layers 16 ... 31</text></g><g id="fig08_parallelism-text_16"><text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: var(--text-muted)" transform="translate(80.728125 490.447687)">Independent microbatches can occupy different stages.</text><text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: var(--text-muted)" transform="translate(105.625781 501.6455)">One token still follows its layer dependencies.</text></g></g><g id="fig08_parallelism-axes_4"><g id="fig08_parallelism-patch_16"><path d="M 461.2792 445.7347 
+L 551.967467 445.7347 
+Q 557.4224 445.7347 557.4224 440.6519 
+L 557.4224 391.0946 
+Q 557.4224 386.0118 551.967467 386.0118 
+L 461.2792 386.0118 
+Q 455.824267 386.0118 455.824267 391.0946 
+L 455.824267 440.6519 
+Q 455.824267 445.7347 461.2792 445.7347 
+z
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_17"><path d="M 590.833867 394.9067 
+L 701.978133 394.9067 
+Q 707.433067 394.9067 707.433067 389.8239 
+L 707.433067 356.15035 
+Q 707.433067 351.06755 701.978133 351.06755 
+L 590.833867 351.06755 
+Q 585.378933 351.06755 585.378933 356.15035 
+L 585.378933 389.8239 
+Q 585.378933 394.9067 590.833867 394.9067 
+z
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_18"><path d="M 590.833867 502.9162 
+L 701.978133 502.9162 
+Q 707.433067 502.9162 707.433067 497.8334 
+L 707.433067 464.15985 
+Q 707.433067 459.07705 701.978133 459.07705 
+L 590.833867 459.07705 
+Q 585.378933 459.07705 585.378933 464.15985 
+L 585.378933 497.8334 
+Q 585.378933 502.9162 590.833867 502.9162 
+z
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: var(--surface-soft); stroke: var(--chart-amber); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_19"><path d="M 747.6632 445.7347 
+L 838.351467 445.7347 
+Q 843.8064 445.7347 843.8064 440.6519 
+L 843.8064 391.0946 
+Q 843.8064 386.0118 838.351467 386.0118 
+L 747.6632 386.0118 
+Q 742.208267 386.0118 742.208267 391.0946 
+L 742.208267 440.6519 
+Q 742.208267 445.7347 747.6632 445.7347 
+z
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig08_parallelism-patch_20"><path d="M 557.446413 404.90625 
+Q 571.399863 390.460082 584.188207 377.220162 
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 579.127243 379.005278 
+L 584.188207 377.220162 
+L 582.579722 382.340003 
+z
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-patch_21"><path d="M 557.019414 427.154125 
+Q 571.39938 453.356556 584.972495 478.088785 
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 584.767135 472.726153 
+L 584.972495 478.088785 
+L 580.559173 475.035494 
+z
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-patch_22"><path d="M 707.596084 375.868769 
+Q 724.821003 390.459535 740.766265 403.966337 
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 738.654913 399.032556 
+L 740.766265 403.966337 
+L 735.552429 402.695149 
+z
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-patch_23"><path d="M 707.184067 479.652401 
+Q 724.821687 453.357378 741.525105 428.455111 
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 736.858113 431.104485 
+L 741.525105 428.455111 
+L 740.844409 433.778329 
+z
+" clip-path="url(#fig08_parallelism-p3ee3d6f28a)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig08_parallelism-text_17"><text style="font-weight: 500; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="453.778667" y="314.21725" transform="rotate(-0 453.778667 314.21725)">Expert parallelism: route activations</text></g><g id="fig08_parallelism-text_18"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="506.623333" y="419.1845" transform="rotate(-0 506.623333 419.1845)">Router</text></g><g id="fig08_parallelism-text_19"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="646.406" y="376.298375" transform="rotate(-0 646.406 376.298375)">Experts A</text></g><g id="fig08_parallelism-text_20"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="646.406" y="484.307875" transform="rotate(-0 646.406 484.307875)">Experts B</text></g><g id="fig08_parallelism-text_21"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="793.007333" y="419.1845" transform="rotate(-0 793.007333 419.1845)">Combine</text></g></g><g id="fig08_parallelism-text_22"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-muted)" x="55.8" y="575.496" transform="rotate(-0 55.8 575.496)">Mechanism schematic. These dimensions can be combined; their communication patterns and capacity costs differ.</text></g></g><defs><clipPath id="fig08_parallelism-p00615ba5e8"><rect x="15.84" y="15.84" width="409.12" height="254.14"/></clipPath><clipPath id="fig08_parallelism-p6052515a32"><rect x="446.96" y="15.84" width="409.12" height="254.14"/></clipPath><clipPath id="fig08_parallelism-p172641c508"><rect x="15.84" y="291.98" width="409.12" height="254.14"/></clipPath><clipPath id="fig08_parallelism-p3ee3d6f28a"><rect x="446.96" y="291.98" width="409.12" height="254.14"/></clipPath></defs></svg>

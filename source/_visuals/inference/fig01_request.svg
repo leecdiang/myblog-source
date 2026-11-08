@@ -1,0 +1,126 @@
+<svg role="img" aria-label="自回归请求流程：提示预填充产生首个输出 token，随后逐 token 解码并复用 KV Cache。" xmlns:xlink="http://www.w3.org/1999/xlink" width="678.96pt" height="364.32pt" viewBox="0 0 678.96 364.32" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style></defs><g id="fig01_request-figure_1"><g id="fig01_request-patch_1"><path d="M 0 364.32 
+L 678.96 364.32 
+L 678.96 0 
+L 0 0 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig01_request-axes_1"><g id="fig01_request-patch_2"><path d="M 35.928 136.1448 
+L 146.412 136.1448 
+Q 150.876 136.1448 150.876 131.7096 
+L 150.876 82.9224 
+Q 150.876 78.4872 146.412 78.4872 
+L 35.928 78.4872 
+Q 31.464 78.4872 31.464 82.9224 
+L 31.464 131.7096 
+Q 31.464 136.1448 35.928 136.1448 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig01_request-patch_3"><path d="M 186.588 136.1448 
+L 297.072 136.1448 
+Q 301.536 136.1448 301.536 131.7096 
+L 301.536 82.9224 
+Q 301.536 78.4872 297.072 78.4872 
+L 186.588 78.4872 
+Q 182.124 78.4872 182.124 82.9224 
+L 182.124 131.7096 
+Q 182.124 136.1448 186.588 136.1448 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig01_request-patch_4"><path d="M 337.248 136.1448 
+L 470.052 136.1448 
+Q 474.516 136.1448 474.516 131.7096 
+L 474.516 82.9224 
+Q 474.516 78.4872 470.052 78.4872 
+L 337.248 78.4872 
+Q 332.784 78.4872 332.784 82.9224 
+L 332.784 131.7096 
+Q 332.784 136.1448 337.248 136.1448 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig01_request-patch_5"><path d="M 510.228 136.1448 
+L 631.872 136.1448 
+Q 636.336 136.1448 636.336 131.7096 
+L 636.336 82.9224 
+Q 636.336 78.4872 631.872 78.4872 
+L 510.228 78.4872 
+Q 505.764 78.4872 505.764 82.9224 
+L 505.764 131.7096 
+Q 505.764 136.1448 510.228 136.1448 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig01_request-patch_6"><path d="M 151.758501 107.316 
+Q 166.49816 107.316 179.560769 107.316 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 174.760769 104.916 
+L 179.560769 107.316 
+L 174.760769 109.716 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig01_request-patch_7"><path d="M 302.418501 107.316 
+Q 317.15816 107.316 330.220769 107.316 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 325.420769 104.916 
+L 330.220769 107.316 
+L 325.420769 109.716 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig01_request-patch_8"><path d="M 475.398501 107.316 
+Q 490.13816 107.316 503.200769 107.316 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 498.400769 104.916 
+L 503.200769 107.316 
+L 498.400769 109.716 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig01_request-patch_9"><path d="M 337.248 266.4288 
+L 470.052 266.4288 
+Q 474.516 266.4288 474.516 261.9936 
+L 474.516 204.8904 
+Q 474.516 200.4552 470.052 200.4552 
+L 337.248 200.4552 
+Q 332.784 200.4552 332.784 204.8904 
+L 332.784 261.9936 
+Q 332.784 266.4288 337.248 266.4288 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig01_request-patch_10"><path d="M 510.228 266.4288 
+L 631.872 266.4288 
+Q 636.336 266.4288 636.336 261.9936 
+L 636.336 204.8904 
+Q 636.336 200.4552 631.872 200.4552 
+L 510.228 200.4552 
+Q 505.764 200.4552 505.764 204.8904 
+L 505.764 261.9936 
+Q 505.764 266.4288 510.228 266.4288 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig01_request-patch_11"><path d="M 158.688 266.4288 
+L 280.332 266.4288 
+Q 284.796 266.4288 284.796 261.9936 
+L 284.796 204.8904 
+Q 284.796 200.4552 280.332 200.4552 
+L 158.688 200.4552 
+Q 154.224 200.4552 154.224 204.8904 
+L 154.224 261.9936 
+Q 154.224 266.4288 158.688 266.4288 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--surface-soft); stroke: var(--chart-amber); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig01_request-patch_12"><path d="M 401.803353 135.808519 
+Q 324.133872 168.300472 248.011519 200.145205 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/><path d="M 253.365885 200.506824 
+L 248.011519 200.145205 
+L 251.513434 196.078684 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--chart-amber); stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig01_request-patch_13"><path d="M 569.283687 135.971956 
+Q 508.273908 168.300579 448.745992 199.843973 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 454.111057 199.717189 
+L 448.745992 199.843973 
+L 451.863604 195.475851 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig01_request-patch_14"><path d="M 287.358617 233.7192 
+Q 308.791628 233.7192 330.224639 233.7192 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/><path d="M 292.158617 236.1192 
+L 287.358617 233.7192 
+L 292.158617 231.3192 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/><path d="M 325.424639 231.3192 
+L 330.224639 233.7192 
+L 325.424639 236.1192 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig01_request-patch_15"><path d="M 475.398501 233.7192 
+Q 490.13816 233.7192 503.200769 233.7192 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 498.400769 231.3192 
+L 503.200769 233.7192 
+L 498.400769 236.1192 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig01_request-patch_16"><path d="M 552.955401 266.794666 
+Q 488.743944 335.967971 425.673419 268.021527 
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: none; stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/><path d="M 427.17996 273.172288 
+L 425.673419 268.021527 
+L 430.697952 269.906751 
+z
+" clip-path="url(#fig01_request-pf05b9a8065)" style="fill: var(--chart-teal); stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig01_request-text_1"><text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="27" y="35.244" transform="rotate(-0 27 35.244)">A request: known prompt tokens, then dependent output tokens</text></g><g id="fig01_request-text_2"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="91.17" y="102.31125" transform="rotate(-0 91.17 102.31125)">Chat template</text></g><g id="fig01_request-text_3"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="91.17" y="122.216988" transform="rotate(-0 91.17 122.216988)">text + roles + tool schema</text></g><g id="fig01_request-text_4"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="241.83" y="102.31125" transform="rotate(-0 241.83 102.31125)">Tokenizer</text></g><g id="fig01_request-text_5"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="241.83" y="122.216988" transform="rotate(-0 241.83 122.216988)">a sequence of token IDs</text></g><g id="fig01_request-text_6"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="403.65" y="102.31125" transform="rotate(-0 403.65 102.31125)">Prefill</text></g><g id="fig01_request-text_7"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="403.65" y="122.216988" transform="rotate(-0 403.65 122.216988)">all prompt positions</text></g><g id="fig01_request-text_8"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="571.05" y="102.31125" transform="rotate(-0 571.05 102.31125)">First token</text></g><g id="fig01_request-text_9"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="571.05" y="122.216988" transform="rotate(-0 571.05 122.216988)">sample from final logits</text></g><g id="fig01_request-text_10"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="403.65" y="227.18985" transform="rotate(-0 403.65 227.18985)">Decode one token</text></g><g id="fig01_request-text_11"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="403.65" y="250.172508" transform="rotate(-0 403.65 250.172508)">query cached K/V; run FFN</text></g><g id="fig01_request-text_12"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="571.05" y="227.18985" transform="rotate(-0 571.05 227.18985)">Next token</text></g><g id="fig01_request-text_13"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="571.05" y="250.172508" transform="rotate(-0 571.05 250.172508)">sample / check stop</text></g><g id="fig01_request-text_14"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="219.51" y="227.18985" transform="rotate(-0 219.51 227.18985)">KV cache</text></g><g id="fig01_request-text_15"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="219.51" y="250.172508" transform="rotate(-0 219.51 250.172508)">per layer, per sequence</text></g><g id="fig01_request-text_16"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="280.89" y="172.1808" transform="rotate(-0 280.89 172.1808)">store prompt K/V</text></g><g id="fig01_request-text_17"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="492.93" y="316.8792" transform="rotate(-0 492.93 316.8792)">feed sampled token into the next step</text></g><g id="fig01_request-text_18"><text style="font-size: 9.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-muted)" x="32.58" y="340.164" transform="rotate(-0 32.58 340.164)">Schematic for decoder-only autoregressive inference. The first output token comes from prefill logits.</text></g></g></g><defs><clipPath id="fig01_request-pf05b9a8065"><rect x="15.84" y="15.84" width="647.28" height="332.64"/></clipPath></defs></svg>

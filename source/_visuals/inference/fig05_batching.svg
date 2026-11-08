@@ -1,0 +1,299 @@
+<svg role="img" aria-label="同一简化模型下，总输出吞吐随批量增加，而每条序列的解码速率下降；长上下文进一步增加 KV 读取。" xmlns:xlink="http://www.w3.org/1999/xlink" width="877.95875pt" height="412.757812pt" viewBox="0 0 877.95875 412.757812" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style></defs><g id="fig05_batching-figure_1"><g id="fig05_batching-patch_1"><path d="M 0 412.757812 
+L 877.95875 412.757812 
+L 877.95875 0 
+L 0 0 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig05_batching-axes_1"><g id="fig05_batching-patch_2"><path d="M 66.44875 307.941812 
+L 435.96875 307.941812 
+L 435.96875 32.477812 
+L 66.44875 32.477812 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig05_batching-matplotlib.axis_1"><g id="fig05_batching-xtick_1"><g id="fig05_batching-line2d_1"><path d="M 121.73127 307.941812 
+L 121.73127 32.477812 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_2"><defs><path id="fig05_batching-mefd133d758" d="M 0 0 
+L 0 3.5 
+" style="stroke: var(--text-primary); stroke-width: 0.8"/></defs><g><use xlink:href="#fig05_batching-mefd133d758" x="121.73127" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_1"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="121.73127" y="323.300094" transform="rotate(-0 121.73127 323.300094)">20</text></g></g><g id="fig05_batching-xtick_2"><g id="fig05_batching-line2d_3"><path d="M 179.923396 307.941812 
+L 179.923396 32.477812 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_4"><g><use xlink:href="#fig05_batching-mefd133d758" x="179.923396" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_2"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="179.923396" y="323.300094" transform="rotate(-0 179.923396 323.300094)">40</text></g></g><g id="fig05_batching-xtick_3"><g id="fig05_batching-line2d_5"><path d="M 238.115522 307.941812 
+L 238.115522 32.477812 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_6"><g><use xlink:href="#fig05_batching-mefd133d758" x="238.115522" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_3"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="238.115522" y="323.300094" transform="rotate(-0 238.115522 323.300094)">60</text></g></g><g id="fig05_batching-xtick_4"><g id="fig05_batching-line2d_7"><path d="M 296.307648 307.941812 
+L 296.307648 32.477812 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_8"><g><use xlink:href="#fig05_batching-mefd133d758" x="296.307648" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_4"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="296.307648" y="323.300094" transform="rotate(-0 296.307648 323.300094)">80</text></g></g><g id="fig05_batching-xtick_5"><g id="fig05_batching-line2d_9"><path d="M 354.499774 307.941812 
+L 354.499774 32.477812 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_10"><g><use xlink:href="#fig05_batching-mefd133d758" x="354.499774" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_5"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="354.499774" y="323.300094" transform="rotate(-0 354.499774 323.300094)">100</text></g></g><g id="fig05_batching-xtick_6"><g id="fig05_batching-line2d_11"><path d="M 412.6919 307.941812 
+L 412.6919 32.477812 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_12"><g><use xlink:href="#fig05_batching-mefd133d758" x="412.6919" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_6"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="412.6919" y="323.300094" transform="rotate(-0 412.6919 323.300094)">120</text></g></g><g id="fig05_batching-text_7"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="251.20875" y="338.705875" transform="rotate(-0 251.20875 338.705875)">Active decode sequences B</text></g></g><g id="fig05_batching-matplotlib.axis_2"><g id="fig05_batching-ytick_1"><g id="fig05_batching-line2d_13"><path d="M 66.44875 300.347942 
+L 435.96875 300.347942 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_14"><defs><path id="fig05_batching-m3a17e3de4c" d="M 0 0 
+L -3.5 0 
+" style="stroke: var(--text-primary); stroke-width: 0.8"/></defs><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="66.44875" y="300.347942" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_8"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="59.44875" y="304.527083" transform="rotate(-0 59.44875 304.527083)">0</text></g></g><g id="fig05_batching-ytick_2"><g id="fig05_batching-line2d_15"><path d="M 66.44875 248.879152 
+L 435.96875 248.879152 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_16"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="66.44875" y="248.879152" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_9"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="59.44875" y="253.058292" transform="rotate(-0 59.44875 253.058292)">1000</text></g></g><g id="fig05_batching-ytick_3"><g id="fig05_batching-line2d_17"><path d="M 66.44875 197.410361 
+L 435.96875 197.410361 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_18"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="66.44875" y="197.410361" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_10"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="59.44875" y="201.589502" transform="rotate(-0 59.44875 201.589502)">2000</text></g></g><g id="fig05_batching-ytick_4"><g id="fig05_batching-line2d_19"><path d="M 66.44875 145.94157 
+L 435.96875 145.94157 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_20"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="66.44875" y="145.94157" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_11"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="59.44875" y="150.120711" transform="rotate(-0 59.44875 150.120711)">3000</text></g></g><g id="fig05_batching-ytick_5"><g id="fig05_batching-line2d_21"><path d="M 66.44875 94.47278 
+L 435.96875 94.47278 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_22"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="66.44875" y="94.47278" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_12"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="59.44875" y="98.65192" transform="rotate(-0 59.44875 98.65192)">4000</text></g></g><g id="fig05_batching-ytick_6"><g id="fig05_batching-line2d_23"><path d="M 66.44875 43.003989 
+L 435.96875 43.003989 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_24"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="66.44875" y="43.003989" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_13"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="59.44875" y="47.18313" transform="rotate(-0 59.44875 47.18313)">5000</text></g></g><g id="fig05_batching-text_14"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="24.958125" y="170.209812" transform="rotate(-90 24.958125 170.209812)">Aggregate output throughput [tokens/s]</text></g></g><g id="fig05_batching-line2d_25"><path d="M 66.44875 292.882886 
+L 75.177569 270.846656 
+L 83.906388 249.333911 
+L 92.635207 228.326218 
+L 101.364026 207.805997 
+L 110.092844 187.756474 
+L 118.821663 168.161639 
+L 127.550482 149.006198 
+L 136.279301 130.275534 
+L 145.00812 111.955674 
+L 153.736939 94.033249 
+L 162.465758 76.495466 
+L 174.104183 53.688985 
+L 177.013789 49.437588 
+L 194.471427 48.598423 
+L 214.838671 47.859535 
+L 241.025128 47.154698 
+L 273.030797 46.529249 
+L 313.765285 45.961966 
+L 369.047805 45.431762 
+L 435.96875 44.998903 
+L 435.96875 44.998903 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke: var(--chart-blue); stroke-width: 2.4; stroke-linecap: square"/></g><g id="fig05_batching-line2d_26"><path d="M 66.44875 293.310975 
+L 69.358356 287.085271 
+L 72.267963 281.538184 
+L 75.177569 276.564492 
+L 78.087175 272.079659 
+L 80.996781 268.014987 
+L 83.906388 264.314073 
+L 86.815994 260.930178 
+L 89.7256 257.824241 
+L 92.635207 254.963367 
+L 95.544813 252.319651 
+L 98.454419 249.869273 
+L 101.364026 247.591772 
+L 104.273632 245.469477 
+L 110.092844 241.63109 
+L 115.912057 238.253105 
+L 121.73127 235.257372 
+L 127.550482 232.582483 
+L 133.369695 230.179514 
+L 139.188907 228.009006 
+L 145.00812 226.038785 
+L 150.827333 224.242349 
+L 159.556152 221.826367 
+L 168.28497 219.692691 
+L 177.013789 217.794572 
+L 185.742608 216.095041 
+L 197.381033 214.087561 
+L 209.019459 212.32584 
+L 220.657884 210.76735 
+L 235.205915 209.055061 
+L 249.753947 207.558567 
+L 267.211585 205.994222 
+L 287.578829 204.42607 
+L 307.946073 203.078901 
+L 331.222923 201.754413 
+L 357.40938 200.48208 
+L 386.505443 199.280967 
+L 421.420719 198.068831 
+L 435.96875 197.62367 
+L 435.96875 197.62367 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke-dasharray: 8.88,3.84; stroke-dashoffset: 0; stroke: var(--chart-teal); stroke-width: 2.4"/></g><g id="fig05_batching-line2d_27"><path d="M 66.44875 295.420722 
+L 69.358356 293.008336 
+L 72.267963 291.576889 
+L 75.177569 290.629159 
+L 78.087175 289.955398 
+L 80.996781 289.451811 
+L 86.815994 288.74927 
+L 92.635207 288.282511 
+L 101.364026 287.817026 
+L 113.002451 287.426023 
+L 130.460089 287.074888 
+L 159.556152 286.757819 
+L 206.109852 286.509551 
+L 290.488435 286.31294 
+L 435.96875 286.180083 
+L 435.96875 286.180083 
+" clip-path="url(#fig05_batching-pa0f17cd56d)" style="fill: none; stroke-dasharray: 2.4,3.96; stroke-dashoffset: 0; stroke: var(--chart-amber); stroke-width: 2.4"/></g><g id="fig05_batching-patch_3"><path d="M 66.44875 307.941812 
+L 66.44875 32.477813 
+" style="fill: none; stroke: var(--divider); stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/></g><g id="fig05_batching-patch_4"><path d="M 66.44875 307.941812 
+L 435.96875 307.941812 
+" style="fill: none; stroke: var(--divider); stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/></g><g id="fig05_batching-text_15"><text style="font-weight: 500; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="66.44875" y="26.477812" transform="rotate(-0 66.44875 26.477812)">More outputs per step</text></g></g><g id="fig05_batching-axes_2"><g id="fig05_batching-patch_5"><path d="M 492.59875 307.941812 
+L 862.11875 307.941812 
+L 862.11875 32.477812 
+L 492.59875 32.477812 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig05_batching-matplotlib.axis_3"><g id="fig05_batching-xtick_7"><g id="fig05_batching-line2d_28"><path d="M 547.88127 307.941812 
+L 547.88127 32.477812 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_29"><g><use xlink:href="#fig05_batching-mefd133d758" x="547.88127" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_16"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="547.88127" y="323.300094" transform="rotate(-0 547.88127 323.300094)">20</text></g></g><g id="fig05_batching-xtick_8"><g id="fig05_batching-line2d_30"><path d="M 606.073396 307.941812 
+L 606.073396 32.477812 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_31"><g><use xlink:href="#fig05_batching-mefd133d758" x="606.073396" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_17"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="606.073396" y="323.300094" transform="rotate(-0 606.073396 323.300094)">40</text></g></g><g id="fig05_batching-xtick_9"><g id="fig05_batching-line2d_32"><path d="M 664.265522 307.941812 
+L 664.265522 32.477812 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_33"><g><use xlink:href="#fig05_batching-mefd133d758" x="664.265522" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_18"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="664.265522" y="323.300094" transform="rotate(-0 664.265522 323.300094)">60</text></g></g><g id="fig05_batching-xtick_10"><g id="fig05_batching-line2d_34"><path d="M 722.457648 307.941812 
+L 722.457648 32.477812 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_35"><g><use xlink:href="#fig05_batching-mefd133d758" x="722.457648" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_19"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="722.457648" y="323.300094" transform="rotate(-0 722.457648 323.300094)">80</text></g></g><g id="fig05_batching-xtick_11"><g id="fig05_batching-line2d_36"><path d="M 780.649774 307.941812 
+L 780.649774 32.477812 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_37"><g><use xlink:href="#fig05_batching-mefd133d758" x="780.649774" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_20"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="780.649774" y="323.300094" transform="rotate(-0 780.649774 323.300094)">100</text></g></g><g id="fig05_batching-xtick_12"><g id="fig05_batching-line2d_38"><path d="M 838.8419 307.941812 
+L 838.8419 32.477812 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_39"><g><use xlink:href="#fig05_batching-mefd133d758" x="838.8419" y="307.941812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_21"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="838.8419" y="323.300094" transform="rotate(-0 838.8419 323.300094)">120</text></g></g><g id="fig05_batching-text_22"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="677.35875" y="338.705875" transform="rotate(-0 677.35875 338.705875)">Active decode sequences B</text></g></g><g id="fig05_batching-matplotlib.axis_4"><g id="fig05_batching-ytick_7"><g id="fig05_batching-line2d_40"><path d="M 492.59875 299.189677 
+L 862.11875 299.189677 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_41"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="492.59875" y="299.189677" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_23"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="485.59875" y="303.368817" transform="rotate(-0 485.59875 303.368817)">0</text></g></g><g id="fig05_batching-ytick_8"><g id="fig05_batching-line2d_42"><path d="M 492.59875 264.138657 
+L 862.11875 264.138657 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_43"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="492.59875" y="264.138657" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_24"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="485.59875" y="268.317797" transform="rotate(-0 485.59875 268.317797)">20</text></g></g><g id="fig05_batching-ytick_9"><g id="fig05_batching-line2d_44"><path d="M 492.59875 229.087637 
+L 862.11875 229.087637 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_45"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="492.59875" y="229.087637" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_25"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="485.59875" y="233.266777" transform="rotate(-0 485.59875 233.266777)">40</text></g></g><g id="fig05_batching-ytick_10"><g id="fig05_batching-line2d_46"><path d="M 492.59875 194.036617 
+L 862.11875 194.036617 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_47"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="492.59875" y="194.036617" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_26"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="485.59875" y="198.215757" transform="rotate(-0 485.59875 198.215757)">60</text></g></g><g id="fig05_batching-ytick_11"><g id="fig05_batching-line2d_48"><path d="M 492.59875 158.985597 
+L 862.11875 158.985597 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_49"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="492.59875" y="158.985597" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_27"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="485.59875" y="163.164737" transform="rotate(-0 485.59875 163.164737)">80</text></g></g><g id="fig05_batching-ytick_12"><g id="fig05_batching-line2d_50"><path d="M 492.59875 123.934577 
+L 862.11875 123.934577 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_51"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="492.59875" y="123.934577" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_28"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="485.59875" y="128.113717" transform="rotate(-0 485.59875 128.113717)">100</text></g></g><g id="fig05_batching-ytick_13"><g id="fig05_batching-line2d_52"><path d="M 492.59875 88.883557 
+L 862.11875 88.883557 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_53"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="492.59875" y="88.883557" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_29"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="485.59875" y="93.062697" transform="rotate(-0 485.59875 93.062697)">120</text></g></g><g id="fig05_batching-ytick_14"><g id="fig05_batching-line2d_54"><path d="M 492.59875 53.832537 
+L 862.11875 53.832537 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig05_batching-line2d_55"><g><use xlink:href="#fig05_batching-m3a17e3de4c" x="492.59875" y="53.832537" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig05_batching-text_30"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="485.59875" y="58.011677" transform="rotate(-0 485.59875 58.011677)">140</text></g></g><g id="fig05_batching-text_31"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="458.106875" y="170.209812" transform="rotate(-90 458.106875 170.209812)">Output rate per sequence [tokens/s]</text></g></g><g id="fig05_batching-line2d_56"><path d="M 492.59875 44.998903 
+L 507.146781 50.050969 
+L 524.604419 55.854539 
+L 542.062057 61.393882 
+L 559.519695 66.68664 
+L 576.977333 71.74892 
+L 594.43497 76.595455 
+L 600.254183 78.165391 
+L 603.163789 80.120802 
+L 606.073396 85.463945 
+L 608.983002 90.552653 
+L 611.892608 95.404677 
+L 617.711821 104.461788 
+L 623.531033 112.748081 
+L 629.350246 120.357942 
+L 635.169459 127.370951 
+L 640.988671 133.854677 
+L 646.807884 139.866859 
+L 652.627096 145.457133 
+L 658.446309 150.668406 
+L 664.265522 155.537955 
+L 670.084734 160.098328 
+L 675.903947 164.378061 
+L 681.723159 168.402289 
+L 687.542372 172.193228 
+L 693.361585 175.770592 
+L 699.180797 179.151937 
+L 705.00001 182.352943 
+L 713.728829 186.846664 
+L 722.457648 191.007516 
+L 731.186467 194.871165 
+L 739.915285 198.468355 
+L 748.644104 201.825732 
+L 757.372923 204.966505 
+L 766.101742 207.910979 
+L 777.740167 211.562127 
+L 789.378593 214.932417 
+L 801.017018 218.053056 
+L 812.655443 220.950793 
+L 824.293868 223.648685 
+L 838.8419 226.770214 
+L 853.389931 229.644002 
+L 862.11875 231.261343 
+L 862.11875 231.261343 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke: var(--chart-blue); stroke-width: 2.4; stroke-linecap: square"/></g><g id="fig05_batching-line2d_57"><path d="M 492.59875 59.575671 
+L 495.508356 73.387712 
+L 498.417963 85.694206 
+L 501.327569 96.728593 
+L 504.237175 106.678422 
+L 507.146781 115.696105 
+L 510.056388 123.906771 
+L 512.965994 131.414113 
+L 515.8756 138.304791 
+L 518.785207 144.651786 
+L 521.694813 150.517003 
+L 524.604419 155.953292 
+L 527.514026 161.006043 
+L 530.423632 165.714463 
+L 533.333238 170.11259 
+L 536.242844 174.230118 
+L 539.152451 178.093071 
+L 542.062057 181.72435 
+L 544.971663 185.14419 
+L 547.88127 188.370535 
+L 550.790876 191.419356 
+L 556.610089 197.039976 
+L 562.429301 202.103385 
+L 568.248514 206.688529 
+L 574.067726 210.860115 
+L 579.886939 214.671679 
+L 585.706152 218.1679 
+L 591.525364 221.386358 
+L 597.344577 224.358889 
+L 603.163789 227.112643 
+L 608.983002 229.670916 
+L 614.802215 232.05381 
+L 623.531033 235.336834 
+L 632.259852 238.31374 
+L 640.988671 241.025435 
+L 649.71749 243.50585 
+L 658.446309 245.783363 
+L 670.084734 248.545228 
+L 681.723159 251.035484 
+L 693.361585 253.292318 
+L 705.00001 255.347082 
+L 719.548041 257.670528 
+L 734.096073 259.760106 
+L 751.553711 262.005777 
+L 769.011348 264.009432 
+L 789.378593 266.090256 
+L 809.745837 267.938675 
+L 833.022687 269.813526 
+L 859.209144 271.67084 
+L 862.11875 271.862812 
+L 862.11875 271.862812 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke-dasharray: 8.88,3.84; stroke-dashoffset: 0; stroke: var(--chart-teal); stroke-width: 2.4"/></g><g id="fig05_batching-line2d_58"><path d="M 492.59875 131.414113 
+L 495.508356 174.230118 
+L 498.417963 199.636022 
+L 501.327569 216.45671 
+L 504.237175 228.414891 
+L 507.146781 237.352766 
+L 510.056388 244.286302 
+L 512.965994 249.82174 
+L 515.8756 254.343224 
+L 518.785207 258.105976 
+L 521.694813 261.286192 
+L 524.604419 264.009432 
+L 527.514026 266.367591 
+L 530.423632 268.429471 
+L 533.333238 270.247608 
+L 536.242844 271.862812 
+L 539.152451 273.307262 
+L 542.062057 274.606677 
+L 547.88127 276.849802 
+L 553.700482 278.7178 
+L 559.519695 280.29751 
+L 565.338907 281.650888 
+L 571.15812 282.823325 
+L 579.886939 284.314858 
+L 588.615758 285.557238 
+L 600.254183 286.923264 
+L 611.892608 288.040461 
+L 626.44064 289.180031 
+L 643.898278 290.273613 
+L 664.265522 291.28159 
+L 687.542372 292.186424 
+L 713.728829 292.985087 
+L 745.734498 293.744113 
+L 786.468986 294.477744 
+L 835.932293 295.140197 
+L 862.11875 295.420722 
+L 862.11875 295.420722 
+" clip-path="url(#fig05_batching-pd87e5b9e95)" style="fill: none; stroke-dasharray: 2.4,3.96; stroke-dashoffset: 0; stroke: var(--chart-amber); stroke-width: 2.4"/></g><g id="fig05_batching-patch_6"><path d="M 492.59875 307.941812 
+L 492.59875 32.477813 
+" style="fill: none; stroke: var(--divider); stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/></g><g id="fig05_batching-patch_7"><path d="M 492.59875 307.941812 
+L 862.11875 307.941812 
+" style="fill: none; stroke: var(--divider); stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/></g><g id="fig05_batching-text_32"><text style="font-weight: 500; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="492.59875" y="26.477812" transform="rotate(-0 492.59875 26.477812)">A longer step for each user</text></g><g id="fig05_batching-legend_1"><g id="fig05_batching-line2d_59"><path d="M 743.877187 44.528375 
+L 753.077187 44.528375 
+L 762.277187 44.528375 
+" style="fill: none; stroke: var(--chart-blue); stroke-width: 2.4; stroke-linecap: square"/></g><g id="fig05_batching-text_33"><text style="font-size: 9.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="769.637187" y="47.748375" transform="rotate(-0 769.637187 47.748375)">128-token context</text></g><g id="fig05_batching-line2d_60"><path d="M 743.877187 58.03225 
+L 753.077187 58.03225 
+L 762.277187 58.03225 
+" style="fill: none; stroke-dasharray: 8.88,3.84; stroke-dashoffset: 0; stroke: var(--chart-teal); stroke-width: 2.4"/></g><g id="fig05_batching-text_34"><text style="font-size: 9.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="769.637187" y="61.25225" transform="rotate(-0 769.637187 61.25225)">2k-token context</text></g><g id="fig05_batching-line2d_61"><path d="M 743.877187 71.536125 
+L 753.077187 71.536125 
+L 762.277187 71.536125 
+" style="fill: none; stroke-dasharray: 2.4,3.96; stroke-dashoffset: 0; stroke: var(--chart-amber); stroke-width: 2.4"/></g><g id="fig05_batching-text_35"><text style="font-size: 9.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="769.637187" y="74.756125" transform="rotate(-0 769.637187 74.756125)">16k-token context</text></g></g></g><g id="fig05_batching-text_36"><text style="font-size: 9.2px; font-family: 'DejaVu Sans'; fill: var(--text-muted)" transform="translate(81.20675 384.702512)">Toy model: W=4 GB; linear work=16 GFLOP/token; L=32, Hkv=8, dh=128, BF16 KV. Capacity is unconstrained.</text><text style="font-size: 9.2px; font-family: 'DejaVu Sans'; fill: var(--text-muted)" transform="translate(81.20675 395.0045)">tstep = max[(W + B·KV)/600 GB/s, B·16 GFLOP / 80 TFLOP/s] + 0.2 ms. Attention FLOPs and queueing omitted.</text></g></g><defs><clipPath id="fig05_batching-pa0f17cd56d"><rect x="66.44875" y="32.477812" width="369.52" height="275.464"/></clipPath><clipPath id="fig05_batching-pd87e5b9e95"><rect x="492.59875" y="32.477812" width="369.52" height="275.464"/></clipPath></defs></svg>
