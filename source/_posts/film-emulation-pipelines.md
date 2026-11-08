@@ -11,19 +11,19 @@ tags:
 etoc: true
 mathjax: true
 published: true
-description: 从 Gloam、Dazz 和 No Fusion 到 Indigo 与桌面工具，沿着照片的输入、显影、颜色与空间效果，理解胶片模拟究竟改变了什么。
-updated: 2026-11-02 12:57:00
+description: 从 Gloam、Dazz、No Fusion 到 Indigo 与 SpektraLab，沿着输入、显影、光谱模型和空间效果，理解胶片模拟改变了什么，以及模型复杂度为什么不直接决定成片偏好。
+updated: 2026-11-08 11:24:00
 toc:
   max_depth: 2
 ---
 
 最近用 Gloam 拍照，我想弄清一个问题：同样叫“胶片模拟”，这些应用到底在改变照片的哪一部分？
 
-Gloam 和 Dazz 把颜色、颗粒和画幅装进一台台虚拟相机；No Fusion 让用户选择拍摄和显影方式；Adobe 的 Project Indigo 则自己采集、合并多张 RAW。到了电脑上，Lightroom 预设、胶片插件和 spektrafilm 又提供了另一组选择。它们都可能让照片更接近自己喜欢的外观，却未必在做同一件事。
+Gloam 和 Dazz 把颜色、颗粒和画幅装进一台台虚拟相机；No Fusion 让用户选择拍摄和显影方式；Adobe 的 Project Indigo 则自己采集、合并多张 RAW。到了电脑上，Lightroom 预设、胶片插件，以及 spektrafilm 模型与 SpektraLab 应用，又提供了另一组选择。它们都可能让照片更接近自己喜欢的外观，却未必在做同一件事。
 
 要理解这些差别，可以沿着一张照片往下走：**先看手机留下了什么，再看它怎样变成一张有胶片外观的照片，最后决定把哪些步骤交给什么工具。**
 
-以下资料截至 2026 年 11 月 1 日，依据官方文档、源码、论文和公开样片整理。文中的产品图片用于解释处理方式，尚未进行统一条件下的跨应用实拍。
+原有市场资料截至 2026 年 11 月 1 日；SpektraLab 专章及相关补充核查至 11 月 8 日，其他产品的版本与价格仍保留原快照。文章依据官方文档、源码、论文和公开样片整理，尚未进行统一条件下的跨应用实拍。
 
 <!-- more -->
 
@@ -115,7 +115,7 @@ Indigo 默认保存 JPEG 与 DNG。对静态夜景，可以先保留它的 DNG�
 
 因此，软件中的“Portra 400”最好理解为一个需要补全的描述：用了什么曝光和显影条件，又以哪一种冲扫结果为参照？Mastin 明确使用指定胶片与 Frontier 扫描参考；Dehancer 介绍的负片参考链则包含光学放相。两套结果即使不同，也可能是在追求各自的目标。[S40](#film-ref-S40) [S73](#film-ref-S73)
 
-建立这种外观，大致有两种思路。一种从真实胶片出发，拍摄、显影、扫描，再拟合颜色与颗粒响应，DxO FilmPack 属于公开说明了这套标定过程的产品。另一种把材料和处理步骤写成模型，计算光经过胶片、相纸后会变成什么。spektrafilm 适合用来理解后一种路线。[S45](#film-ref-S45) [S53](#film-ref-S53)
+在有明确材料参照的工具里，可以看到两种常见做法。一种从真实胶片出发，拍摄、显影、扫描，再拟合颜色与颗粒响应，DxO FilmPack 属于公开说明了这套标定过程的产品。另一种把材料和处理步骤写成模型，计算光经过胶片、相纸后会变成什么。spektrafilm 适合用来理解后一种路线。[S45](#film-ref-S45) [S53](#film-ref-S53)
 
 先看它的公开示例：
 
@@ -133,9 +133,57 @@ spektrafilm 延续了原来的 agx-emulsion 项目。它分别模拟胶片层曝
 
 因此，实物标定和过程建模有各自的价值：前者直接对准一个已知参考，后者便于解释和改变过程参数。**能否接近某张目标照片，要看参考和验证；能够控制哪些过程，则可以从模型本身判断。**
 
-不过，即使颜色与影调已经接近参考，照片仍可能缺少胶片的质感。还需要看颗粒，以及强光怎样影响周围区域。
+模型说明了照片可以怎样形成。到了具体应用，还要决定怎样解释输入、采用什么默认设置，以及把多少调整交给使用者。SpektraLab 让我们可以继续看，这些选择最终怎样落到成片上。[S82](#film-ref-S82)
 
-## 5. 颜色之外，颗粒和光晕怎样改变照片？
+## 5. SpektraLab：有了光谱模型，为什么未必更好看？
+
+看过 SpektraLab 的公开样片后，我仍更喜欢 Gloam 的成片。这也让我想把“技术上限”说得更具体：光谱模型增加了哪些能力，这些能力又怎样变成一张自己喜欢的照片？
+
+SpektraLab 是围绕 spektrafilm 模型建立的独立应用；macOS 版把相关计算移植到 C++ 与 Metal，再加上原生界面、RAW 导入和编辑流程。它与前一节的材料模型属于同一条技术路线，补上的是让模型进入日常编辑的一层。以下实现细节以 2026 年 11 月 8 日核查的 macOS 1.3.7 为准；移动版与 Windows 版的实现和成熟度另列在附录。[S82](#film-ref-S82) [S84](#film-ref-S84)
+
+{% raw %}
+<div class="v-figure"><a href="/images/film-emulation-spektralab/spektralab_official_workspace.png"><img src="/images/film-emulation-spektralab/spektralab_official_workspace.png" width="2560" height="1440" loading="lazy" decoding="async" alt="SpektraLab 官方工作区截图：夜景照片，左侧选中 Portra 160 胶片与 Vision 2383 材料，右侧为输入调整"></a><p class="v-caption">SpektraLab 项目公开的界面示例，画面中选择 Portra 160＋Vision 2383。图片取自 1.3.7 标签对应的源码仓库，截图所示界面的版本未注明，历史控件不能当作当前功能清单。摄影及界面权利归各自权利人。<a href="#film-ref-S93">[S93]</a></p></div>
+{% endraw %}
+
+### 先看输入，再看整套处理
+
+一份 RAW 进入 SpektraLab，也要先变成模型可以使用的数值。macOS 版借助 Apple 的 RAW 解码器生成线性 ProPhoto RGB 输入，关闭若干亮度增强与局部影调映射；对照用的 Original 则另取 Apple 默认显示渲染。因此，界面里的左右比较应理解为**同一份 RAW 经不同路径得到的显示结果**，不能把左边那张显示图直接当成右边的计算起点。[S86](#film-ref-S86)
+
+这条流程仍然受输入限制。ProRAW 已经融合的信息不会在这里拆回单帧，JPEG 中被剪掉的高光也不会因增加光谱步骤重新出现。进入模型后，选择胶片、负片曝光、相纸与放相配光，才会逐步确定成片；后面的曝光、白平衡和曲线等 Post-Dev 调整，继续参与最终外观。[S02](#film-ref-S02) [S83](#film-ref-S83)
+
+{% raw %}
+<div class="v-figure"><a href="/images/film-emulation-spektralab/spektralab_official_halation.png"><img src="/images/film-emulation-spektralab/spektralab_official_halation.png" width="1386" height="1400" loading="lazy" decoding="async" alt="SpektraLab 官方城市景观 Before/After 分割图，左右的颜色、天空颗粒和建筑边缘均有变化"></a><p class="v-caption">官方 Before／After 分割示例。可见颜色、颗粒与边缘观感一起变化；原文件虽然名为 natural_halation，但没有配套 RAW 与完整参数，不能把全部差异归因于光晕，也不能据此判定当前默认效果。原图未改色，摄影及界面权利归各自权利人。<a href="#film-ref-S93">[S93]</a></p></div>
+{% endraw %}
+
+### 并行计算主要改善等待时间
+
+SpektraLab 的 GPU 会同时处理许多像素，在相关步骤里计算不同波长下的材料响应。它还通过预计算、缓存已显影的负片和较小的交互预览减少重复工作。速度的意义很实际：修改放相参数时，可以更快看到结果，愿意尝试的组合也会更多。更快得到结果，方便的是编辑和比较，并没有增加原照片记录的信息。[S87](#film-ref-S87) [S89](#film-ref-S89) [S94](#film-ref-S94)
+
+SpektraLab 也使用预先计算的响应表和 LUT。**光谱模型决定颜色关系怎样建立，查表与并行计算帮助它更快得到结果。** 这些方法可以出现在同一套软件里；具体怎样预计算，放在附录 C7 展开。[S88](#film-ref-S88) [S95](#film-ref-S95)
+
+### 模型的上限，和照片是否合口味
+
+“理论上限更高”最好拆成三个可以分别判断的问题。
+
+| 想判断什么 | 需要看什么 | 目前可以怎样评价 SpektraLab |
+|---|---|---|
+| 能控制多少成像过程 | 模型、参数与它们所处的位置 | 胶片、相纸、曝光、配光及空间效果可以分别调整，适合探索材料之间的关系 |
+| 能否接近指定胶片结果 | 固定胶卷、曝光、显影与冲扫的实物参照 | 需要验证；光谱模型本身不能代替这组证据 |
+| 是否更喜欢、是否容易出片 | 自己的照片、默认结果和愿意投入的编辑时间 | 由风格与使用体验决定，不存在由模型复杂度规定的名次 |
+
+这条路线扩大了可控制的过程；能否准确预测结果，仍取决于输入标定、材料数据与模型近似。当前实现包含拟合与假设：SpektraLab 自有的黑白相纸 Profile 明确标注了假定的银光谱和基底密度，指南也说明彩色胶片目前共享一个颗粒模型。参数可调，并不等于每个材料特征都已独立测量。[S91](#film-ref-S91) [S83](#film-ref-S83)
+
+至于是否喜欢，默认选择就会带来很大影响。macOS 1.3.7 的前端初始设置为 Portra 400＋Supra Endura，并开启自动曝光；指南里的 Portra 400＋Portra Endura 则是练习配对。选择哪张相纸、曝光落在哪里、是否继续调色，都会改变读者看到的第一张照片。[S90](#film-ref-S90) [S83](#film-ref-S83)
+
+Gloam 把颜色、颗粒和画幅整理成可以直接选用的相机风格。使用者从作者已经调好的外观开始拍摄，再判断这些组合是否适合自己的场景。对日常使用而言，默认风格是否合意，本来就是重要标准。[S08](#film-ref-S08) [S09](#film-ref-S09)
+
+所以，就目前公开样片而言，我仍更喜欢 Gloam 的外观。SpektraLab 提供的另一种价值，是对负片与放相过程的控制。它能否在自己的照片上得到更合意的结果，需要分别比较默认出片和投入时间后的调整；本次调研没有完成这组实拍。
+
+颜色和影调之外，颗粒的大小、强光的扩散，也会改变一张照片的观感。
+
+<span id="5-颜色之外，颗粒和光晕怎样改变照片？"></span>
+
+## 6. 颜色之外，颗粒和光晕怎样改变照片？
 
 胶片颗粒很容易被想成一层噪点，但它的观感与底片画幅、放大倍率和观看距离有关。把同一张底片放得更大，颗粒也更容易被看见。
 
@@ -153,7 +201,9 @@ Kodak 的 Portra 400 资料给出了印相颗粒指数 PGI：在规定观看条�
 
 这些效果把我们带到了工具选择：颜色可以逐个像素计算，光晕要知道附近有什么，颗粒还需要随机结构。Lightroom 预设、Profile、LUT 和插件，正是在这些任务上各有分工。
 
-## 6. 到了电脑上，预设、LUT 和插件各接管什么？
+<span id="6-到了电脑上，预设、LUT-和插件各接管什么？"></span>
+
+## 7. 到了电脑上，预设、LUT 和插件各接管什么？
 
 先从 Lightroom 里最常见的两个名字说起。**预设保存一组开发设置**，让曝光、曲线、色彩、颗粒或蒙版等参数快速复用；**Profile 参与颜色与明暗的解释**，可以提供更复杂的映射，而不必把常规滑块改成一套固定值。不同文件即使都以 XMP 保存，作用也未必相同。[S34](#film-ref-S34) [S35](#film-ref-S35) [S36](#film-ref-S36)
 
@@ -173,13 +223,17 @@ DxO FilmPack、Dehancer 等工具将颜色与颗粒、光晕等处理组织在�
 
 Adobe 自己也在扩展这部分能力。Camera Raw 18.6 已加入 Diffusion、Bloom、Halation；一次 Glow 选择一个 Style，蒙版可调整 Amount，其他相关参数仍全局共享。这让许多空间效果可以留在 ACR 内完成。其他 Lightroom 客户端是否支持，要按各自版本确认。[S38](#film-ref-S38) [S39](#film-ref-S39) [S72](#film-ref-S72)
 
-独立插件的价值因此要落到更具体的地方：材质响应是否合意，参数是否好用，能否匹配目标参考，以及批处理和导出是否顺畅。功能名称相同，并不保证处理位置和结果相同。
+SpektraLab 则提供独立应用入口，把输入准备、材料模型与放相编辑组织在一起；它与宿主插件的差别，也体现在照片怎样导入、怎样继续编辑。[S82](#film-ref-S82) [S83](#film-ref-S83)
+
+这些工具的价值因此要落到更具体的地方：材质响应是否合意，参数是否好用，能否匹配目标参考，以及批处理和导出是否顺畅。功能名称相同，并不保证处理位置和结果相同。
 
 手机与桌面之间也有一条实用连接。No Fusion 支持导入 LUT，官方还提供从 Lightroom 调色生成 LUT 的方法。这可以迁移适合写入颜色表的部分；RAW 相机标定、蒙版、颗粒和光晕仍要由对应流程承担。[S15](#film-ref-S15)
 
 跨软件传递时，格式还不够，还要确认色彩空间与编码。16-bit TIFF 可以保存精细的颜色数值，但也可能已经完成显影；一张用于编码 sRGB 的 LUT，也不能直接按线性 RGB 来解释。把输入约定对齐，才有意义讨论两边的颜色是否一致。[S42](#film-ref-S42) [S43](#film-ref-S43) [S54](#film-ref-S54) [S70](#film-ref-S70)
 
-## 7. 回到拍摄：先找出自己想改变的那一步
+<span id="7-回到拍摄：先找出自己想改变的那一步"></span>
+
+## 8. 回到拍摄：先找出自己想改变的那一步
 
 沿着这条过程看下来，工具选择可以从三个实际需求开始。
 
@@ -187,7 +241,7 @@ Adobe 自己也在扩展这部分能力。Camera Raw 18.6 已加入 Diffusion、
 
 **想改变手机处理痕迹，先区分采集与显影。** 希望减少跨帧时间混合，可以尝试单帧 RAW；希望保留融合信息、重新安排影调，可以尝试 ProRAW 的替代显影；静态暗光需要更充分的采样时，再观察 Indigo 的表现。同时确认原件能否保存和导出。[S13](#film-ref-S13) [S24](#film-ref-S24) [S04](#film-ref-S04)
 
-**想精调颜色和材质，再选择桌面流程。** 批量统一照片，可以从宿主内的预设或 Profile 开始；需要独立控制颗粒与光晕，可以使用相应工具；对负片曝光、相纸和滤色关系感兴趣，则值得进一步研究 spektrafilm。
+**想精调颜色和材质，再选择桌面流程。** 批量统一照片，可以从宿主内的预设或 Profile 开始；需要独立控制颗粒与光晕，可以使用相应工具；对负片曝光、相纸和滤色关系感兴趣，可以通过 SpektraLab 操作这些过程，再按需要研究 spektrafilm 的模型。是否值得增加这一步，也要看它在自己的照片上带来的改变。[S82](#film-ref-S82)
 
 做比较时，先固定一个问题。同一份 ProRAW 交给两种显影，回答的是“这份数据怎样呈现”；用两个 App 分别拍摄，比较的是各自完整的采集与处理。想判断是否接近某种真实胶片，还需要固定胶卷、曝光、显影与冲扫参考。
 
@@ -197,7 +251,7 @@ Adobe 自己也在扩展这部分能力。Camera Raw 18.6 已加入 Diffusion、
 
 ## 资料与技术附录
 
-正文沿照片的形成过程展开。下面保留产品清单、价格快照、数学说明和测试方案，供需要时查阅；它们使用同一批截至 2026-11-01 的资料。
+正文沿照片的形成过程展开。下面保留产品清单、价格快照、数学说明和测试方案。原有资料仍以 2026-11-01 为准；标明 SpektraLab 的新增条目核查于 2026-11-08。
 
 <details>
 <summary><strong>A. 产品速查：输入、风格和使用限制</strong></summary>
@@ -218,6 +272,7 @@ Adobe 自己也在扩展这部分能力。Camera Raw 18.6 已加入 Diffusion、
 | Leica LUX | 品牌色彩、计算镜头风格与 RAW／ProRAW | 数字模拟的镜头风格不会改变手机的真实采光条件 [S32](#film-ref-S32) |
 | Chromagraph | Steve Yedlin 等参与设计的作者化 RAW 色彩与纹理，保留原始文件 | 2026 年 10 月已可在商店获取，内部算法披露有限 [S33](#film-ref-S33) |
 | Open Camera | Android 的 Camera2 RAW/DNG、手动控制、包围曝光与 HDR | 是开放采集工具，功能受设备支持限制 [S80](#film-ref-S80) |
+| SpektraLab 移动版（11-08 补充） | 围绕同一光谱材料路线重新实现的 iPhone／iPad 应用 | 版本独立演进，免费下载并提供 Plus 内购；Mac 源码分析不等于移动端实现验证 [S84](#film-ref-S84) [S85](#film-ref-S85) |
 
 Indigo 在 2026 年 7 月还公开了面向受邀用户的 AI Playground 试验，可在拍后进行生成式修改。它与正常采集管线分开评价；是否改变画面内容，比笼统的“有没有 AI”更值得说明。[S06](#film-ref-S06)
 
@@ -233,19 +288,20 @@ Indigo 在 2026 年 7 月还公开了面向受邀用户的 AI Playground 试验�
 | FilmConvert Nitrate | 针对摄影机与拍摄模式适配的胶片渲染和颗粒 | 主要用于视频；宿主与 Halation 授权需单独核对 [S51](#film-ref-S51) |
 | Filmulator | 由胶片显影过程启发的 RAW 影调处理 | 重点是全局压缩和局部对比，而非特定胶卷名称的风格库 [S52](#film-ref-S52) |
 | spektrafilm | 开放的光谱、材料与负片—相纸模型 | 参考引擎、GUI、OFX 等移植和 LUT 集成要分别记录版本与输入约定 [S53](#film-ref-S53) [S54](#film-ref-S54) [S58](#film-ref-S58) [S59](#film-ref-S59) [S60](#film-ref-S60) |
+| SpektraLab（11-08 补充） | 基于 spektrafilm 的原生应用，Mac 为 C++／Metal 引擎 | 提供 RAW 导入、配光与后续编辑；Windows 处于预发布阶段，各平台不可直接视为相同实现 [S82](#film-ref-S82) [S84](#film-ref-S84) |
 
 几个相邻领域也值得分清：RawTherapee 的 Hald CLUT 是把颜色表存成二维图像；darktable 的 filmic RGB 主要承担场景到显示的影调变换，AgX 也与 agx-emulsion 项目有不同含义。Fujifilm X RAW Studio 使用连接相机的机内处理器转换 RAW；Negative Lab Pro 则对真实胶片的数字扫描件反相与调色。[S74](#film-ref-S74) [S75](#film-ref-S75) [S67](#film-ref-S67) [S68](#film-ref-S68)
 
 ### 市场正在怎样变化
 
-从这些产品可以看到，胶片模拟的竞争正在延伸到整套使用体验。Gloam、Dazz 把审美组织成相机与风格选择，用户购买的也包括拍摄时的习惯和判断。[S08](#film-ref-S08) [S17](#film-ref-S17) ACR 原生加入空间效果后，独立插件更需要体现材质控制、参考一致性与效率的价值。[S38](#film-ref-S38) [S39](#film-ref-S39) spektrafilm 公开材料数据与处理逻辑，让模型开发与产品设计能够分别推进。[S53](#film-ref-S53) [S54](#film-ref-S54) [S60](#film-ref-S60)
+从这些产品可以看到，胶片模拟的竞争正在延伸到整套使用体验。Gloam、Dazz 把审美组织成相机与风格选择，用户购买的也包括拍摄时的习惯和判断。[S08](#film-ref-S08) [S17](#film-ref-S17) ACR 原生加入空间效果后，独立插件更需要体现材质控制、参考一致性与效率的价值。[S38](#film-ref-S38) [S39](#film-ref-S39) spektrafilm 公开材料数据与处理逻辑，让模型开发与产品设计能够分别推进；SpektraLab 展示了把同一模型做成原生编辑工具的方向。[S53](#film-ref-S53) [S54](#film-ref-S54) [S60](#film-ref-S60) [S82](#film-ref-S82)
 
 据此推断，可靠的输入处理、恰当的默认值、批量照片的一致性，以及原片和参数能否顺畅流转，会越来越影响产品的长期价值。这是依据产品结构作出的判断；现有资料不足以计算统一口径的销量、收入或市场份额。
 
 </details>
 
 <details>
-<summary><strong>B. 版本与价格：2026-11-01 快照</strong></summary>
+<summary><strong>B. 版本与价格：11-01 原快照，SpektraLab 于 11-08 补充</strong></summary>
 
 ### 主要手机应用的版本
 
@@ -293,6 +349,19 @@ Indigo 在 2026 年 7 月还公开了面向受邀用户的 AI Playground 试验�
 | Cobalt | 依机型与包组合 | 未取得可比的统一报价；计算成本时应纳入所需 Base Pack [S50](#film-ref-S50) |
 
 Dehancer 的 Photo 计划覆盖多个照片端入口，同时受席位数约束。Adobe Lightroom／Photoshop 另有宿主订阅费用，随地区和套装变化。[S44](#film-ref-S44) 这些都是 2026-11-01 的公开价格，后续促销、税费与授权可能调整，购买时应查看对应地区的结算页。
+
+### SpektraLab 平台与价格，2026-11-08 补充
+
+各平台版本号独立演进，下表只更新 SpektraLab。[S84](#film-ref-S84) [S85](#film-ref-S85)
+
+| 平台与版本 | 环境要求 | 收费与状态 |
+|---|---|---|
+| macOS 1.3.7 | macOS 15+、Apple silicon | 免费开源；11 月 7 日发布。本文的 C++／Metal 源码核查针对此版本 |
+| iOS／iPadOS 1.2.1 | iOS／iPadOS 17+；HDR 功能另需 iOS 18 及相应屏幕 | 免费下载＋Plus；中国大陆商店为 **¥9.90/月、¥98/年、¥268 永久**。移动引擎重新实现 |
+| Windows 1.3.4 预发布 | x64、Vulkan 驱动、WebView2 Runtime；下载页未明确最低 Windows 版本 | 可免费下载早期构建；不推定与 Mac 完全功能对等 |
+| Linux 开发中 | 尚无可核实的已发布构建要求 | 官方下载页尚未发布构建，不列为已经可用的版本 |
+
+移动端的长描述与 1.2.0 更新记录在部分 Plus 权益上有出入，因此这里仅记录可核实的收费方式与价格，不拼接一份可能过时的完整收费功能表。价格只对应本次核查的商店地区与日期。[S85](#film-ref-S85)
 
 </details>
 
@@ -391,6 +460,25 @@ PGI 不是 RMS 颗粒度，也不是比例量表；89/37 不能解释成颗粒�
 
 跨软件处理时，至少要确认色域／原色、传递函数、白点、场景或显示参照，以及输出观看条件。指派 ICC 标签与正确转换色彩空间是不同操作；16-bit TIFF 也不自动意味着线性或未经显影。[S54](#film-ref-S54) [S70](#film-ref-S70)
 
+### C7. SpektraLab 的光谱计算与加速边界
+
+以下是 macOS 1.3.7 固定提交的静态源码核查，不是运行应用得到的测量结果。固定版本与逐项文件链接见 S86–S97。
+
+| 计算位置 | 源码可确认的做法 | 应怎样理解 |
+|---|---|---|
+| 波长网格 | 380–780 nm，以 5 nm 为间隔，共 81 个采样点 | 这是模型的数值离散，不是相机测得的 81 个光谱通道 [S96](#film-ref-S96) |
+| 输入 RGB 到胶片响应 | 将 192×192×81 的光谱表与材料响应预先收缩成 192×192×3 的表，再插值并恢复亮度尺度 | 查表承接了光谱模型的预计算，避免对每个像素重复相同积分 [S87](#film-ref-S87) [S88](#film-ref-S88) [S89](#film-ref-S89) |
+| 负片与相纸计算 | GPU 按像素执行，相关 shader 内遍历波长做积分 | 并行像素计算与波长积分同时存在；不等于每像素都长期保存一份完整光谱图像 [S89](#film-ref-S89) |
+| 放相交互 | 可复用负片缓存；程序随附八张 33³ 预览 LUT，快速相纸预览按所选相纸调用相应表 | 修改后段参数可减少重复计算，预览与完整渲染仍需分别判断 [S94](#film-ref-S94) [S95](#film-ref-S95) [S97](#film-ref-S97) |
+
+这些网格与加速方法没有消除 RGB 到光谱重建的不唯一性：同一组 RGB 可能对应不同的光谱分布，重建仍依赖先验。计算采用更多波长采样，不等于补回原场景未被记录的信息。[S66](#film-ref-S66)
+
+源码中的 parity 测试以 Python 参考实现为比对对象，帮助检查移植后的数值一致性。它没有给出与真实胶片冲扫的统一误差，也没有测量观看者更喜欢哪张照片。[S92](#film-ref-S92)
+
+{% raw %}
+<div class="v-figure"><a href="/images/film-emulation-spektralab/spektralab_official_grain.png"><img src="/images/film-emulation-spektralab/spektralab_official_grain.png" width="1226" height="1278" loading="lazy" decoding="async" alt="SpektraLab 官方颗粒局部示例，蓝色天空与岩石附近可见彩色纹理"></a><p class="v-caption">官方颗粒局部展示，未公开这张图的完整材料参数、截图倍率或捕获版本。文件名中的 physically_accurate 是项目命名，不能替代真实胶片颗粒的测量；本图也不标作 100% 同倍率对照。原图未改色，摄影及界面权利归各自权利人。<a href="#film-ref-S93">[S93]</a></p></div>
+{% endraw %}
+
 </details>
 
 <details>
@@ -404,6 +492,14 @@ PGI 不是 RMS 颗粒度，也不是比例量表；89/37 不能解释成颗粒�
 | 完整相机系统 | 同设备与镜头、同场景、尽量接近的时刻和条件 | App 的采集、融合与显影 | 评估真实拍摄体验 |
 
 不提供任意照片导入的应用参加第二类。完整相机比较可分别设置锁定曝光的控制组、各 App 默认自动的使用组。若目标是匹配真实胶片，还要固定胶卷、曝光、显影、扫描或相纸和输出条件。
+
+### 如果继续比较 Gloam 与 SpektraLab
+
+先看 Gloam 能否导出与该张成片对应、且能被 SpektraLab 正确读取的原片。若条件满足，保留 Gloam 成片，再由同一文件生成 SpektraLab 的默认版与限定编辑时间版；记录实际文件类型、材料、曝光、配光与导出条件。不能因政策提到保留 RAW，就假定一定能导出所需的 Bayer RAW。[S09](#film-ref-S09) [S86](#film-ref-S86)
+
+如果拿不到这份输入，就在同一手机、镜头和静态场景下比较两套完整流程，并明确其中包含采集差异。Gloam 不提供任意外部照片导入，不能把“同一份外部 DNG 导入两款 App”写成已经可执行的方案。[S09](#film-ref-S09)
+
+两种情况都先统一裁切、输出大小与观看环境，分别评价默认出片和投入同样编辑时间后的偏好；不要把后者冒充前者。本段是后续实验设计，本轮未执行。
 
 ### 场景覆盖
 
@@ -453,6 +549,14 @@ PGI 不是 RMS 颗粒度，也不是比例量表；89/37 不能解释成颗粒�
 网页矢量图采用相同数据重绘，摄影样片保持原有颜色；复算脚本生成对应 PNG 图表。官方样片和作者展示图的来源、处理条件随图标注，照片权利归各自开发者或摄影者。
 
 spektrafilm 的代码为 GPLv3；本文所用 Profile、派生曲线与图表保留 Andrea Volpato 署名，按 CC BY-SA 4.0 提供。Profile 许可与示例照片的权利分别处理，最终用户照片不会因此被要求采用同一许可。[S64](#film-ref-S64)
+
+### SpektraLab 补充材料，2026-11-08
+
+- [新增参考来源与核查范围](https://leecdiang.com/2026/11/01/film-emulation-pipelines/data/spektralab_sources_2026-11-08.csv)
+- [平台、版本与中国区内购快照](https://leecdiang.com/2026/11/01/film-emulation-pipelines/data/spektralab_platforms_2026-11-08.csv)
+- [三张新增原图的出处、尺寸、哈希与图注限制](https://leecdiang.com/2026/11/01/film-emulation-pipelines/data/spektralab_asset_manifest.json)
+
+三张新增图片均取自 SpektraLab 1.3.7 标签对应的公开仓库，保留原始文件字节，图片出处与捕获版本分别记录。它们用于本文的界面与处理评论；照片及截图不因项目代码开源就自动采用 GPL 或 Profile 的 CC BY-SA 许可，权利仍归各自权利人。更多官方对照可在 [SpektraLab 官网](https://spektralab.app/#compare) 查看，其样片同样不构成本次跨产品实测。[S81](#film-ref-S81) [S93](#film-ref-S93)
 
 主要事实依据包括官方规格、开发者技术说明、固定提交的源码和 Profile、厂家数据及论文。计算图表使用明确假设，产品未公开的算法保留为未知；图像示例的具体限制写在相应图注中。
 
@@ -541,3 +645,23 @@ spektrafilm 的代码为 GPLv3；本文所用 Profile、派生曲线与图表保
 - <span id="film-ref-S78"></span>**S78**｜[Apple lookup — No Fusion，中国区](https://itunes.apple.com/lookup?id=6444706244&country=cn)。用于：版本、UTC更新时间、最低系统，随包保留JSON。
 - <span id="film-ref-S79"></span>**S79**｜[Apple lookup — Dazz，中国区](https://itunes.apple.com/lookup?id=1422471180&country=cn)。用于：版本、UTC更新时间、最低系统，随包保留JSON。
 - <span id="film-ref-S80"></span>**S80**｜[Open Camera — 官方项目](https://opencamera.org.uk/)。用于：Android开放采集、Camera2/RAW与设备限制。
+
+### SpektraLab 补充来源（2026-11-08 核查）
+
+- <span id="film-ref-S81"></span>**S81**｜[SpektraLab 官网与 Compare](https://spektralab.app/)。用于：产品定位与额外官方演示；未作同输入横测。
+- <span id="film-ref-S82"></span>**S82**｜[SpektraLab 1.3.7 README](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/README.md)。用于：原生应用、spektrafilm 继承关系、移植与界面。
+- <span id="film-ref-S83"></span>**S83**｜[SpektraLab User Guide](https://spektralab.app/user_guide/)。用于：输入、配光、Post-Dev、练习配对、共享颗粒模型和预览。
+- <span id="film-ref-S84"></span>**S84**｜[SpektraLab Download](https://spektralab.app/download/)。用于：平台版本、最低环境、移动版重新实现、Windows 预发布与 Linux 状态。
+- <span id="film-ref-S85"></span>**S85**｜[SpektraLab 中国大陆 App Store](https://apps.apple.com/cn/app/spektralab/id6820950508)。用于：移动版版本、系统门槛、Plus 内购价格；不将旧长描述当现行完整权益表。
+- <span id="film-ref-S86"></span>**S86**｜[ImageDecoder.swift](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/modern_UI/Spektrafilm/Spektrafilm/Import/ImageDecoder.swift)。用于：RAW 的线性模型输入与 Original 显示路径。
+- <span id="film-ref-S87"></span>**S87**｜[ARCHITECTURE.md](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/ARCHITECTURE.md)。用于：原生引擎、缓存、光谱计算与性能口径；未独立复测性能。
+- <span id="film-ref-S88"></span>**S88**｜[hanatos.cpp](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/engine/src/core/hanatos.cpp)。用于：光谱上采样表预收缩成胶片响应表、逐像素插值。
+- <span id="film-ref-S89"></span>**S89**｜[nodes.metal](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/engine/src/shaders/nodes.metal)。用于：GPU 按像素计算与相关节点内的波长积分。
+- <span id="film-ref-S90"></span>**S90**｜[macOS 前端 Params.swift](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/modern_UI/Spektrafilm/Spektrafilm/Model/Params.swift)。用于：Portra 400＋Supra Endura、自动曝光和 balanced 测光初始值及重置值。
+- <span id="film-ref-S91"></span>**S91**｜[ilford_multigrade_iv_rc.json](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/engine/resources_product/profiles/ilford_multigrade_iv_rc.json)。用于：自有黑白相纸资料中的假定银光谱、基底密度及拟合。
+- <span id="film-ref-S92"></span>**S92**｜[parity_render.py](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/engine/tests/parity_render.py)。用于：C++ 与 Python 参考实现的一致性校核；不是实物胶片或审美测试。
+- <span id="film-ref-S93"></span>**S93**｜[SpektraLab 官方展示图目录](https://github.com/JamesQiu2005/SpektraLab/tree/12d75e60a02281e4b470329b4ac2ac14947caa37/screenshots)。用于：三张原始 PNG 的出处；截图捕获版本与完整配方未披露。
+- <span id="film-ref-S94"></span>**S94**｜[pipeline.cpp](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/engine/src/pipeline/pipeline.cpp)。用于：负片缓存、放相重算与完整处理管线。
+- <span id="film-ref-S95"></span>**S95**｜[print_lut.cpp](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/engine/src/core/print_lut.cpp)。用于：相纸快速预览所用 LUT；光谱模型与查表可共存。
+- <span id="film-ref-S96"></span>**S96**｜[colour.hpp](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/engine/src/core/colour.hpp)。用于：380–780 nm、5 nm 步长的 81 点光谱数值网格约定。
+- <span id="film-ref-S97"></span>**S97**｜[print_luts.json](https://github.com/JamesQiu2005/SpektraLab/blob/12d75e60a02281e4b470329b4ac2ac14947caa37/engine/resources/print_luts.json)。用于：随附相纸预览表恰有八个条目，网格尺寸均为 33；与运行时读取选择分别核查。
