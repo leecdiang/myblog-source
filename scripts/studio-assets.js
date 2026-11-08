@@ -85,6 +85,15 @@ hexo.extend.filter.register('before_generate', async () => {
 });
 hexo.extend.generator.register('studio-assets', () => {
   const output = [...assets];
+  // Cached HTML can outlive a deployment; keep previously shipped content hashes.
+  const compatibility = path.join(root, 'theme-assets/studio-compat');
+  if (fs.existsSync(compatibility)) {
+    for (const name of fs.readdirSync(compatibility)) {
+      if (/^(?:style|core|content|math|orrery)\.[a-f0-9]{12}\.(?:css|js)$/.test(name) && !output.some(asset => asset.path === 'assets/studio/' + name)) {
+        output.push({path: 'assets/studio/' + name, data: () => fs.createReadStream(path.join(compatibility, name))});
+      }
+    }
+  }
   // Keep MathJax components and fonts same-origin; its loader discovers these paths.
   const base = path.join(root, 'node_modules/mathjax/es5');
   function visit(dir) {
