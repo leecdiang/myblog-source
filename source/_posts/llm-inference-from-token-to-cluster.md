@@ -723,4 +723,4 @@ Harness 的比较应包含成功率、任务总时间、模型调用数、输入
 </ol>
 {% endraw %}
 
-{% raw %}<script src="./interactive/article-bridge.js"></script>{% endraw %}
+{% raw %}<script src="/2026/11/08/llm-inference-from-token-to-cluster/interactive/article-bridge.js"></script>{% endraw %}
