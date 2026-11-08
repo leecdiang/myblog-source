@@ -99,7 +99,9 @@ hexo.extend.filter.register('server_middleware', function (app) {
       return res.end('Local preview only.');
     }
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
+    const previewPath = (req.url || '/').split('?', 1)[0];
+    const isInferenceLab = previewPath === '/2026/11/08/llm-inference-from-token-to-cluster/interactive/inference-lab.html';
+    res.setHeader('X-Frame-Options', isInferenceLab ? 'SAMEORIGIN' : 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
     next();

@@ -20,8 +20,10 @@
         {%- else %}
           {%- if path.endsWith('.html') %}
             <li>{{ name | replace(r/\.html$/, '') | upper }}</li>
-          {%- else %}
+          {%- elif theme.menu_map.has(link) or site.pages.findOne({ path: link.slice(1) + 'index.html' }) %}
             <li><a href="{{ url_for(link) }}">{{ name | upper }}</a></li>
+          {%- else %}
+            <li>{{ name | upper }}</li>
           {%- endif %}
         {%- endif %}
       {%- endif %}

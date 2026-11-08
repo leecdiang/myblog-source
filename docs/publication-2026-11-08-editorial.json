@@ -1,0 +1,31 @@
+{
+  "status": "prepared",
+  "prepared_at": "2026-11-08T17:24:12.705489+08:00",
+  "site": "https://leecdiang.com/",
+  "authorization": "Explicit user request to publish the checked version",
+  "source_parent": "3c1c5e5dd6452cacf7ab68b2effceb2c70210699",
+  "previous_deployment": "81bced9d50920a0e6c4e6f6caf67361b28913b04",
+  "scope": {
+    "revised_2026_posts": 18,
+    "photography_posts_unchanged": [
+      "eight-thousand-miles.md",
+      "polaroid-636-northwest.md"
+    ],
+    "included_current_preview_page_updates": true,
+    "preserved_previous_social_covers": 10,
+    "preserved_previous_studio_assets": 13,
+    "deployment_workflow": "preserve existing bytes"
+  },
+  "verification": {
+    "article_page_views": 72,
+    "interactive_panel_checks": 8,
+    "series_page_views": 4,
+    "homepage_views": 4,
+    "local_and_same_site_references": 1630,
+    "content_check": "passed",
+    "loading_check": "191 static expressions across 10 pages",
+    "security_check": "9 regression tests and 155 HTML pages passed",
+    "source_invariants": "original numbers, formulas, code, images, references retained"
+  },
+  "preview": "http://127.0.0.1:4000/archives/"
+}

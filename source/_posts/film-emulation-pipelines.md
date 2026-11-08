@@ -1,5 +1,5 @@
 ---
-title: 手机里的底片，电脑里的暗房：胶片模拟究竟在模拟什么？
+title: "胶片模拟的输入处理与材料建模"
 date: 2026-11-01 21:38:00
 lang: zh-CN
 categories:
@@ -11,25 +11,25 @@ tags:
 etoc: true
 mathjax: true
 published: true
-description: 从 Gloam、Dazz、No Fusion 到 Indigo 与 SpektraLab，沿着输入、显影、光谱模型和空间效果，理解胶片模拟改变了什么，以及模型复杂度为什么不直接决定成片偏好。
+description: "比较 Gloam、Dazz、No Fusion、Indigo 与 SpektraLab 的胶片模拟链路，区分输入处理、显影、光谱建模和空间效果，并讨论模型复杂度与成片偏好的关系。"
 updated: 2026-11-08 11:24:00
 toc:
   max_depth: 2
 ---
 
-最近用 Gloam 拍照，我开始分不清“胶片模拟”这个名字究竟指什么。同样能让照片有胶片外观，有的应用换一套颜色与颗粒，有的连采集、显影也一起改了。
+最近使用 Gloam 拍照，使我开始关注“胶片模拟”所涵盖的不同技术对象。相近的成片外观，可能来自颜色映射与颗粒叠加，也可能涉及采集、RAW 显影和材料响应建模；仅以风格名称分类，容易忽略这些处理层次。
 
-Gloam、Dazz 把颜色、颗粒和画幅组织成虚拟相机；No Fusion 让人选择拍摄与显影方式；Project Indigo 自己采集并合并多张 RAW。到了电脑上，又有 Lightroom 预设、胶片插件、spektrafilm 模型和 SpektraLab。放在同一张功能表里，这些工具看似相近，接手的其实是照片形成过程中的不同环节。
+Gloam、Dazz 以虚拟相机组织颜色、颗粒与画幅，No Fusion 开放采集与显影选择，Project Indigo 则自行采集、对齐和合并多张 RAW。桌面端的 Lightroom 预设、胶片插件、spektrafilm 与 SpektraLab 又介入不同环节。因此，功能名称相近，并不意味着输入条件、计算过程或评价目标一致。
 
-我想先弄清手机保留了什么，再看胶片外观怎样生成。选工具之前，得知道自己想动哪一步。
+本文以图像形成流程为线索，先分析输入数据与显影边界，再讨论材料模型、空间效果和工具分工。比较范围据此限定到具体处理环节，避免将审美偏好与模型能力混为一项判断。
 
 原有市场资料截至 2026 年 11 月 1 日；SpektraLab 专章及相关补充核查至 11 月 8 日，其他产品的版本与价格仍保留原快照。文章依据官方文档、源码、论文和公开样片整理，尚未进行统一条件下的跨应用实拍。
 
 <!-- more -->
 
-## 1. Gloam 与 Dazz：先选一台喜欢的相机
+## 1. Gloam 与 Dazz：风格组织与输入差异
 
-这类应用让人先选成片风格：一台虚拟相机，一种颜色或胶卷，选好就拍。它把技术选择收在后面，使用者未必需要先理解整条处理流程。
+虚拟相机将多项处理参数组织为可直接使用的风格，用户首先选择相机、颜色或胶卷，而非逐一配置底层处理。这样的产品组织简化了使用，但也需要进一步核查各模式的输入与可编辑范围。
 
 Gloam 的风格围绕不同相机展开：T3 提供胶片扫描式色彩，CCD12 借用经典小数码的视觉语言，GRD 则提供街拍取向的负片、正片和黑柔效果。这些名称把颜色和拍摄体验连在一起，也方便使用者记住自己喜欢的组合。[S08](#film-ref-S08) [S11](#film-ref-S11)
 
@@ -45,15 +45,15 @@ Dazz 的组织方式与之相近，选择范围还包括半格、即影即有、
 
 *Dazz Original 的官方说明图。RAW／ProRAW 功能属于图中展示的模式，各虚拟相机的能力需要分别查看；“HDR Removal”沿用开发者界面用语。[S17](#film-ref-S17)*
 
-日常使用更容易碰到的是这些差别：日光下喜欢的风格，到了室内还合适吗？换镜头后肤色能否保持一致？拍完发现不合适，还能改多少？
+日常评价可以具体到跨光照的风格稳定性、不同镜头的肤色一致性，以及拍摄后可修改的参数范围。这些维度比单张展示图更接近长期使用条件。
 
-Gloam 的官方政策提到了本地 RAW/DNG 处理、保留原片和编辑记录，但没有详细公开不同机型的 RAW 路径、融合策略和颗粒算法。这部分暂时留作未知。[S09](#film-ref-S09) 而 Dazz 的模式差异已经提醒我们：**同一个 App 里的不同相机，也可能从不同的输入出发。**
+Gloam 官方政策说明本地 RAW/DNG 处理、原片保留和编辑记录，但未完整披露不同机型的 RAW 路径、融合策略与颗粒算法，本文将这些实现细节保留为未知。[S09](#film-ref-S09) Dazz 的模式差异则表明，同一应用中的虚拟相机也可能采用不同输入。
 
-照片柔和了，可能是采集时少做了处理，也可能是同一份数据换了显影。No Fusion 和 Halide 恰好能把两件事拆开看。
+外观柔和可能来自采集处理的减少，也可能来自同一输入的替代显影。No Fusion 与 Halide 的公开材料提供了区分这两类变化的案例。
 
-## 2. 照片怎样拍到，和怎样显影，是两次选择
+## 2. 采集数据与 RAW 显影的边界
 
-一张 JPEG 或 HEIF 通常已经经过颜色、明暗、降噪和锐化处理。想重新安排这些步骤，就需要尽量向前走，接触更早期的图像数据。但“RAW”这个名字下面，也有不同的输入。[S01](#film-ref-S01) [S02](#film-ref-S02)
+JPEG、HEIF 通常已经包含颜色、影调、降噪与锐化处理。重新安排这些步骤，需要获得更早阶段的数据；但 RAW 也并非单一处理状态，必须区分其中保留的信息与已完成的计算。[S01](#film-ref-S01) [S02](#film-ref-S02)
 
 | 输入 | 已经发生了什么 | 对后续处理的影响 |
 |---|---|---|
@@ -65,13 +65,13 @@ Gloam 的官方政策提到了本地 RAW/DNG 处理、保留原片和编辑记�
 
 No Fusion 把这几种选择交到了用户手里。标准 HEIF 使用 Apple 的成片；RAW 模式保留原件；HEIF+ 则从 RAW 显影，再经过自己的校准和输出。官方说明，兼容机型上的 HEIF+ 默认使用 ProRAW，也可以在支持的机型上选择 Bayer RAW。[S12](#film-ref-S12) [S13](#film-ref-S13)
 
-想减少锐化痕迹，可以保留 ProRAW 已融合的信息，另做显影；想看单次曝光留下了什么，可以选 Bayer RAW。两者都可能柔和，却不能用同一个原因解释。
+保留 ProRAW 融合结果而更换显影，可以调整锐化与影调；选择 Bayer RAW 则改变采集输入。两条路径可能产生相近的柔和观感，却对应不同的信息基础和技术原因。
 
 ![No Fusion HEIF+官方对照](https://leecdiang.com/2026/11/01/film-emulation-pipelines/assets/nofusion_official_compare.webp)
 
 *左为 iPhone Camera，右为 No Fusion HEIF+。这是官方同场景展示，适合观察边缘与细节处理；两张图并非由同一份 RAW 显影而来。[S12](#film-ref-S12)*
 
-Halide 的对照更适合观察显影本身：两张图来自同一份 ProRAW，阴影、反差和高光的安排却不同。采集数据不变，外观仍有很大的调整余地。[S24](#film-ref-S24)
+Halide 的对照固定了 ProRAW 输入，仅改变显影，便产生不同的阴影、反差和高光分配。该示例支持显影路径影响外观的判断，不能被解释为采集能力的直接比较。[S24](#film-ref-S24)
 
 | Apple 默认 SDR 渲染 | Halide 替代渲染 |
 |---|---|
@@ -83,9 +83,9 @@ Halide 现在同时覆盖两端：拍摄时可以选择单帧 Process Zero，也
 
 是否让用户保留 RAW，又是单独的产品选择。例如 mood.camera 在支持的机型上利用 ProRAW 生成成片，却不保存 RAW，也不提供任意照片导入。这种设计把重点放在拍摄即成片；需要长期后期余地的人，则应选择能交付原件的流程。[S19](#film-ref-S19) [S20](#film-ref-S20)
 
-采集和显影拆开以后，还能再问一步：如果主动多采几帧，后面可以少付出哪些代价？
+采集与显影的区分，也为评价多帧方案提供了前提：增加采样主要改变可用于后续处理的信息，而非直接规定最终风格。
 
-## 3. Indigo：多拍几帧，能给后期留下什么？
+## 3. Indigo：多帧采样的收益与代价
 
 Adobe Project Indigo 会连续取得多张 RAW，尽量保护高光，再把画面对齐、合并。多次采样可以降低噪声，让后续处理减少对强力空间平滑的依赖。开发者希望由此保留细小纹理，同时获得自然的影调。[S03](#film-ref-S03)
 
@@ -97,25 +97,25 @@ Adobe Project Indigo 会连续取得多张 RAW，尽量保护高光，再把画�
 
 在每帧曝光相同、噪声独立且配准准确的理想条件下，32 帧平均能把噪声标准差降到单帧的约 0.177 倍。代价是更多采样时间；主体运动、噪声相关和对齐误差也会改变收益。完整公式和曲线放在文末技术附录。
 
-多帧融合可以增加可用信息，阴影提到多亮、边缘锐化多重，却仍是显影选择。把成片看起来“用力过猛”全部归因于计算摄影，会混掉这两层。HDR+ 的研究也展示了采集与渲染的分工。[S07](#film-ref-S07)
+多帧融合可以增加可用信息，阴影提升和锐化强度则仍由渲染决定。成片处理感较强，不能单独归因于融合帧数；HDR+ 研究也将采集收益与渲染选择分别讨论。[S07](#film-ref-S07)
 
 Indigo 默认保存 JPEG 与 DNG。对静态夜景，可以先保留它的 DNG，再到兼容编辑器里调整曝光、白平衡和胶片风格。拍摄产生的噪声与后期选择的胶片颗粒有不同来源，分开处理后，细节与材质便能分别控制。[S04](#film-ref-S04)
 
 单帧和融合各有适合的场景。单帧避免了跨帧时间混合；Indigo 的 Photo 模式通过预缓冲提供零快门延迟，但运动重影仍需结合场景判断。选择时，既要看照片，也要看主体运动和拍后等待。[S04](#film-ref-S04)
 
-几款应用分别介入了哪些环节，可以在下图对照。
+图中将各应用映射到相应处理环节，便于比较其实际控制范围。
 
 <div class="v-figure film-chart"><p class="v-scroll-hint">左右滑动查看完整图表；键盘聚焦后可用方向键。</p><div class="v-chart-viewport" tabindex="0" role="region" aria-label="可横向滚动的图表"><svg viewBox="0 0 800 430" role="img" xmlns="http://www.w3.org/2000/svg" aria-label="先确定输入，再讨论胶片风格"><text x="28" y="34" font-size="22" class="v-ink" text-anchor="start">先确定输入，再讨论胶片风格</text><rect x="24" y="70" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="var(--accent)"/><text x="111" y="101" font-size="15" class="v-ink" text-anchor="middle">单帧 Bayer RAW</text><text x="111" y="126" font-size="12" class="v-sub" text-anchor="middle">传感器采样</text><text x="208" y="116" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="219" y="70" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="var(--accent)"/><text x="306" y="101" font-size="15" class="v-ink" text-anchor="middle">RAW 显影</text><text x="306" y="126" font-size="12" class="v-sub" text-anchor="middle">白平衡 / 去马赛克</text><text x="403" y="116" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="414" y="70" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="var(--accent)"/><text x="501" y="101" font-size="15" class="v-ink" text-anchor="middle">材质与色彩</text><text x="501" y="126" font-size="12" class="v-sub" text-anchor="middle">曲线 / 颗粒 / 光晕</text><text x="598" y="116" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="609" y="70" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="var(--accent)"/><text x="696" y="101" font-size="15" class="v-ink" text-anchor="middle">输出</text><text x="696" y="126" font-size="12" class="v-sub" text-anchor="middle">SDR / HDR / 色域</text><rect x="24" y="175" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="#b98245"/><text x="111" y="206" font-size="15" class="v-ink" text-anchor="middle">多帧 RAW 采集</text><text x="111" y="231" font-size="12" class="v-sub" text-anchor="middle">曝光 / 时间采样</text><text x="208" y="221" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="219" y="175" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="#b98245"/><text x="306" y="206" font-size="15" class="v-ink" text-anchor="middle">融合与显影</text><text x="306" y="231" font-size="12" class="v-sub" text-anchor="middle">ProRAW / Indigo</text><text x="403" y="221" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="414" y="175" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="#b98245"/><text x="501" y="206" font-size="15" class="v-ink" text-anchor="middle">重新渲染与风格</text><text x="501" y="231" font-size="12" class="v-sub" text-anchor="middle">可与上游组合</text><text x="598" y="221" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="609" y="175" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="#b98245"/><text x="696" y="206" font-size="15" class="v-ink" text-anchor="middle">输出</text><text x="696" y="231" font-size="12" class="v-sub" text-anchor="middle">JPEG / HEIF</text><rect x="24" y="280" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="#d27372"/><text x="111" y="311" font-size="15" class="v-ink" text-anchor="middle">已渲染照片</text><text x="111" y="336" font-size="12" class="v-sub" text-anchor="middle">JPEG / HEIF / TIFF</text><text x="208" y="326" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="219" y="280" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="#d27372"/><text x="306" y="311" font-size="15" class="v-ink" text-anchor="middle">输入解释与校正</text><text x="306" y="336" font-size="12" class="v-sub" text-anchor="middle">色彩空间 / 影调</text><text x="403" y="326" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="414" y="280" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="#d27372"/><text x="501" y="311" font-size="15" class="v-ink" text-anchor="middle">颜色与空间效果</text><text x="501" y="336" font-size="12" class="v-sub" text-anchor="middle">预设 / LUT / 插件</text><text x="598" y="326" font-size="18" class="v-sub" text-anchor="middle">→</text><rect x="609" y="280" width="174" height="80" rx="12" fill="var(--surface-card)" stroke="#d27372"/><text x="696" y="311" font-size="15" class="v-ink" text-anchor="middle">输出</text><text x="696" y="336" font-size="12" class="v-sub" text-anchor="middle">尺寸 / 颗粒 / 压缩</text><text x="28" y="405" font-size="13" class="v-sub" text-anchor="start">原始 / 融合 DNG 在上游保留，风格成片另行导出；DNG 后缀不保证未经处理。</text></svg></div><p class="v-caption">依据各产品文档整理的管线示意。方框表示功能位置，不是画质等级；真实软件可以跨越多个方框。<a href="#film-ref-S01">[S01]</a> <a href="#film-ref-S02">[S02]</a> <a href="#film-ref-S13">[S13]</a> <a href="#film-ref-S54">[S54]</a></p></div>
 
-有的工具改善输入，有的接管显影，它们也可能搭配使用。输入准备好以后，才轮到确定胶片外观。
+输入准备、显影与风格形成可以由不同工具承担，也可以组成连续流程。胶片模拟的评价应在明确输入之后，再确定所拟合的外观或材料过程。
 
-## 4. 同样叫 Portra，为什么颜色会不同？
+## 4. Portra 模拟的参考数据与材料模型
 
-一卷彩色负片显影后，还没有规定最终正像的全部样子。扫描器怎样读取它、软件怎样反相，或它经过什么放大机与相纸，都会参与成片。直接扫描负片，与先做光学放相再观看，参考的终点本来就不同。[S40](#film-ref-S40) [S68](#film-ref-S68)
+彩色负片显影并未唯一确定最终正像。扫描器读取、反相算法、放大机与相纸均参与成片，直接负片扫描和光学放相采用的参考终点不同。[S40](#film-ref-S40) [S68](#film-ref-S68)
 
-所以，“Portra 400”还缺半个说明：曝光和显影怎样设置，最后对准哪一种冲扫？Mastin 以指定胶片和 Frontier 扫描为参照，Dehancer 的负片参考链包含光学放相。结果不同，可能只是参照的终点不同。[S40](#film-ref-S40) [S73](#film-ref-S73)
+“Portra 400”需要进一步说明曝光、显影和冲扫参考。Mastin 采用指定胶片与 Frontier 扫描，Dehancer 的负片参考链包含光学放相。两种外观的差异，可能来自目标链条而非某一方模拟失效。[S40](#film-ref-S40) [S73](#film-ref-S73)
 
-有些工具从实物标定入手，拍摄真实胶片，再显影、扫描，拟合颜色和颗粒，DxO FilmPack 公开说明过这套过程。另一些把材料响应与处理步骤写成模型，计算光穿过胶片和相纸后的结果。spektrafilm 属于后一条路线。[S45](#film-ref-S45) [S53](#film-ref-S53)
+技术上可区分实物标定与过程建模。DxO FilmPack 公开说明了实拍、显影、扫描及颜色颗粒拟合；spektrafilm 则将材料响应和处理步骤写入模型，计算光穿过胶片与相纸后的结果。两者的参数含义与验证方式不同。[S45](#film-ref-S45) [S53](#film-ref-S53)
 
 先看它的公开示例：
 
@@ -125,19 +125,19 @@ Indigo 默认保存 JPEG 与 DNG。对静态夜景，可以先保留它的 DNG�
 
 *Andrea Volpato 于 2025-02-09 发布的 v0.1.0 示例，摄影署名 Signature Edits／@signatureeditsco。左图是另做的 darktable 基础渲染；模型实际使用关闭 sigmoid、降低曝光避免剪裁的 16-bit PNG，并非把左图 JPEG 直接加上效果。样片用于说明材料组合，不作为当前版本的测试成绩。[S61](#film-ref-S61)*
 
-spektrafilm 延续了原来的 agx-emulsion 项目。它分别模拟胶片层曝光、显影后的染料密度、负片透射、相纸曝光，以及最终的观看或扫描。这相当于保留了两次调整：拍摄时让胶片多受或少受一些光，放相时再决定用多少光穿过负片照到相纸。两次调整都能改变成片，但作用的位置不同。[S53](#film-ref-S53) [S55](#film-ref-S55) [S56](#film-ref-S56) [S57](#film-ref-S57)
+spektrafilm 延续 agx-emulsion，依次模拟胶片层曝光、染料密度、负片透射、相纸曝光，以及观看或扫描。负片曝光与放相曝光因此是两个独立控制位置：前者改变感光层受光，后者改变穿过负片照射相纸的光量。[S53](#film-ref-S53) [S55](#film-ref-S55) [S56](#film-ref-S56) [S57](#film-ref-S57)
 
-这样，负片曝光和放相曝光就能分别调整，而不必全部挤到最后的 RGB 调色里。附录中的 Portra 400 与 Portra Endura 曲线，保留了各感色层对波长、曝光的不同响应。
+这种参数化允许在成片形成的不同阶段调整，而非全部归结为末端 RGB 映射。附录保留 Portra 400 与 Portra Endura 的材料曲线，展示感色层对波长及曝光的不同响应。
 
 模型同时依赖数据和假设。部分材料数据尚未公开，需要通用数据或拟合补足；普通 RGB 也无法唯一确定原场景光谱。面对 LED、霓虹等特殊光源时，重建方法的差别尤其值得检验。[S53](#film-ref-S53) [S58](#film-ref-S58) [S66](#film-ref-S66)
 
-实物标定便于对准已知参考，过程模型便于修改和解释过程参数。模型能控制哪些步骤，可以读实现；能否复现一张目标照片，还得有明确参照与验证。
+实物标定直接对应已知参考，过程模型则便于解释和改变中间参数。可控制范围能够从模型结构判断，目标复现精度仍需要明确参照和验证。
 
-把模型放进日常应用，又要处理输入解释、默认配方和操作方式。SpektraLab 可以继续说明这些选择怎样影响最终照片。[S82](#film-ref-S82)
+独立应用还需要确定输入解释、默认配方与交互方式。SpektraLab 可用于考察这些产品层选择如何影响同一材料模型的最终输出。[S82](#film-ref-S82)
 
-## 5. SpektraLab：有了光谱模型，为什么未必更好看？
+## 5. SpektraLab：模型能力、实现近似与审美评价
 
-看过公开样片，我仍更喜欢 Gloam 的成片。SpektraLab 的光谱模型更复杂，但复杂在哪里、能多控制什么，与照片是否合口味，需要分开判断。
+就公开样片而言，我仍更偏好 Gloam 的成片。这个偏好不构成对光谱路线准确性的否定：模型复杂度、可控制的过程，以及观看者偏好，需要采用不同证据评价。
 
 SpektraLab 把 spektrafilm 模型做成独立编辑应用。macOS 版将计算移植到 C++ 与 Metal，加入原生界面、RAW 导入与编辑流程。以下实现说明以 2026 年 11 月 8 日核查的 macOS 1.3.7 为准；移动版、Windows 版的实现与成熟度在附录另列。[S82](#film-ref-S82) [S84](#film-ref-S84)
 
@@ -145,9 +145,9 @@ SpektraLab 把 spektrafilm 模型做成独立编辑应用。macOS 版将计算�
 <div class="v-figure"><a href="/images/film-emulation-spektralab/spektralab_official_workspace.png"><img src="/images/film-emulation-spektralab/spektralab_official_workspace.png" width="2560" height="1440" loading="lazy" decoding="async" alt="SpektraLab 官方工作区截图：夜景照片，左侧选中 Portra 160 胶片与 Vision 2383 材料，右侧为输入调整"></a><p class="v-caption">SpektraLab 项目公开的界面示例，画面中选择 Portra 160＋Vision 2383。图片取自 1.3.7 标签对应的源码仓库，截图所示界面的版本未注明，历史控件不能当作当前功能清单。摄影及界面权利归各自权利人。<a href="#film-ref-S93">[S93]</a></p></div>
 {% endraw %}
 
-### 先看输入，再看整套处理
+### RAW 输入与显示对照的不同路径
 
-macOS 版先用 Apple RAW 解码器生成线性 ProPhoto RGB，关闭若干亮度增强与局部影调映射，再送入模型。界面里供对照的 Original 则另走 Apple 默认显示渲染。因此，左右两边是同一 RAW 的两条显示路径，左边那张显示图并不是右边模型实际读取的起点。[S86](#film-ref-S86)
+macOS 版使用 Apple RAW 解码器生成线性 ProPhoto RGB，关闭若干亮度增强与局部影调映射后进入模型；Original 对照则采用 Apple 默认显示渲染。因此，界面比较的是同一 RAW 的两条处理路径，而非左侧显示图直接作为右侧模型输入。[S86](#film-ref-S86)
 
 这条流程仍然受输入限制。ProRAW 已经融合的信息不会在这里拆回单帧，JPEG 中被剪掉的高光也不会因增加光谱步骤重新出现。进入模型后，选择胶片、负片曝光、相纸与放相配光，才会逐步确定成片；后面的曝光、白平衡和曲线等 Post-Dev 调整，继续参与最终外观。[S02](#film-ref-S02) [S83](#film-ref-S83)
 
@@ -155,15 +155,15 @@ macOS 版先用 Apple RAW 解码器生成线性 ProPhoto RGB，关闭若干亮�
 <div class="v-figure"><a href="/images/film-emulation-spektralab/spektralab_official_halation.png"><img src="/images/film-emulation-spektralab/spektralab_official_halation.png" width="1386" height="1400" loading="lazy" decoding="async" alt="SpektraLab 官方城市景观 Before/After 分割图，左右的颜色、天空颗粒和建筑边缘均有变化"></a><p class="v-caption">官方 Before／After 分割示例。可见颜色、颗粒与边缘观感一起变化；原文件虽然名为 natural_halation，但没有配套 RAW 与完整参数，不能把全部差异归因于光晕，也不能据此判定当前默认效果。原图未改色，摄影及界面权利归各自权利人。<a href="#film-ref-S93">[S93]</a></p></div>
 {% endraw %}
 
-### 并行计算主要改善等待时间
+### 并行计算与预计算的作用范围
 
-GPU 并行处理像素，并在相关步骤计算各波长的材料响应；预计算、已显影负片缓存和小尺寸交互预览，则减少重复计算。修改放相参数后更快看到结果，编辑时就更方便尝试组合。但这缩短的是等待，没有增加原照片的信息。[S87](#film-ref-S87) [S89](#film-ref-S89) [S94](#film-ref-S94)
+GPU 并行处理像素，并在相关阶段计算各波长的材料响应；预计算、负片缓存与低分辨率交互预览则减少重复工作。它们降低调整放相参数时的等待成本，不增加原图记录的信息，也不能单独证明模拟更准确。[S87](#film-ref-S87) [S89](#film-ref-S89) [S94](#film-ref-S94)
 
-SpektraLab 也会查响应表和 LUT。光谱模型建立颜色关系，预计算与并行执行让这些关系更快得到结果，几种方法可以一起用。附录 C7 列出了具体的预计算位置。[S88](#film-ref-S88) [S95](#film-ref-S95)
+响应表与 LUT 同样用于 SpektraLab 的加速。光谱计算确定颜色关系，预计算与并行执行改变求值效率，二者可以存在于同一管线。附录 C7 进一步区分相关计算位置。[S88](#film-ref-S88) [S95](#film-ref-S95)
 
-### 模型的上限，和照片是否合口味
+### 过程控制、预测准确性与主观偏好
 
-“上限”至少有三个不同含义，不能由模型复杂度一起回答。
+“理论上限”至少涉及以下三类不同命题，需要分别判断。
 
 | 想判断什么 | 需要看什么 | 目前可以怎样评价 SpektraLab |
 |---|---|---|
@@ -171,51 +171,51 @@ SpektraLab 也会查响应表和 LUT。光谱模型建立颜色关系，预计�
 | 能否接近指定胶片结果 | 固定胶卷、曝光、显影与冲扫的实物参照 | 需要验证；光谱模型本身不能代替这组证据 |
 | 是否更喜欢、是否容易出片 | 自己的照片、默认结果和愿意投入的编辑时间 | 由风格与使用体验决定，不存在由模型复杂度规定的名次 |
 
-可调过程多，不代表每种材料特征都测过。预测准确性仍取决于输入标定、材料数据和模型近似。例如 SpektraLab 自有黑白相纸 Profile 注明使用假定的银光谱与基底密度，指南也说明彩色胶片目前共享一个颗粒模型。[S91](#film-ref-S91) [S83](#film-ref-S83)
+更多过程参数不等于所有材料特征均经过独立测量。预测能力仍依赖输入标定、材料数据和近似。例如，自有黑白相纸 Profile 明确采用假定银光谱与基底密度，指南也说明彩色胶片目前共享一个颗粒模型。[S91](#film-ref-S91) [S83](#film-ref-S83)
 
 至于是否喜欢，默认选择就会带来很大影响。macOS 1.3.7 的前端初始设置为 Portra 400＋Supra Endura，并开启自动曝光；指南里的 Portra 400＋Portra Endura 则是练习配对。选择哪张相纸、曝光落在哪里、是否继续调色，都会改变读者看到的第一张照片。[S90](#film-ref-S90) [S83](#film-ref-S83)
 
-Gloam 已经把颜色、颗粒、画幅调成可直接选择的相机风格。使用者从这套现成外观出发，再判断它适不适合场景。默认出片合意，完全可以成为日常选用它的理由。[S08](#film-ref-S08) [S09](#film-ref-S09)
+Gloam 将颜色、颗粒与画幅组织为预先调整的风格，使用者首先评价默认组合是否适合场景。对直接拍摄而言，默认渲染的审美选择本身具有产品价值，不能由参数数量替代。[S08](#film-ref-S08) [S09](#film-ref-S09)
 
-我目前偏向 Gloam，依据仍是公开样片。SpektraLab 提供更细的负片、放相控制，但它在自己照片上的默认效果，以及花时间调整后的结果，都还需要另比。本次没有完成这组实拍。
+本文对 Gloam 的偏好仍限定于公开样片。SpektraLab 在自有照片上的默认结果及限定编辑时间后的结果，需要分别测试，才可评价额外控制是否改善偏好；本次未完成这组实拍。
 
 <span id="5-颜色之外，颗粒和光晕怎样改变照片？"></span>
 
-## 6. 颜色之外，颗粒和光晕怎样改变照片？
+## 6. 颗粒尺度、空间扩散与处理顺序
 
-胶片颗粒很容易被想成一层噪点，但它的观感与底片画幅、放大倍率和观看距离有关。把同一张底片放得更大，颗粒也更容易被看见。
+颗粒观感取决于底片画幅、放大倍率与观看距离。相同底片放大到不同输出尺寸，颗粒可见性便可能变化，因此不能将其简化为固定强度的噪点层。
 
 Kodak 的 Portra 400 资料给出了印相颗粒指数 PGI：在规定观看条件下，135 底片制作 4×6 英寸印相时为 37，放大到 16×20 英寸时为 89；120 底片达到同样印相尺寸，需要的放大倍率较小，对应指数也较低。[S65](#film-ref-S65)
 
 <div class="v-figure film-chart"><p class="v-scroll-hint">左右滑动查看完整图表；键盘聚焦后可用方向键。</p><div class="v-chart-viewport" tabindex="0" role="region" aria-label="可横向滚动的图表"><svg viewBox="0 0 800 420" role="img" xmlns="http://www.w3.org/2000/svg" aria-label="Portra 400：画幅、放大与颗粒观感"><text x="28" y="32" font-size="20" class="v-ink" text-anchor="start">Portra 400：画幅、放大与颗粒观感</text><text x="74" y="64" font-size="13" class="v-sub" text-anchor="start">Print Grain Index（感知指标）</text><path d="M74 320.00H754" class="v-grid" fill="none"/><text x="62" y="325.0" font-size="12" class="v-muted" text-anchor="end">0</text><path d="M74 262.50H754" class="v-grid" fill="none"/><text x="62" y="267.5" font-size="12" class="v-muted" text-anchor="end">25</text><path d="M74 205.00H754" class="v-grid" fill="none"/><text x="62" y="210.0" font-size="12" class="v-muted" text-anchor="end">50</text><path d="M74 147.50H754" class="v-grid" fill="none"/><text x="62" y="152.5" font-size="12" class="v-muted" text-anchor="end">75</text><path d="M74 90.00H754" class="v-grid" fill="none"/><text x="62" y="95.0" font-size="12" class="v-muted" text-anchor="end">100</text><text x="74.0" y="343" font-size="13" class="v-sub" text-anchor="middle">4×6</text><text x="414.0" y="343" font-size="13" class="v-sub" text-anchor="middle">8×10</text><text x="754.0" y="343" font-size="13" class="v-sub" text-anchor="middle">16×20</text><text x="414" y="370" font-size="13" class="v-sub" text-anchor="middle">印相尺寸（英寸） · 观看距离 14 英寸</text><path d="M74.00,234.90 L414.00,184.30 L754.00,115.30 " fill="none" stroke="var(--accent)" stroke-width="2.6"/><circle cx="74.00" cy="234.90" r="4" fill="var(--accent)"/><circle cx="414.00" cy="184.30" r="4" fill="var(--accent)"/><circle cx="754.00" cy="115.30" r="4" fill="var(--accent)"/><path d="M80 397h24" stroke="var(--accent)" stroke-width="3"/><text x="110" y="402" font-size="12" class="v-sub" text-anchor="start">135 · 24×36 mm</text><path d="M74.00,262.50 L414.00,234.90 L754.00,184.30 " fill="none" stroke="#b98245" stroke-width="2.6"/><circle cx="74.00" cy="262.50" r="4" fill="#b98245"/><circle cx="414.00" cy="234.90" r="4" fill="#b98245"/><circle cx="754.00" cy="184.30" r="4" fill="#b98245"/><path d="M315 397h24" stroke="#b98245" stroke-width="3"/><text x="345" y="402" font-size="12" class="v-sub" text-anchor="start">120 · 6×6 cm</text></svg></div><p class="v-caption">重绘 Kodak E-4050 的 PGI 表。测量条件包括约 14 英寸观看距离和漫射印相；约 25 是颗粒可见阈值。厂家将约 4 个指数单位作为 90% 观察者的一个可辨差异。图中只连接 135 与 120 的确切值；4×5 的 <code>&lt;25</code> 是范围值，未在图中连线，CSV 保留原值。<a href="#film-ref-S65">[S65]</a></p></div>
 
-调整数字颗粒时，要把裁切和输出尺寸一起定下来。大图上的细颗粒缩小后可能被平均掉；缩图后再按固定像素生成，纹理又不同。“颗粒强度 30”只是各软件自己的标尺，不能直接用来匹配材质。
+数字颗粒需要与裁切和输出尺寸共同设定。大图缩小可能平均掉细颗粒，缩图后再按像素生成则改变纹理尺度。因此，各软件的“颗粒强度 30”不具有可直接比较的材料含义。
 
 除了大小，还要看颗粒怎样随亮度变化、不同颜色通道如何相关、细节是否被纹理吞没。公开研究既有随机几何模型，也有用学习方法加速颗粒生成的路线；这里的学习模型可以只处理材质，不必改写照片中的物体。[S69](#film-ref-S69) [S71](#film-ref-S71)
 
 光晕则涉及像素之间的关系。Halation 参考的是光在感光材料及相关结构中返回、扩散后造成的额外曝光；Bloom／Diffusion 常用来描述强光向周围散射的外观。评估它们时，要观察光晕从多亮开始出现、扩散多远，以及小点光源和大面积亮区是否被合理区分。[S28](#film-ref-S28) [S38](#film-ref-S38) [S58](#film-ref-S58)
 
-强光先扩散再压缩高光，与压缩好的 JPEG 再加柔光，边缘未必相同。颗粒和缩图、曝光和影调映射，也会受到顺序影响。
+空间扩散与非线性影调处理的次序也影响结果。强光先扩散再压缩，与对已压缩 JPEG 施加柔光未必产生相同边缘；颗粒和缩图、曝光和影调映射同样不能默认交换顺序。
 
-颜色能逐像素计算，光晕要看邻域，颗粒需要随机结构。到了桌面，预设、Profile、LUT 与插件就是按这些能力分工的。
+逐像素颜色映射、邻域扩散与随机颗粒需要不同输入和运算。预设、Profile、LUT 与完整插件的能力边界，应依据这些处理对象区分。
 
 <span id="6-到了电脑上，预设、LUT-和插件各接管什么？"></span>
 
-## 7. 到了电脑上，预设、LUT 和插件各接管什么？
+## 7. 预设、Profile、LUT 与插件的能力边界
 
 先从 Lightroom 里最常见的两个名字说起。**预设保存一组开发设置**，让曝光、曲线、色彩、颗粒或蒙版等参数快速复用；**Profile 参与颜色与明暗的解释**，可以提供更复杂的映射，而不必把常规滑块改成一套固定值。不同文件即使都以 XMP 保存，作用也未必相同。[S34](#film-ref-S34) [S35](#film-ref-S35) [S36](#film-ref-S36)
 
 RNI 主要以 Profile 组织胶片颜色；Mastin 提供围绕特定扫描参照调整曝光、白平衡的预设流程；Cobalt 则先使用相机专属标定数据，再选择目标渲染。这些产品适合把大量照片的编辑留在现有 RAW 宿主里。[S48](#film-ref-S48) [S49](#film-ref-S49) [S50](#film-ref-S50)
 
-### LUT 保存的是颜色关系
+### LUT 的颜色映射范围
 
-一个普通 3D LUT 记录的是：输入这个 RGB，输出哪个 RGB。两个灰色像素的输入值相同，查表结果就相同。即使其中一个紧挨着强光灯，另一个远离灯，LUT 本身也不知道这种区别。因此，单靠这张表无法产生由邻域决定的光晕，也无法生成新的随机颗粒。
+普通 3D LUT 定义 RGB 到 RGB 的映射。输入相同便产生相同输出，与像素是否靠近强光无关。因此，LUT 本身不能表达邻域决定的光晕，也不能独立生成新的随机颗粒。
 
 但表里的颜色关系可以很复杂。假设我们选定一套胶片与相纸模型，固定曝光、滤色和自动调整，再预先计算一批颜色的输出，就能把全局一致、逐像素的颜色部分存进 LUT。使用时按输入查表，在已记录的点之间插值；颗粒与空间效果继续由其他模块执行。spektrafilm 的工具和 ART 的集成就展示了这种组合。[S54](#film-ref-S54) [S58](#film-ref-S58) [S60](#film-ref-S60)
 
-LUT 只说明运行时怎样查表。表中的颜色关系仍可能来自手工调色、胶片测量或材料模型，要分别查来源。
+LUT 描述运行时的映射表示，不说明映射如何获得。手工调色、胶片测量和材料模型均可生成颜色表，需要另行核查来源及输入约定。
 
-### 空间效果需要完整的处理工具
+### 空间效果的处理要求
 
 DxO FilmPack、Dehancer 等工具将颜色与颗粒、光晕等处理组织在一起。选择时，除了外观，也要看接收什么输入：例如 FilmPack 的独立程序与 PhotoLab 集成可以处理支持的 RAW，Photoshop／Lightroom Classic 插件入口则是 JPEG 或 TIFF。[S45](#film-ref-S45) [S46](#film-ref-S46) [S40](#film-ref-S40) [S41](#film-ref-S41)
 
@@ -223,27 +223,27 @@ Adobe 自己也在扩展这部分能力。Camera Raw 18.6 已加入 Diffusion、
 
 SpektraLab 则提供独立应用入口，把输入准备、材料模型与放相编辑组织在一起；它与宿主插件的差别，也体现在照片怎样导入、怎样继续编辑。[S82](#film-ref-S82) [S83](#film-ref-S83)
 
-选这类工具，我会看材质是否合意、参数是否便于调整，能否匹配需要的参考，再看批处理和导出是否顺手。同名功能也可能放在不同的处理位置，结果不能只按名字比较。
+工具评价应分别考察材质响应、参数可控性、参考匹配及批处理和导出效率。同名功能可能处于不同处理阶段，不能仅按功能名称推断输出一致。
 
 手机与桌面之间也有一条实用连接。No Fusion 支持导入 LUT，官方还提供从 Lightroom 调色生成 LUT 的方法。这可以迁移适合写入颜色表的部分；RAW 相机标定、蒙版、颗粒和光晕仍要由对应流程承担。[S15](#film-ref-S15)
 
-格式对上还不够，色彩空间和编码也要一致。16-bit TIFF 可能早已显影完成，面向编码 sRGB 的 LUT 也不能直接按线性 RGB 输入。输入解释没对齐，就很难判断软件间的颜色差异。[S42](#film-ref-S42) [S43](#film-ref-S43) [S54](#film-ref-S54) [S70](#film-ref-S70)
+跨软件传递还需统一色彩空间与编码。16-bit TIFF 可能已经完成显影，面向编码 sRGB 的 LUT 也不能直接处理线性 RGB。输入解释不一致时，颜色差异无法可靠归因于目标模型。[S42](#film-ref-S42) [S43](#film-ref-S43) [S54](#film-ref-S54) [S70](#film-ref-S70)
 
 <span id="7-回到拍摄：先找出自己想改变的那一步"></span>
 
-## 8. 回到拍摄：先找出自己想改变的那一步
+## 8. 按处理目标选择与验证工具
 
-选哪套工具，可以先从自己不满意的部分开始。
+工具选择应先明确需要改变的处理环节，再确定可比较的输入和输出。
 
-如果喜欢 Gloam 或 Dazz 的直出，就固定少数相机风格，看它们在日光、室内、人物和夜景中能否一直合意。让人愿意继续拍，是相机很实际的价值。不过 Gloam 目前不能任意导入相册照片，别处拍的 DNG 得交给兼容编辑器。[S09](#film-ref-S09)
+直接拍摄可以围绕少数 Gloam、Dazz 风格，检查日光、室内、人像和夜景下的一致性。默认结果是否符合偏好，与使用意愿直接相关。Gloam 当前不支持任意相册导入，外部 DNG 则需要兼容编辑器处理。[S09](#film-ref-S09)
 
-如果介意手机处理痕迹，先定位在采集还是显影。单帧 RAW 减少跨帧时间混合，ProRAW 的替代显影保留融合信息、另排影调；静态暗光需要更多采样，可以再看 Indigo。同时确认原件能否保留与导出。[S13](#film-ref-S13) [S24](#film-ref-S24) [S04](#film-ref-S04)
+若目标是减少手机处理痕迹，应先区分采集与显影：单帧 RAW 减少跨帧时间混合，ProRAW 替代显影保留融合信息并重排影调，Indigo 则用于考察静态暗光下的更多采样。原件能否保留与导出同样属于流程条件。[S13](#film-ref-S13) [S24](#film-ref-S24) [S04](#film-ref-S04)
 
-桌面编辑也按需求选：批量统一可以先用宿主预设或 Profile，颗粒、光晕需要对应工具，想控制负片曝光、相纸和滤色，则可以操作 SpektraLab，再研究 spektrafilm 模型。多走这一步是否值得，要看自己的照片实际变好了多少。[S82](#film-ref-S82)
+桌面端可按控制范围选择：预设与 Profile 支持批量统一，颗粒和光晕需要对应处理模块，负片曝光、相纸与滤色则可由 SpektraLab 调整。进一步研究 spektrafilm 模型有助于解释参数，但额外复杂度是否值得仍取决于自有照片上的实际结果。[S82](#film-ref-S82)
 
-做比较时，先固定一个问题。同一份 ProRAW 交给两种显影，回答的是“这份数据怎样呈现”；用两个 App 分别拍摄，比较的是各自完整的采集与处理。想判断是否接近某种真实胶片，还需要固定胶卷、曝光、显影与冲扫参考。
+对照设计应固定所回答的问题。同一 ProRAW 的不同显影比较处理路径，不同应用分别拍摄则比较完整采集与处理。若评价真实胶片匹配，还需固定胶卷、曝光、显影与冲扫参考。
 
-对我来说，喜欢一张照片之后还值得多看一会儿：喜欢的是颜色、较轻的锐化、颗粒大小，还是高光扩散的边缘？找到那一项，下一次比较就不用把所有工具从头试一遍。
+审美判断最终可以具体到颜色、锐化、颗粒尺度与高光扩散。将偏好定位到这些可观察特征，才能判断何种工具改变了目标属性，以及改进是否值得增加流程成本。
 
 ---
 
@@ -290,11 +290,11 @@ Indigo 在 2026 年 7 月还公开了面向受邀用户的 AI Playground 试验�
 
 几个相邻领域也值得分清：RawTherapee 的 Hald CLUT 是把颜色表存成二维图像；darktable 的 filmic RGB 主要承担场景到显示的影调变换，AgX 也与 agx-emulsion 项目有不同含义。Fujifilm X RAW Studio 使用连接相机的机内处理器转换 RAW；Negative Lab Pro 则对真实胶片的数字扫描件反相与调色。[S74](#film-ref-S74) [S75](#film-ref-S75) [S67](#film-ref-S67) [S68](#film-ref-S68)
 
-### 市场正在怎样变化
+### 产品方向与市场变化
 
 Gloam、Dazz 把审美选择放进相机与风格，影响的也包括拍摄习惯。[S08](#film-ref-S08) [S17](#film-ref-S17) ACR 加入原生空间效果以后，独立插件需要在材质控制、参考匹配和效率上继续体现价值。[S38](#film-ref-S38) [S39](#film-ref-S39) spektrafilm 公开数据与逻辑，模型开发与产品设计因此可以分别推进；SpektraLab 则给出了原生应用的实现。[S53](#film-ref-S53) [S54](#film-ref-S54) [S60](#film-ref-S60) [S82](#film-ref-S82)
 
-我据此更看重输入处理、默认值、批量一致性和原片参数的流转。这是从产品结构作出的判断，现有资料还不足以计算统一口径的销量、收入或市场份额。
+据此可以推断，输入可靠性、默认值、批量一致性和原片参数流转会影响长期使用价值。这是基于产品结构的判断；现有资料不足以计算统一口径的销量、收入和市场份额。
 
 </details>
 
@@ -388,7 +388,7 @@ $$
 
 dB 使用 $20\log_{10}(\mathrm{SNR\ 倍数})$。这里固定每帧曝光，32 帧也付出了 32 倍总积分时间；收益不是某个 App 的实测动态范围。若任意两帧噪声具有共同相关系数 $\rho$，平均后的标准差比为 $\sqrt{[1+(N-1)\rho]/N}$，图中的 $\rho=0.1$ 只是示例。
 
-### C2. 材料模型怎样从光走到颜色
+### C2. 光谱到颜色的材料模型
 
 省略归一化和耦合等实现细节，可以用下式解释胶片层曝光、密度和透射的关系：
 
@@ -434,7 +434,7 @@ Kodak E-4050 的 Print Grain Index 描述规定条件下的印相颗粒观感，
 
 PGI 不是 RMS 颗粒度，也不是比例量表；89/37 不能解释成颗粒“强 2.4 倍”。`<25` 是范围值，数据文件原样保留。
 
-### C4. LUT 网格变密，增加了什么
+### C4. LUT 网格密度与存储开销
 
 每个节点保存 RGB 三个 float32 值时，$n^3$ 网格的理论存储量为 $n^3\times3\times4$ 字节。
 
@@ -442,7 +442,7 @@ PGI 不是 RMS 颗粒度，也不是比例量表；89/37 不能解释成颗粒�
 
 17³、33³、65³、129³ 分别有 4,913、35,937、274,625、2,146,689 个节点，理论存储约为 0.056、0.411、3.143、24.567 MiB。更密的表可以减少插值误差，不会增加输入中没有的邻域或随机信息；这些数值也不代表软件速度。
 
-### C5. 为什么调整顺序会改变结果
+### C5. 处理顺序与非交换性
 
 用 $T(x)=x/(1+x)$ 作为简单压缩曲线。先提高一档线性曝光再映射，得到 $T(2x)$；先映射再把结果乘 2 并剪裁，得到 $\min[1,2T(x)]$。当 $x=0.18$ 时，两者分别为 0.264706 和 0.305085。
 
@@ -450,7 +450,7 @@ PGI 不是 RMS 颗粒度，也不是比例量表；89/37 不能解释成颗粒�
 
 这个数学示例只说明非线性操作一般不能交换顺序，不是任何产品或胶卷的响应曲线。
 
-### C6. 几个会影响输入解释的细节
+### C6. 输入数据与色彩解释
 
 位深、动态范围和像素数描述不同属性。Apple 在 WWDC21 对 ProRAW 的说明包含 12-bit 压扩编码和最高约 14 档的设计表述，可用来理解编码与亮暗范围的区别，不能直接视作所有机型的实测。[S02](#film-ref-S02)
 
@@ -491,7 +491,7 @@ PGI 不是 RMS 颗粒度，也不是比例量表；89/37 不能解释成颗粒�
 
 不提供任意照片导入的应用参加第二类。完整相机比较可分别设置锁定曝光的控制组、各 App 默认自动的使用组。若目标是匹配真实胶片，还要固定胶卷、曝光、显影、扫描或相纸和输出条件。
 
-### 如果继续比较 Gloam 与 SpektraLab
+### Gloam 与 SpektraLab 的后续比较方案
 
 先看 Gloam 能否导出与该张成片对应、且能被 SpektraLab 正确读取的原片。若条件满足，保留 Gloam 成片，再由同一文件生成 SpektraLab 的默认版与限定编辑时间版；记录实际文件类型、材料、曝光、配光与导出条件。不能因政策提到保留 RAW，就假定一定能导出所需的 Bayer RAW。[S09](#film-ref-S09) [S86](#film-ref-S86)
 

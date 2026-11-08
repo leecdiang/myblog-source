@@ -1,6 +1,6 @@
 ---
 lang: zh-CN
-title: 智算互联(中):重构可靠性--从强制无损到端网协同
+title: "智算互联（中）：RDMA 可靠性与拥塞控制"
 date: 2026-06-28 22:39:00
 categories: Silicon & Circuits
 etoc: true
@@ -15,12 +15,12 @@ tags:
   - Ultra-Ethernet
   - TTPoE
   - In-Network-Computing
-description: 从 RoCE、PFC、ECN 与 DCQCN 出发,拆解无损以太网的收益和代价,并比较 IRN、TTPoE 与 Ultra Ethernet 如何把可靠性、拥塞控制和多路径能力重新分配给端点、交换机与控制平面。
+description: "区分 Fabric 容损、端到端可靠性与排序语义，分析 PFC、ECN、DCQCN 的职责，并比较 IRN、TTPoE 与 Ultra Ethernet 对恢复和拥塞控制的不同安排。"
 keywords: RoCE, RDMA, PFC, ECN, DCQCN, TTPoE, UET, 数据中心网络, 拥塞控制
 ---
 
 > **Abstract - Part 2**
-> PFC can protect Ethernet buffers while also spreading pauses upstream. This article separates fabric loss, end-to-end reliability, and ordering, then examines RoCE, IRN, TTPoE, and Ultra Ethernet. Each assigns recovery and congestion control differently across endpoints, switches, and the control plane.
+> Priority-based Flow Control protects Ethernet buffers through hop-by-hop backpressure, but can also cause head-of-line blocking and propagate congestion upstream. This article distinguishes fabric loss tolerance, end-to-end reliability, and ordering requirements, then compares how RoCE, IRN, TTPoE, and Ultra Ethernet distribute recovery and congestion-control responsibilities. The analysis follows the resulting trade-offs across endpoint state, switch buffering, multipath transport, and control-plane coordination, and outlines the evidence needed to evaluate alternatives to PFC-dependent operation.
 
 {% note info %}
 本文是「智算互联」系列中篇。<a href="/series/ai-interconnect/">查看系列目录 →</a><br>
@@ -29,21 +29,21 @@ keywords: RoCE, RDMA, PFC, ECN, DCQCN, TTPoE, UET, 数据中心网络, 拥塞控
 
 ---
 
-同步训练里，一个包丢了、一条流乱序了，或某个队列多等一会儿，都可能让 Collective 卡在最慢 Rank。为保持 RDMA（Remote Direct Memory Access，远程直接内存访问）的低时延、高吞吐，智算网络长期尽量避免交换机丢包。
+同步训练的完成时间受最慢 Rank 约束，丢包恢复、乱序处理和队列等待都可能进入 Collective 的关键路径。为维持 RDMA（Remote Direct Memory Access，远程直接内存访问）的低时延与高吞吐，智算网络长期倾向于在交换 Fabric 中尽量避免丢包。
 
-代价也从这里开始。
+这种部署选择将一部分可靠性压力转化为了交换网络的缓冲与流控要求。
 
-PFC（Priority-based Flow Control）在队列接近溢出时暂停上游，但数据会改在上游积压，暂停可能继续传播；共享优先级的无关流也会被挡住。依赖关系形成循环时，还可能死锁。
+PFC（Priority-based Flow Control）在队列接近溢出时暂停上游发送，但未被消除的数据会在上游继续积压，使暂停向更大范围传播。共享优先级的无关流也可能被阻塞；若缓冲依赖形成循环，还存在死锁风险。
 
-另一种办法是允许 Fabric 丢包，让端点检测和恢复，再由端网协同调度减少拥塞。
+另一条设计路径允许 Fabric 在拥塞时丢包，由端点检测并恢复，同时通过端网协同控制发送节奏和路径使用。
 
-可靠性仍然需要保证，只是执行恢复的位置变了。
+两条路径都需要可靠交付，区别在于恢复责任的分配，以及为此付出的状态、缓冲和控制成本。
 
 ---
 
-## 一、为什么 AI 集群偏爱 RDMA
+## 一、RDMA 的执行路径与 RoCE 部署基础
 
-### 1. 传统网络栈的路径太长
+### 1. 主机协议栈的参与成本
 
 普通 Socket 通信可能经历:
 
@@ -54,62 +54,62 @@ PFC（Priority-based Flow Control）在队列接近溢出时暂停上游，但�
 5. 网卡 DMA;
 6. 接收端反向执行类似路径。
 
-零拷贝与卸载已经减少了传统栈的成本，但 CPU 介入、复制和上下文切换，对微秒级通信仍可能昂贵。
+零拷贝与硬件卸载已降低传统网络栈的成本，但在微秒级通信中，CPU 介入、数据复制及上下文切换仍可能构成显著开销。
 
-RDMA 让网卡访问已注册内存，以较少 CPU 参与完成远端读写和 Send/Recv。GPUDirect RDMA 继续打通网卡与 GPU 显存的路径，减少主机内存中转。
+RDMA 通过网卡访问已注册内存，以较少的 CPU 参与完成远端读写和 Send/Recv。GPUDirect RDMA 进一步连接网卡与 GPU 显存，减少经由主机内存中转的路径。
 
 ### 2. RoCEv2 把 RDMA 放到可路由以太网上
 
 RDMA over Converged Ethernet version 2(RoCEv2)通常封装在 UDP/IP 之上,因此可以跨三层网络路由。它保留 RDMA 的队列对(Queue Pair, QP)、完成队列(Completion Queue, CQ)、内存注册和可靠连接等语义,同时利用成熟的 Ethernet 交换生态。
 
-以太网生态给它提供了这些条件：
+这一选择能够利用以太网已有的部署条件：
 
 - Ethernet 设备和运维体系成熟;
 - 可以与 IP 路由和 Clos Fabric 结合;
 - 服务器、网卡和交换机供应商众多;
 - 与 MPI、NCCL、存储和云平台生态衔接。
 
-传统 RoCE 可靠连接对丢包、乱序比较敏感，部署时常结合 PFC、ECN 和端到端拥塞控制，尽量少走重传路径。
+传统 RoCE 可靠连接对丢包与乱序较为敏感，因此部署中常组合使用 PFC、ECN 和端到端拥塞控制，尽量避免进入代价较高的重传路径。
 
-## 二、PFC、ECN 与 DCQCN 各自做什么
+## 二、PFC、ECN 与 DCQCN 的控制职责
 
-先按暂停、拥塞信号和调速分开看。
+三者分别承担逐跳暂停、拥塞信号传递和源端速率调整，作用范围与响应时间并不相同。
 
 ### 1. PFC:逐跳、按优先级暂停
 
 Priority-based Flow Control(PFC)由 IEEE 802.1Qbb 定义。与暂停整个端口的传统 Pause Frame 不同,PFC 可以暂停某个优先级类别。
 
-下游优先级队列达到阈值后，向上游发 PFC Pause，暂时阻止同优先级发送，为排空留出时间。
+下游优先级队列达到阈值后，向上游发送 PFC Pause，暂时阻止同优先级流量继续进入，为队列排空提供时间。
 
-这种处理发生在相邻链路上：
+逐跳控制具有以下特征：
 
 - 响应发生在相邻链路之间;
 - 不必等待端到端控制环路;
 - 能防止队列立即溢出;
 - 对不擅长处理丢包的旧式 RoCE 端点友好。
 
-但暂停并不会消除数据，它只是把积压移到上游。
+但暂停并不消除待传输数据，积压只是向上游转移；其影响范围取决于后续缓冲与流量依赖。
 
 ### 2. ECN:交换机标记拥塞,而不是立刻丢包
 
 Explicit Congestion Notification(ECN)允许交换机在队列达到标记阈值时,为报文设置拥塞标志。接收端把拥塞信息反馈给发送端,发送端再降低速率。
 
-标记的作用，是在溢出前把队列压力传给源端。
+ECN 的作用是将队列压力在溢出前反馈给源端，为主动减速提供信号。
 
-反馈要完成一圈，源端才会改变速率：
+源端速率调整需要经过完整的反馈环路：
 
 - 报文抵达接收端;
 - 接收端生成反馈;
 - 反馈返回发送端;
 - 发送端调整发送速率。
 
-400G、800G 在一圈反馈时间内仍能注入大量数据，阈值或控制参数没匹配好，队列就可能先涨起来。
+在 400G、800G 链路上，一个反馈周期内仍可能注入大量数据。若标记阈值、缓冲容量与控制参数不匹配，源端完成减速之前队列就可能继续增长。
 
 ### 3. DCQCN:为 RoCEv2 设计的端到端速率控制
 
 Data Center Quantized Congestion Notification(DCQCN)由 Microsoft 等提出,用于大规模 RoCEv2 部署。交换机使用 ECN 标记,接收端向发送端发送 Congestion Notification Packet(CNP),发送端根据反馈调整速率。[Congestion Control for Large-Scale RDMA Deployments](https://www.microsoft.com/en-us/research/publication/congestion-control-for-large-scale-rdma-deployments/)
 
-DCQCN 希望尽量在 PFC 触发前让源端减速，把 PFC 留作接收缓冲紧张时的保护。
+DCQCN 希望通过端到端调速减少 PFC 触发，将逐跳暂停保留为缓冲紧张时的保护机制。
 
 {% mermaid %}
 sequenceDiagram
@@ -131,38 +131,38 @@ sequenceDiagram
 | ECN | 交换机到端点 | 标记拥塞 | 不必立刻丢包,可提前反馈 | 依赖端到端控制环路 |
 | DCQCN | 发送端 | 调整发送速率 | 改善吞吐、公平性和队列 | 参数复杂,对突发流量反应有限 |
 
-实际 RoCE 常将三者组合。规模、线速和同步流量增加后，要同时配好控制参数与缓冲，维持低丢包的成本也会上升。
+实际 RoCE 部署常将三者组合使用。规模、线速和同步流量增加后，控制环路与缓冲参数需要共同匹配，维持低丢包运行的配置和运维成本也随之上升。
 
-## 三、PFC 的代价怎样显现
+## 三、逐跳暂停的系统性代价
 
-### 1. Head-of-Line Blocking:无辜流量一起停车
+### 1. Head-of-Line Blocking：共享队列的连带阻塞
 
 队头阻塞(Head-of-Line Blocking, HoL Blocking)指的是:队列前部的报文被阻塞,后面的报文即使目的地和路径并不拥塞,也无法前进。
 
 PFC 按优先级暂停,而不是按单条流暂停。如果多条流共享同一优先级和队列,一条热点流触发 Pause,其他流也可能被迫等待。
 
-### 2. 暂停怎样向上游传播
+### 2. 反压传播与 Congestion Tree
 
-A 出口拥塞，暂停 B；B 排不掉数据，又暂停 C。压力沿反向路径继续扩散，就可能形成 Congestion Tree。
+若 A 的出口拥塞并暂停 B，B 无法排出数据后又暂停 C，压力便沿反向路径扩散，可能形成 Congestion Tree。最初的局部热点因此能够影响更大范围。
 
-这时会看到：
+其可观察后果包括：
 
 - 原本不经过热点出口的流也可能受影响;
 - 故障定位变得困难,因为看到 Pause 的设备未必是拥塞根源。
 
-### 3. 形成循环依赖以后，才可能死锁
+### 3. 循环缓冲依赖与死锁条件
 
-多个队列互等下游释放缓冲，没有谁能先继续时，就可能发生 PFC Deadlock。
+当多个队列循环等待下游释放缓冲，且没有队列能够先恢复发送时，就可能形成 PFC Deadlock。
 
-不能从启用 PFC 直接推断死锁，也不能只凭“配置正确”排除所有风险。
+启用 PFC 本身不意味着必然死锁，而“配置正确”也不能替代对循环依赖条件的分析。
 
-拓扑、路由、虚拟通道、优先级、缓冲和故障状态都会改变依赖。规模越大、路径越动态、业务越混杂，就越难证明它们始终没有循环。
+拓扑、路由、虚拟通道、优先级、缓冲分配和故障状态都会改变依赖关系。规模扩大、路径动态变化及业务混合，使得持续证明依赖无环更加困难。
 
 Microsoft 的研究和后续 IRN 工作都把 Head-of-Line Blocking、Congestion Spreading 与偶发死锁列为 PFC 的核心问题。[Revisiting Network Support for RDMA](https://dl.acm.org/doi/10.1145/3230543.3230557)
 
-### 4. 阈值要覆盖暂停生效前的数据
+### 4. Headroom 与暂停响应期间的在途数据
 
-Pause 发出后，链路还会继续送来数据，Headroom 至少要考虑：
+PFC Pause 发出后，到上游实际停止发送之前仍会有数据到达。因此，Headroom 至少需要考虑：
 
 - 链路速率;
 - 电缆与光纤传播时延;
@@ -171,11 +171,11 @@ Pause 发出后，链路还会继续送来数据，Headroom 至少要考虑：
 - 最大帧长;
 - 多个上游端口同时注入的情况。
 
-阈值低，可能频繁暂停；阈值高，又可能来不及止住溢出。100G 到 400G、800G，同样的响应时间会带来更多在途字节，预留空间也要重算。
+阈值过低可能导致频繁暂停，过高则可能无法及时避免溢出。从 100G 提高到 400G、800G 后，相同响应时间对应更多在途字节，预留缓冲也需要重新计算。
 
-## 四、先拆开"有损、可靠、有序"三个概念
+## 四、Fabric 容损、传输可靠性与有序语义
 
-“交换机可以丢包”和“应用数据不可靠”，不能等同起来。
+这三个概念对应不同系统层面的约束。交换机允许丢包，并不意味着应用最终收到的数据可以不完整。
 
 ### 1. Fabric 是否允许丢包
 
@@ -198,13 +198,13 @@ Pause 发出后，链路还会继续送来数据，Headroom 至少要考虑：
 | 允许丢包 | 可靠 | 灵活有序 | 可使用包级多路径和直接数据放置 |
 | 允许丢包 | 不可靠 | 不保证有序 | 适合能自行容错的特殊应用,不适合普通 RDMA 语义 |
 
-新的 AI Transport 常采用表中第二或第三种组合：极端拥塞时允许 Fabric 丢包，由端点完成最终可靠交付。
+新的 AI Transport 常采用表中第二或第三种组合：允许 Fabric 在极端拥塞时丢包，同时由端点承担最终可靠交付。
 
-## 五、为什么选择性重传改变了问题
+## 五、选择性重传与端点状态成本
 
-Go-Back-N 丢了一个包，可能从缺口开始把后面一串重发，已到达的数据也占了一次带宽。
+采用 Go-Back-N 时，单个包丢失可能触发从缺口开始的连续重发，使已经到达的数据再次消耗链路带宽。
 
-选择性确认与重传只补缺口，能减少高速有损 Fabric 上的重复工作。
+选择性确认与重传仅补发缺失部分，可以减少高速有损 Fabric 上的重复传输，但需要更细粒度的接收和恢复状态。
 
 这需要端点维护更多状态：
 
@@ -215,19 +215,19 @@ Go-Back-N 丢了一个包，可能从缺口开始把后面一串重发，已到�
 - 更细粒度的计时器与重传队列;
 - 防止重复写入或状态失配。
 
-因此，容损也没有省掉全部硬件工作。部分复杂性从交换机缓冲和 PFC 运维，转移到了 RNIC Transport Engine。
+因此，允许丢包并未消除可靠传输的硬件成本，而是将部分复杂性从交换机缓冲与 PFC 运维转移到 RNIC Transport Engine。
 
-## 六、IRN:PFC 不是 RDMA 的物理定律
+## 六、IRN：重新审视 RoCE 对 PFC 的依赖
 
-SIGCOMM 2018 的 IRN（Improved RoCE NIC）把 RoCE 对 PFC 的依赖指向当时的 NIC 设计，而非 RDMA 语义的必然要求。
+SIGCOMM 2018 的 IRN（Improved RoCE NIC）将 RoCE 对 PFC 的依赖归因于当时的 NIC 设计选择，而非 RDMA 语义本身的必然约束。
 
-IRN 以有限接收窗口、选择性重传和丢包处理，让 RoCE 在无 PFC 条件下工作。论文的典型场景报告性能比传统 RoCE + PFC 高 6%–83%，NIC 资源开销约 3%–10%。数字只对应其实现与实验，不能直接推广到商用网络；它验证的是，这种可靠传输可以另做设计。
+IRN 结合有限接收窗口、选择性重传与丢包处理，使 RoCE 可以在无 PFC 条件下运行。论文在典型实验场景中报告，相对传统 RoCE + PFC 的性能提升为 6%–83%，NIC 资源开销约为 3%–10%。这些数字仅适用于其实现与实验条件，不能直接外推到商用网络；其主要意义在于展示另一种可靠传输设计的可行性。
 
-因此，全网强无损并非 RDMA 唯一可用的实现前提。
+由此，依靠全网强无损维持 RDMA 运行，是一种实现路径，而非唯一前提。
 
 [Revisiting Network Support for RDMA](https://dl.acm.org/doi/10.1145/3230543.3230557)
 
-## 七、TTPoE:垂直整合系统的极端样本
+## 七、TTPoE：垂直整合条件下的传输设计
 
 Tesla Transport Protocol over Ethernet(TTPoE)常被误写成 Tensor over Ethernet。Tesla 在 Hot Chips 2024 后公开了相关代码与说明。[Tesla TTPoE GitHub Repository](https://github.com/teslamotors/ttpoe)
 
@@ -239,34 +239,34 @@ Tesla 的官方 README 给出了几个关键设计取向:
 - 数据链路不需要 CPU 或操作系统参与;
 - 拥塞管理强调端点自治,而不是集中式控制。
 
-### 1. 垂直整合为 TTPoE 留出了哪些条件
+### 1. 系统控制范围与通用性取舍
 
-同时控制加速器、接口、拓扑与软件栈，就能舍弃部分通用性，围绕特定系统设计 Transport。TTPoE 展示了这种取舍。
+同时掌握加速器、接口、拓扑与软件栈，可以围绕特定系统设计 Transport，并舍弃部分通用兼容性。TTPoE 提供了这一取舍的具体案例。
 
-把它推广到行业通用部署，还受以下条件限制：
+其向行业通用部署推广时，仍受到以下条件限制：
 
 - 公开实现和生态远小于 RoCE;
 - 部署条件高度特定;
 - 与通用 Verbs、libfabric 和多厂商交换生态的兼容性有限;
 - 公开材料不足以完整评估大规模故障、隔离和安全语义。
 
-所以我会把它看作定制系统的案例，现有证据不足以称它为 RoCE 的通用继任者。
+因此，更合理的定位是垂直整合系统中的定制传输案例。现有公开证据不足以将其认定为 RoCE 的通用继任方案。
 
-## 八、Ultra Ethernet 怎样重新安排传输
+## 八、Ultra Ethernet 的协同传输架构
 
 Ultra Ethernet Consortium(UEC)在 2025 年发布 Ultra Ethernet Specification 1.0,目标是为 AI 与 HPC 的 Scale-out 网络提供开放、多厂商的完整通信架构。[Ultra Ethernet Specification 1.0 Announcement](https://ultraethernet.org/ultra-ethernet-consortium-uec-launches-specification-1-0-transforming-ethernet-for-ai-and-hpc-at-scale/)
 
-UET（Ultra Ethernet Transport）同时协调 Transport、API、交换机、安全与物理层，其范围超出给 RoCE 加一个拥塞算法。
+UET（Ultra Ethernet Transport）处于同时协调 Transport、API、交换机、安全与物理层的架构中，其设计范围超出了为 RoCE 增加单一拥塞算法。
 
-### 1. Packet Spraying:从"每条流选一条路"到"每个包利用多条路"
+### 1. Packet Spraying：包级多路径与乱序代价
 
 传统 ECMP 通常对五元组做哈希,同一条流固定走一条路径。这能避免乱序,但当少数大流碰巧哈希到同一路径时,其他路径可能空闲,热点路径却拥塞。
 
 UET 支持多路径 Packet Spraying,让同一传输的不同包使用多条可用路径,并结合端点与网络的实时拥塞信息进行更细粒度负载均衡。[UEC Progresses Towards v1.0 Set of Specifications](https://ultraethernet.org/uec-progresses-towards-v1-0-set-of-specifications/)
 
-包级分散提高了路径利用率，减少 Flow Collision 和尾延迟，接收端则要承担乱序处理。
+包级分散有助于提高路径利用率、缓解 Flow Collision 与尾延迟，但也要求接收端处理由多路径时延差异产生的乱序。实际收益取决于这两方面能否匹配。
 
-### 2. Flexible Ordering:不为应用不需要的顺序付费
+### 2. Flexible Ordering：按应用需求约束顺序
 
 有些应用只关心整个消息何时完成,并不要求每个包按顺序交给软件。UET 允许应用通过 libfabric 表达不同的 Ordering 需求。
 
@@ -276,22 +276,22 @@ UET 支持多路径 Packet Spraying,让同一传输的不同包使用多条可�
 
 UEC 公开资料描述的基础路径是可扩展的发送端拥塞控制,并可选用接收端基于 Credit 的控制来缓解 All-to-All Incast。
 
-路径与接收拥塞，需要的信息也不同：
+路径拥塞与接收侧拥塞所需的观测信息并不相同：
 
 - Fabric 中间链路拥塞,适合由路径遥测和发送端调速处理;
 - 接收端口或最终 ToR 出口 Incast,接收端更清楚自己能够接收多少数据。
 
-### 4. Packet Trimming:丢 Payload,但保留快速反馈
+### 4. Packet Trimming：保留拥塞反馈信息
 
 在极端拥塞时,交换机可以截断报文 Payload,只把 Header 和拥塞信息送到接收端。这样接收端更快知道哪个包受损,而不必等待超时。
 
-保留 Header，相当于让受损包还能带回明确反馈，减少等待静默丢包超时的时间。
+Header 得以保留后，接收端能够更早获得受损包信息，减少静默丢包后等待超时的恢复延迟。
 
-### 5. 把安全放进 Transport 设计
+### 5. Transport 与多租户安全
 
-多租户云里，训练数据、参数、梯度和 KV Cache 会穿过主机与网络边界。UEC 因此把安全放在 Transport 协同设计中，而非最后再加一层。
+多租户云中，训练数据、参数、梯度与 KV Cache 会跨越主机和网络边界。UEC 因而将安全纳入 Transport 协同设计，使其与传输和隔离机制共同考虑。
 
-规范发布以后，仍有一整条实现链需要验证：
+规范发布并不等于完整部署链路已得到验证，后续仍需检查：
 
 - RNIC 实现;
 - Switch 支持;
@@ -300,7 +300,7 @@ UEC 公开资料描述的基础路径是可扩展的发送端拥塞控制,并可
 - 大规模故障和性能测试;
 - 与现有 RoCE 网络的迁移成本。
 
-## 九、RoCE、TTPoE 与 UET 应该怎样比较
+## 九、RoCE、TTPoE 与 UET 的比较口径
 
 | 维度 | RoCEv2 | TTPoE | UET |
 | :--- | :----- | :---- | :-- |
@@ -327,11 +327,11 @@ UEC 公开资料描述的基础路径是可扩展的发送端拥塞控制,并可
 <p class="v-caption">图 1：三种 Transport 的定性对比。lv0–lv4 是作者主观分级，不是性能测试。</p>
 </div>
 
-RoCE 已有的部署和软件是实际优势，TTPoE 用通用性换系统定制，UET 则尝试开放的多厂商路线。表中分级只描述这些方向，不能当作性能排名。
+RoCE 的既有部署与软件生态构成实际优势，TTPoE 通过限定通用性适配特定系统，UET 则推进开放的多厂商架构。表中分级仅概括这些设计方向，不能用作实测性能排名。
 
 ## 十、端点、交换机与 Fabric Controller 的闭环
 
-NIC、Switch 和 Controller 看到的信息不同，需要并行分工。
+NIC、Switch 与 Controller 分别掌握不同粒度的信息，适合承担不同时间尺度的控制任务。
 
 ### 1. Endpoint / RNIC
 
@@ -380,19 +380,19 @@ flowchart TB
     B -->|Endpoint statistics| D
 {% endmermaid %}
 
-端点知道连接和应用语义，交换机看到局部队列、链路，Controller 掌握全局拓扑。控制应按各自的观测和时间尺度配合，单独一层没有全部信息。
+端点掌握连接状态与应用语义，交换机观测局部队列和链路，Controller 掌握全局拓扑。三者需要依据各自的观测范围与响应时间协作，任何单层都不足以独立完成全部控制。
 
-## 十一、In-Network Computing:交换机可以计算什么
+## 十一、在网计算的适用范围
 
-### 1. SHARP 的正确位置
+### 1. SHARP 与集合通信卸载
 
 NVIDIA Scalable Hierarchical Aggregation and Reduction Protocol(SHARP)把 AllReduce、Reduce 和 Broadcast 等 Collective 的部分操作卸载到交换 Fabric 中。交换 ASIC 在数据经过时完成归约,减少端点之间重复传输的数据量。[NVIDIA SHARP In-Network Computing](https://developer.nvidia.com/blog/advancing-performance-with-nvidia-sharp-in-network-computing/)
 
-公开资料把 SHARP 定义为集成在交换 ASIC 中的在网集合通信能力，没有说明采用通用 CGRA，不能反推其内部阵列结构。
+公开资料将 SHARP 描述为集成在交换 ASIC 中的在网集合通信能力，并未披露其采用通用 CGRA。因此，不能由“可执行归约”反推内部阵列结构。
 
-### 2. 在网计算的优势
+### 2. 适合数据面的计算特征
 
-适合数据面计算的任务通常有这些限制：
+适合放入数据面的任务通常具备以下约束：
 
 - 操作简单;
 - 状态有限;
@@ -409,7 +409,7 @@ NVIDIA Scalable Hierarchical Aggregation and Reduction Protocol(SHARP)把 AllRed
 - 报文裁剪与拥塞信号;
 - 某些安全、压缩或校验操作。
 
-### 3. 为什么不能把整个训练算子塞进交换机
+### 3. 交换芯片的计算与状态边界
 
 交换芯片受到严格约束:
 
@@ -420,9 +420,9 @@ NVIDIA Scalable Hierarchical Aggregation and Reduction Protocol(SHARP)把 AllRed
 - 可编程性越强,PPA 与验证代价越高;
 - 交换机故障会影响整个 Fabric,不能随意运行复杂代码。
 
-在这些限制里，少量归约和反馈操作可以减少后续流量。把整个训练算子放进交换机，却会改变面积、存储、隔离和故障风险，不能照搬 GPU 的做法。
+在这些限制下，有限的归约和反馈操作能够减少后续流量；完整训练算子则会显著改变面积、存储、隔离与故障约束，不能直接沿用 GPU 的计算组织方式。
 
-## 十二、从 FPGA 到可编程微引擎:不要把"可编程"混成一个词
+## 十二、FPGA、CGRA 与微引擎的实现取舍
 
 网络数据面可以采用多种实现:
 
@@ -435,13 +435,13 @@ NVIDIA Scalable Hierarchical Aggregation and Reduction Protocol(SHARP)把 AllRed
 | FPGA | 开发快、位级可重构 | 面积、功耗和频率劣于 ASIC | 原型、小批量、快速变化功能 |
 | CGRA | 算术密集数据流效率较高 | 工具链和映射复杂 | 规则计算图、特定流式加速 |
 
-选 FPGA、CGRA 或 ASIC，要看位级灵活性、控制流、状态规律、并行吞吐和产量能否摊薄成本。“FPGA 能效低”或“CGRA 更好”都不足以作决定。
+FPGA、CGRA 与 ASIC 的选择，需要结合位级灵活性、控制流、状态规律、并行吞吐和产量摊销分析。仅凭“FPGA 能效低”或“CGRA 更好”，无法形成充分的工程判断。
 
-## 十三、怎样判断一种"无 PFC"方案是否真的更好
+## 十三、无 PFC 方案的验证维度
 
-支持包喷洒、乱序和重传，只说明机制存在。能否减少实际任务时间，需要放进拥塞与故障环境里测。
+支持包喷洒、乱序接收和重传，说明方案具备相应机制，却不能直接证明任务完成时间更短。性能收益需要在拥塞、故障与混合负载条件下测量。
 
-我会先查以下结果：
+评估至少应覆盖以下结果与测试条件：
 
 ### 1. 性能
 
@@ -478,19 +478,19 @@ NVIDIA Scalable Hierarchical Aggregation and Reduction Protocol(SHARP)把 AllRed
 - 遥测、调试与故障定位;
 - 与现有 RoCE Fabric 的迁移方式。
 
-## 容损以后，复杂性移到了哪里
+## 可靠性职责的重新分配
 
-旧式 RoCE 端点不擅长处理丢包，PFC 用逐跳暂停保护有限缓冲，为大规模部署提供了条件。这部分价值仍在，短期不会突然消失。
+传统 RoCE 端点处理丢包的代价较高，PFC 通过逐跳暂停保护有限缓冲，为大规模部署提供了可行条件。既有系统仍依赖这些能力，其价值不能因新协议出现而被忽略。
 
-但 400G、800G 上更强的同步、Incast 和多路径需求，也增加了逐跳暂停的配置与缓冲成本。
+但在 400G、800G 下，更强的同步、Incast 与多路径需求，也增加了逐跳暂停所需的缓冲、配置和运维成本。
 
-IRN 重做恢复，TTPoE 利用定制系统让端点自治，UET 则把多路径、排序、重传、遥测与安全组合到开放架构中。
+IRN 重新设计端点恢复机制，TTPoE 借助定制系统实现端点自治，UET 则将多路径、排序、重传、遥测与安全纳入开放架构。
 
-几条路线共同面对的，是端点、交换机和控制平面各自承担多少拥塞与恢复工作。
+这些路线的共同问题，是如何在端点、交换机和控制平面之间分配拥塞控制与恢复职责，并控制由此产生的复杂性。
 
-不能只问“要不要 PFC”，还得查关掉之后由哪些机制接替。
+因此，是否采用 PFC 需要与替代机制一并评估：关闭逐跳暂停后，哪些组件负责检测、恢复、限速和隔离，才是判断方案是否完整的依据。
 
-下篇把这些要求放回芯片：从 PCIe、DMA、NoC 与 RDMA Engine，到 112G/224G SerDes 和可编程微引擎，查看线速需要哪些资源。沐创 N20、N30 等公开路线也在这个范围内讨论。
+下篇将把这些需求映射到芯片实现，从 PCIe、DMA、NoC 与 RDMA Engine，到 112G/224G SerDes 和可编程微引擎，分析维持线速所需的资源，并据此讨论沐创 N20、N30 等公开路线。
 
 <link rel="stylesheet" href="/css/series-page.css">
 

@@ -92,6 +92,26 @@ test('preview rejects remote clients even with a forged forwarding header', t =>
   assert.equal(next, true);
 });
 
+test('preview permits same-origin embedding only for the inference lab', t => {
+  const f = fixture(t, page('')); let middleware;
+  f.filters.server_middleware({use(fn) {middleware = fn;}});
+  const lab = '/2026/11/08/llm-inference-from-token-to-cluster/interactive/inference-lab.html';
+  for (const [url, expected] of [
+    [lab, 'SAMEORIGIN'],
+    [lab + '?tab=batch', 'SAMEORIGIN'],
+    [lab + '?tab=memory', 'SAMEORIGIN'],
+    ['/', 'DENY'],
+    ['/2026/11/08/llm-inference-from-token-to-cluster/', 'DENY'],
+    [lab + '.other', 'DENY']
+  ]) {
+    const headers = {}; let proceeded = false;
+    middleware({url, socket: {remoteAddress: '127.0.0.1'}},
+      {setHeader(name, value) {headers[name] = value;}}, () => {proceeded = true;});
+    assert.equal(proceeded, true, url);
+    assert.equal(headers['X-Frame-Options'], expected, url);
+  }
+});
+
 test('visitor maps permit only the image endpoint on the homepage and keep remote scripts blocked', async t => {
   const f = fixture(t, page('<img src="https://mapmyvisitors.com/map.png?d=example">'));
   f.routes.set('archives/index.html', page(''));
