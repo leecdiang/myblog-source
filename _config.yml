@@ -46,6 +46,8 @@ i18n_dir: :lang
 skip_render:
   - "*.txt"
   - "_posts/**/reproduce/**"
+  - "_posts/**/interactive/**"
+  - "_posts/**/data/**"
 
 # Writing
 new_post_name: :title.md

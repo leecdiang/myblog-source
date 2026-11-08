@@ -1,0 +1,92 @@
+<svg role="img" aria-label="Agent harness 管理状态、工具和任务验收；推理服务器调度模型请求，设备运行时执行算子。" xmlns:xlink="http://www.w3.org/1999/xlink" width="678.96pt" height="347.688pt" viewBox="0 0 678.96 347.688" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style></defs><g id="fig09_harness-figure_1"><g id="fig09_harness-patch_1"><path d="M 0 347.688 
+L 678.96 347.688 
+L 678.96 0 
+L 0 0 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig09_harness-axes_1"><g id="fig09_harness-patch_2"><path d="M 35.928 144.4608 
+L 179.892 144.4608 
+Q 184.356 144.4608 184.356 140.0256 
+L 184.356 91.2384 
+Q 184.356 86.8032 179.892 86.8032 
+L 35.928 86.8032 
+Q 31.464 86.8032 31.464 91.2384 
+L 31.464 140.0256 
+Q 31.464 144.4608 35.928 144.4608 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig09_harness-patch_3"><path d="M 247.968 144.4608 
+L 391.932 144.4608 
+Q 396.396 144.4608 396.396 140.0256 
+L 396.396 91.2384 
+Q 396.396 86.8032 391.932 86.8032 
+L 247.968 86.8032 
+Q 243.504 86.8032 243.504 91.2384 
+L 243.504 140.0256 
+Q 243.504 144.4608 247.968 144.4608 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig09_harness-patch_4"><path d="M 465.588 144.4608 
+L 626.292 144.4608 
+Q 630.756 144.4608 630.756 140.0256 
+L 630.756 91.2384 
+Q 630.756 86.8032 626.292 86.8032 
+L 465.588 86.8032 
+Q 461.124 86.8032 461.124 91.2384 
+L 461.124 140.0256 
+Q 461.124 144.4608 465.588 144.4608 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--surface-soft); stroke: var(--chart-blue); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig09_harness-patch_5"><path d="M 185.236798 115.632 
+Q 213.929859 115.632 240.94587 115.632 
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 236.14587 113.232 
+L 240.94587 115.632 
+L 236.14587 118.032 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig09_harness-patch_6"><path d="M 397.278501 115.632 
+Q 428.758104 115.632 458.560657 115.632 
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/><path d="M 453.760657 113.232 
+L 458.560657 115.632 
+L 453.760657 118.032 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--text-muted); stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig09_harness-patch_7"><path d="M 460.447718 141.470384 
+Q 322.738473 209.440369 186.533066 142.211152 
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: none; stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/><path d="M 189.775044 146.487784 
+L 186.533066 142.211152 
+L 191.899558 142.183549 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--chart-teal); stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig09_harness-patch_8"><path d="M 35.928 291.3768 
+L 179.892 291.3768 
+Q 184.356 291.3768 184.356 286.9416 
+L 184.356 238.1544 
+Q 184.356 233.7192 179.892 233.7192 
+L 35.928 233.7192 
+Q 31.464 233.7192 31.464 238.1544 
+L 31.464 286.9416 
+Q 31.464 291.3768 35.928 291.3768 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--surface-soft); stroke: var(--chart-amber); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig09_harness-patch_9"><path d="M 247.968 291.3768 
+L 391.932 291.3768 
+Q 396.396 291.3768 396.396 286.9416 
+L 396.396 238.1544 
+Q 396.396 233.7192 391.932 233.7192 
+L 247.968 233.7192 
+Q 243.504 233.7192 243.504 238.1544 
+L 243.504 286.9416 
+Q 243.504 291.3768 247.968 291.3768 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--surface-soft); stroke: var(--chart-teal); stroke-width: 1.35; stroke-linejoin: miter"/></g><g id="fig09_harness-patch_10"><path d="M 77.22 145.353596 
+Q 77.22 189.090054 77.22 231.149462 
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: none; stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/><path d="M 79.62 226.349462 
+L 77.22 231.149462 
+L 74.82 226.349462 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--chart-amber); stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig09_harness-patch_11"><path d="M 138.6 232.826404 
+Q 138.6 189.089946 138.6 147.030538 
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: none; stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/><path d="M 136.2 151.830538 
+L 138.6 147.030538 
+L 141 151.830538 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--chart-amber); stroke: var(--chart-amber); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig09_harness-patch_12"><path d="M 185.236798 262.548 
+Q 213.929859 262.548 240.94587 262.548 
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: none; stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/><path d="M 236.14587 260.148 
+L 240.94587 262.548 
+L 236.14587 264.948 
+z
+" clip-path="url(#fig09_harness-p4f7dccda21)" style="fill: var(--chart-teal); stroke: var(--chart-teal); stroke-width: 1.5; stroke-linecap: round"/></g><g id="fig09_harness-text_1"><text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="27" y="35.244" transform="rotate(-0 27 35.244)">An agent task spans model calls, tools and persistent state</text></g><g id="fig09_harness-text_2"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="107.91" y="110.62725" transform="rotate(-0 107.91 110.62725)">Agent harness</text></g><g id="fig09_harness-text_3"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="107.91" y="130.532987" transform="rotate(-0 107.91 130.532987)">state / tools / context / checks</text></g><g id="fig09_harness-text_4"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="319.95" y="110.62725" transform="rotate(-0 319.95 110.62725)">Inference server</text></g><g id="fig09_harness-text_5"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="319.95" y="130.532987" transform="rotate(-0 319.95 130.532987)">queue / cache / scheduler</text></g><g id="fig09_harness-text_6"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="545.94" y="110.62725" transform="rotate(-0 545.94 110.62725)">Device runtime</text></g><g id="fig09_harness-text_7"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="545.94" y="130.532987" transform="rotate(-0 545.94 130.532987)">kernels / memory / collectives</text></g><g id="fig09_harness-text_8"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="314.37" y="193.248" transform="rotate(-0 314.37 193.248)">tokens or a structured tool call</text></g><g id="fig09_harness-text_9"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="107.91" y="257.54325" transform="rotate(-0 107.91 257.54325)">Tools / environment</text></g><g id="fig09_harness-text_10"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="107.91" y="277.448987" transform="rotate(-0 107.91 277.448987)">search / shell / code / files</text></g><g id="fig09_harness-text_11"><text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="319.95" y="257.54325" transform="rotate(-0 319.95 257.54325)">Task result</text></g><g id="fig09_harness-text_12"><text style="font-size: 9.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-muted)" x="319.95" y="277.448987" transform="rotate(-0 319.95 277.448987)">tests / success / cost</text></g><g id="fig09_harness-text_13"><text style="font-size: 12px; font-family: 'DejaVu Sans'; fill: var(--text-muted)" transform="translate(439.429688 259.140562)">Token speed is one term</text><text style="font-size: 12px; font-family: 'DejaVu Sans'; fill: var(--text-muted)" transform="translate(440.106563 272.577937)">in end-to-end task time.</text></g><g id="fig09_harness-text_14"><text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-muted)" x="32.58" y="322.4232" transform="rotate(-0 32.58 322.4232)">Schematic. Multiple calls and branches may overlap; the longest dependency path sets completion time.</text></g></g></g><defs><clipPath id="fig09_harness-p4f7dccda21"><rect x="15.84" y="15.84" width="647.28" height="316.008"/></clipPath></defs></svg>

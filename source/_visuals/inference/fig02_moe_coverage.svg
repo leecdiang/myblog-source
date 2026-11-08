@@ -1,0 +1,131 @@
+<svg role="img" aria-label="均匀独立路由假设下，64 个专家中每 token 选择 8 个，批量增加会扩大专家覆盖范围。" xmlns:xlink="http://www.w3.org/1999/xlink" width="741.02125pt" height="426.797812pt" viewBox="0 0 741.02125 426.797812" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style></defs><g id="fig02_moe_coverage-figure_1"><g id="fig02_moe_coverage-patch_1"><path d="M 0 426.797812 
+L 741.02125 426.797812 
+L 741.02125 0 
+L 0 0 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig02_moe_coverage-axes_1"><g id="fig02_moe_coverage-patch_2"><path d="M 52.45125 330.909812 
+L 725.18125 330.909812 
+L 725.18125 41.477813 
+L 52.45125 41.477813 
+z
+" style="fill: var(--surface-card)"/></g><g id="fig02_moe_coverage-matplotlib.axis_1"><g id="fig02_moe_coverage-xtick_1"><g id="fig02_moe_coverage-line2d_1"><path d="M 52.45125 330.909812 
+L 52.45125 41.477813 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_2"><defs><path id="fig02_moe_coverage-mba563bd970" d="M 0 0 
+L 0 3.5 
+" style="stroke: var(--text-primary); stroke-width: 0.8"/></defs><g><use xlink:href="#fig02_moe_coverage-mba563bd970" x="52.45125" y="330.909812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_1"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="52.45125" y="346.268094" transform="rotate(-0 52.45125 346.268094)">0</text></g></g><g id="fig02_moe_coverage-xtick_2"><g id="fig02_moe_coverage-line2d_3"><path d="M 155.948173 330.909812 
+L 155.948173 41.477813 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_4"><g><use xlink:href="#fig02_moe_coverage-mba563bd970" x="155.948173" y="330.909812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_2"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="155.948173" y="346.268094" transform="rotate(-0 155.948173 346.268094)">10</text></g></g><g id="fig02_moe_coverage-xtick_3"><g id="fig02_moe_coverage-line2d_5"><path d="M 259.445096 330.909812 
+L 259.445096 41.477813 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_6"><g><use xlink:href="#fig02_moe_coverage-mba563bd970" x="259.445096" y="330.909812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_3"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="259.445096" y="346.268094" transform="rotate(-0 259.445096 346.268094)">20</text></g></g><g id="fig02_moe_coverage-xtick_4"><g id="fig02_moe_coverage-line2d_7"><path d="M 362.942019 330.909812 
+L 362.942019 41.477813 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_8"><g><use xlink:href="#fig02_moe_coverage-mba563bd970" x="362.942019" y="330.909812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_4"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="362.942019" y="346.268094" transform="rotate(-0 362.942019 346.268094)">30</text></g></g><g id="fig02_moe_coverage-xtick_5"><g id="fig02_moe_coverage-line2d_9"><path d="M 466.438942 330.909812 
+L 466.438942 41.477813 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_10"><g><use xlink:href="#fig02_moe_coverage-mba563bd970" x="466.438942" y="330.909812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_5"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="466.438942" y="346.268094" transform="rotate(-0 466.438942 346.268094)">40</text></g></g><g id="fig02_moe_coverage-xtick_6"><g id="fig02_moe_coverage-line2d_11"><path d="M 569.935865 330.909812 
+L 569.935865 41.477813 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_12"><g><use xlink:href="#fig02_moe_coverage-mba563bd970" x="569.935865" y="330.909812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_6"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="569.935865" y="346.268094" transform="rotate(-0 569.935865 346.268094)">50</text></g></g><g id="fig02_moe_coverage-xtick_7"><g id="fig02_moe_coverage-line2d_13"><path d="M 673.432788 330.909812 
+L 673.432788 41.477813 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_14"><g><use xlink:href="#fig02_moe_coverage-mba563bd970" x="673.432788" y="330.909812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_7"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="673.432788" y="346.268094" transform="rotate(-0 673.432788 346.268094)">60</text></g></g><g id="fig02_moe_coverage-text_8"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="388.81625" y="361.673875" transform="rotate(-0 388.81625 361.673875)">Tokens routed in one batch, B</text></g></g><g id="fig02_moe_coverage-matplotlib.axis_2"><g id="fig02_moe_coverage-ytick_1"><g id="fig02_moe_coverage-line2d_15"><path d="M 52.45125 330.909812 
+L 725.18125 330.909812 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_16"><defs><path id="fig02_moe_coverage-m423ce99333" d="M 0 0 
+L -3.5 0 
+" style="stroke: var(--text-primary); stroke-width: 0.8"/></defs><g><use xlink:href="#fig02_moe_coverage-m423ce99333" x="52.45125" y="330.909812" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_9"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="45.45125" y="335.088953" transform="rotate(-0 45.45125 335.088953)">0</text></g></g><g id="fig02_moe_coverage-ytick_2"><g id="fig02_moe_coverage-line2d_17"><path d="M 52.45125 289.562384 
+L 725.18125 289.562384 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_18"><g><use xlink:href="#fig02_moe_coverage-m423ce99333" x="52.45125" y="289.562384" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_10"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="45.45125" y="293.741525" transform="rotate(-0 45.45125 293.741525)">10</text></g></g><g id="fig02_moe_coverage-ytick_3"><g id="fig02_moe_coverage-line2d_19"><path d="M 52.45125 248.214955 
+L 725.18125 248.214955 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_20"><g><use xlink:href="#fig02_moe_coverage-m423ce99333" x="52.45125" y="248.214955" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_11"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="45.45125" y="252.394096" transform="rotate(-0 45.45125 252.394096)">20</text></g></g><g id="fig02_moe_coverage-ytick_4"><g id="fig02_moe_coverage-line2d_21"><path d="M 52.45125 206.867527 
+L 725.18125 206.867527 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_22"><g><use xlink:href="#fig02_moe_coverage-m423ce99333" x="52.45125" y="206.867527" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_12"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="45.45125" y="211.046667" transform="rotate(-0 45.45125 211.046667)">30</text></g></g><g id="fig02_moe_coverage-ytick_5"><g id="fig02_moe_coverage-line2d_23"><path d="M 52.45125 165.520098 
+L 725.18125 165.520098 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_24"><g><use xlink:href="#fig02_moe_coverage-m423ce99333" x="52.45125" y="165.520098" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_13"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="45.45125" y="169.699239" transform="rotate(-0 45.45125 169.699239)">40</text></g></g><g id="fig02_moe_coverage-ytick_6"><g id="fig02_moe_coverage-line2d_25"><path d="M 52.45125 124.17267 
+L 725.18125 124.17267 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_26"><g><use xlink:href="#fig02_moe_coverage-m423ce99333" x="52.45125" y="124.17267" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_14"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="45.45125" y="128.35181" transform="rotate(-0 45.45125 128.35181)">50</text></g></g><g id="fig02_moe_coverage-ytick_7"><g id="fig02_moe_coverage-line2d_27"><path d="M 52.45125 82.825241 
+L 725.18125 82.825241 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_28"><g><use xlink:href="#fig02_moe_coverage-m423ce99333" x="52.45125" y="82.825241" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_15"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="45.45125" y="87.004382" transform="rotate(-0 45.45125 87.004382)">60</text></g></g><g id="fig02_moe_coverage-ytick_8"><g id="fig02_moe_coverage-line2d_29"><path d="M 52.45125 41.477813 
+L 725.18125 41.477813 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--divider); stroke-width: 0.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_30"><g><use xlink:href="#fig02_moe_coverage-m423ce99333" x="52.45125" y="41.477813" style="fill: var(--text-primary); stroke: var(--text-primary); stroke-width: 0.8"/></g></g><g id="fig02_moe_coverage-text_16"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: var(--text-primary)" x="45.45125" y="45.656953" transform="rotate(-0 45.45125 45.656953)">70</text></g></g><g id="fig02_moe_coverage-text_17"><text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: var(--text-primary)" x="24.958125" y="186.193813" transform="rotate(-90 24.958125 186.193813)">Distinct experts touched</text></g></g><g id="fig02_moe_coverage-line2d_31"><path d="M 62.800942 297.83187 
+L 73.150635 268.88867 
+L 83.500327 243.56337 
+L 93.850019 221.403732 
+L 104.199712 202.014049 
+L 114.549404 185.048077 
+L 124.899096 170.202851 
+L 135.248788 157.213278 
+L 145.598481 145.847402 
+L 155.948173 135.902261 
+L 166.297865 127.200262 
+L 176.647558 119.586013 
+L 186.99725 112.923545 
+L 197.346942 107.093885 
+L 207.696635 101.992933 
+L 218.046327 97.529601 
+L 228.396019 93.624184 
+L 238.745712 90.206945 
+L 249.095404 87.21686 
+L 259.445096 84.600537 
+L 269.794788 82.311253 
+L 280.144481 80.30813 
+L 290.494173 78.555398 
+L 300.843865 77.021757 
+L 311.193558 75.679821 
+L 321.54325 74.505627 
+L 331.892942 73.478207 
+L 342.242635 72.579215 
+L 352.592327 71.792597 
+L 362.942019 71.104306 
+L 373.291712 70.502051 
+L 383.641404 69.975079 
+L 393.991096 69.513978 
+L 404.340788 69.110514 
+L 414.690481 68.757484 
+L 425.040173 68.448582 
+L 435.389865 68.178293 
+L 445.739558 67.94179 
+L 456.08925 67.73485 
+L 466.438942 67.553777 
+L 476.788635 67.395339 
+L 487.138327 67.256705 
+L 497.488019 67.135401 
+L 507.837712 67.029259 
+L 518.187404 66.936386 
+L 528.537096 66.855121 
+L 538.886788 66.784015 
+L 549.236481 66.721797 
+L 559.586173 66.667356 
+L 569.935865 66.61972 
+L 580.285558 66.578039 
+L 590.63525 66.541568 
+L 600.984942 66.509655 
+L 611.334635 66.481732 
+L 621.684327 66.457299 
+L 632.034019 66.435921 
+L 642.383712 66.417214 
+L 652.733404 66.400846 
+L 663.083096 66.386524 
+L 673.432788 66.373992 
+L 683.782481 66.363027 
+L 694.132173 66.353432 
+L 704.481865 66.345037 
+L 714.831558 66.337691 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke: var(--chart-blue); stroke-width: 2.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-line2d_32"><path d="M 52.45125 66.28627 
+L 725.18125 66.28627 
+" clip-path="url(#fig02_moe_coverage-p2dac9a4677)" style="fill: none; stroke-dasharray: 1.4,2.31; stroke-dashoffset: 0; stroke: var(--text-muted); stroke-width: 1.4"/></g><g id="fig02_moe_coverage-line2d_33"><defs><path id="fig02_moe_coverage-m46daceb756" d="M 0 3 
+C 0.795609 3 1.55874 2.683901 2.12132 2.12132 
+C 2.683901 1.55874 3 0.795609 3 0 
+C 3 -0.795609 2.683901 -1.55874 2.12132 -2.12132 
+C 1.55874 -2.683901 0.795609 -3 0 -3 
+C -0.795609 -3 -1.55874 -2.683901 -2.12132 -2.12132 
+C -2.683901 -1.55874 -3 -0.795609 -3 0 
+C -3 0.795609 -2.683901 1.55874 -2.12132 2.12132 
+C -1.55874 2.683901 -0.795609 3 0 3 
+z
+" style="stroke: var(--chart-blue)"/></defs><g clip-path="url(#fig02_moe_coverage-p2dac9a4677)"><use xlink:href="#fig02_moe_coverage-m46daceb756" x="62.800942" y="297.83187" style="fill: var(--chart-blue); stroke: var(--chart-blue)"/></g></g><g id="fig02_moe_coverage-line2d_34"><g clip-path="url(#fig02_moe_coverage-p2dac9a4677)"><use xlink:href="#fig02_moe_coverage-m46daceb756" x="135.248788" y="157.213278" style="fill: var(--chart-blue); stroke: var(--chart-blue)"/></g></g><g id="fig02_moe_coverage-line2d_35"><g clip-path="url(#fig02_moe_coverage-p2dac9a4677)"><use xlink:href="#fig02_moe_coverage-m46daceb756" x="218.046327" y="97.529601" style="fill: var(--chart-blue); stroke: var(--chart-blue)"/></g></g><g id="fig02_moe_coverage-line2d_36"><g clip-path="url(#fig02_moe_coverage-p2dac9a4677)"><use xlink:href="#fig02_moe_coverage-m46daceb756" x="383.641404" y="69.975079" style="fill: var(--chart-blue); stroke: var(--chart-blue)"/></g></g><g id="fig02_moe_coverage-patch_3"><path d="M 52.45125 330.909812 
+L 52.45125 41.477813 
+" style="fill: none; stroke: var(--divider); stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/></g><g id="fig02_moe_coverage-patch_4"><path d="M 52.45125 330.909812 
+L 725.18125 330.909812 
+" style="fill: none; stroke: var(--divider); stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/></g><g id="fig02_moe_coverage-text_18"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="69.800942" y="289.83187" transform="rotate(-0 69.800942 289.83187)">B=1: 8.0</text></g><g id="fig02_moe_coverage-text_19"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="142.248788" y="176.213278" transform="rotate(-0 142.248788 176.213278)">B=8: 42.0</text></g><g id="fig02_moe_coverage-text_20"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="225.046327" y="116.529601" transform="rotate(-0 225.046327 116.529601)">B=16: 56.4</text></g><g id="fig02_moe_coverage-text_21"><text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="390.641404" y="88.975079" transform="rotate(-0 390.641404 88.975079)">B=32: 63.1</text></g><g id="fig02_moe_coverage-text_22"><text style="font-weight: 500; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="52.45125" y="26.477813" transform="rotate(-0 52.45125 26.477813)">MoE: sparse per token, increasingly broad across a batch</text></g><g id="fig02_moe_coverage-legend_1"><g id="fig02_moe_coverage-line2d_37"><path d="M 544.291406 298.726219 
+L 555.291406 298.726219 
+L 566.291406 298.726219 
+" style="fill: none; stroke: var(--chart-blue); stroke-width: 2.7; stroke-linecap: square"/></g><g id="fig02_moe_coverage-text_23"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="575.091406" y="302.576219" transform="rotate(-0 575.091406 302.576219)">Expected distinct experts</text></g><g id="fig02_moe_coverage-line2d_38"><path d="M 544.291406 314.872156 
+L 555.291406 314.872156 
+L 566.291406 314.872156 
+" style="fill: none; stroke-dasharray: 1.4,2.31; stroke-dashoffset: 0; stroke: var(--text-muted); stroke-width: 1.4"/></g><g id="fig02_moe_coverage-text_24"><text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: var(--text-primary)" x="575.091406" y="318.722156" transform="rotate(-0 575.091406 318.722156)">All 64 experts</text></g></g></g><g id="fig02_moe_coverage-text_25"><text style="font-size: 9.2px; font-family: 'DejaVu Sans'; fill: var(--text-muted)" transform="translate(68.75725 398.742512)">One MoE layer: E=64 routed experts, k=8; independent tokens, uniform choices within each token.</text><text style="font-size: 9.2px; font-family: 'DejaVu Sans'; fill: var(--text-muted)" transform="translate(68.75725 409.0445)">E[touched] = E × [1 − (1 − k/E)^B]. Real routers are neither uniform nor independent.</text></g></g><defs><clipPath id="fig02_moe_coverage-p2dac9a4677"><rect x="52.45125" y="41.477813" width="672.73" height="289.432"/></clipPath></defs></svg>
