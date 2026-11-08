@@ -1,6 +1,6 @@
 ---
 title: 大模型推理到底在忙什么：从一个 token 到多机集群
-date: 2026-11-08
+date: 2026-11-08 13:00:00
 lang: zh-CN
 published: true
 categories: Silicon & Circuits
