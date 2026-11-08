@@ -48,3 +48,9 @@ GitHub 的依赖图仍可能按 deepmerge 上游 4.3.1 的版本区间提示已�
 用户已明确授权发布当前本地版本，包含此前的界面和文章改动。发布源码提交为 `4feeda3604fee1e0d7399ab12ec94a499856e947`，网站发布提交为 `459774cf001313e7ebd2ac0ab5a878f8c32e716a`，GitHub Pages 构建状态为 built。线上首页、归档与交互文章均出现 2026-11-07 安全策略标记，核心 JS/CSS 与本地构建字节一致，六个安全响应头生效，敏感路径返回 403。浏览器验证主题切换、归档搜索、交互模型、64 个文章公式和两幅 Mermaid 流程图正常，未报告控制台错误。核验明细保存在 `docs/security-publication-2026-11-07.json`。
 
 用户选择稍后自行开启 Cloudflare 双重验证；该项尚未标记完成。
+
+## 2026-11-08：交互面板的同源嵌入例外
+
+Cloudflare 响应头转换规则 `Allow same-origin inference lab embedding`（`023a683f18cd44a2909bd9cb6792d357`）排在 `Blog security headers` 之后。仅匹配两个博客域名上路径 `/2026/11/08/llm-inference-from-token-to-cluster/interactive/inference-lab.html`，把 `X-Frame-Options` 设置为 `SAMEORIGIN`，CSP 设置为 `frame-ancestors 'self'; object-src 'none'; base-uri 'none'`。其余安全响应头及其他路径的 DENY 策略保留。HTTP 核验确认交互页为 SAMEORIGIN，首页仍为 DENY。
+
+已在正式域名验证 390px 与 1280px 的浅色、深色：11 幅 SVG、5 个 PDF/源码资料图标可见且随主题换色，两块隔离交互面板同步网站手动主题。主题桥接读取 Studio 的 `data-color`，不再读取不存在的 `data-theme`。历史 HTML 缓存引用的带哈希资源继续发布，维护说明见 README 的缓存兼容章节。
