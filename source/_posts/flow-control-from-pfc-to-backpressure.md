@@ -19,7 +19,7 @@ mathjax: true
 ---
 
 {% note primary %}
-看到 PFC、PAUSE，很容易把“流控”理解成 RDMA（远程直接内存访问）网卡里的某个功能开关。沿着一条报文路径走一遍，会发现交换机、PCIe、网卡内部流水线和接收端软件都可能要求发送方等一等。本文从缓冲区和反馈延迟讲起，区分暂停、调速、空间许可与整形额度。文中的速率与缓冲算例均为理论计算，不是特定产品的实测结果。
+PFC、PCIe credit、ready/valid 都能让发送停下来，保护的资源却各不相同。从交换机缓冲区到网卡流水线，再到接收端软件，沿报文路径看清谁在等待谁，才能区分暂停、调速、空间许可和整形额度。文中涉及 RDMA（远程直接内存访问）；速率与缓冲算例均为理论计算，不代表产品实测。
 {% endnote %}
 
 <!-- more -->
@@ -34,13 +34,13 @@ mathjax: true
 <p><strong>队列增量 = 到达的数据量 − 成功送出的数据量。</strong></p>
 {% endraw %}
 
-定位这类积压，先问：**哪块缓冲区在积压？谁有能力减少它的输入？反馈多久能生效？** 控制的资源和距离不同，“让发送方慢下来”的办法也会不同。
+积压发生以后，要找到具体的缓冲区、能减少其输入的发送者，以及反馈生效前还要等多久。资源位置和反馈距离变了，控制办法也就变了。
 
 {% visual_svg flow-control/fig01_scope %}
 图 1｜沿报文路径寻找控制边界。PCIe credit、片内握手、以太网链路级暂停和端到端控制可以同时存在；箭头表示作用范围，不是完整协议栈。依据 <a href="#ref-1">[1]</a>、<a href="#ref-13">[13]</a>、<a href="#ref-15">[15]</a>、<a href="#ref-16">[16]</a> 绘制。
 {% endvisual_svg %}
 
-按控制目标，可以先分成下面三类。
+按控制目标区分，三类机制的差别如下。
 
 {% raw %}
 <div class="v-figure"><table class="v-matrix"><thead><tr><th>问题</th><th>控制依据</th><th>典型机制</th></tr></thead><tbody><tr><td>流量控制</td><td>接收资源还能承受多少</td><td>PAUSE / PFC、buffer credit、rwnd</td></tr><tr><td>拥塞控制</td><td>共享网络是否正在积压</td><td>DCQCN、DCTCP、TIMELY、HPCC</td></tr><tr><td>流量整形</td><td>本端设定的速率与突发预算</td><td>Token Bucket、发送 pacing</td></tr></tbody></table><p class="v-caption">表 1｜按主要控制目标分类。pacing 是发包节奏的执行手段，也可以接受拥塞控制器给出的目标速率；三个类别并非互斥的硬件分区。</p></div>
@@ -50,7 +50,7 @@ PAUSE、PFC 会因为队列积压而触发，但它们直接执行的是链路�
 
 ## 2. PAUSE 与 PFC：暂停相邻链路，粒度不同
 
-先看最直接的办法。B 的接收缓冲区快装不下了，就向相邻的 A 发一条控制消息，要求 A 暂时不要再朝这个方向发送普通数据帧。
+B 的接收缓冲区快满时，可以给相邻的 A 发控制消息，请它暂时停止朝 B 发送普通数据帧。PAUSE 和 PFC 都采用了这条思路。
 
 传统以太网 PAUSE，也就是常说的 802.3x 流控，不区分这些数据属于哪个业务。PFC，Priority-based Flow Control，则把暂停粒度细化到最多 8 个优先级。这里的“8 个”是协议可表达的粒度，不等于每台设备都能同时启用 8 个无损队列。<sup class="cite"><a href="#ref-1">[1]</a></sup><sup class="cite"><a href="#ref-2">[2]</a></sup><sup class="cite"><a href="#ref-3">[3]</a></sup>
 
@@ -61,12 +61,11 @@ PAUSE、PFC 会因为队列积压而触发，但它们直接执行的是链路�
 <div class="v-figure paper-figure"><a href="/images/flow-control-papers/pfc-mechanism.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/pfc-mechanism.png" alt="论文原图：相邻交换机通过 PFC 暂停指定优先级。这里展示的是逐跳反馈，不是按 RDMA QP 暂停。" loading="lazy" /></a><p class="v-caption">论文原图：相邻交换机通过 PFC 暂停指定优先级。这里展示的是逐跳反馈，不是按 RDMA QP 暂停。 来源：<a href="https://www.techscience.com/cmc/v75n1/51518/html">Jin Wang et al. (2023), Figure 1</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
 {% endraw %}
 
+PFC 比 PAUSE 的粒度更细，但仍有两个容易误解的地方。
 
-“PFC 是 PAUSE 的升级版”这个理解还需要补上两个限定。
+PFC 按链路优先级暂停。多个 QP（Queue Pair，队列对）可能映射到同一优先级，也就会一起停下，无法只暂停其中某个 QP。报文分类怎样映射到硬件队列，还要看设备配置。
 
-第一，**PFC 暂停的是链路上的优先级，不是单个 RDMA QP。** QP 是 Queue Pair，即队列对；多个 QP 完全可能映射到同一优先级，并一起受到影响。优先级如何从报文分类映射到硬件队列，还取决于设备配置。
-
-第二，暂停有方向。B 发出的请求影响 A 向 B 的相应数据发送，不是把整个全双工端口断开，也不等于 B 向 A 的反向数据自动停下。暂停定时器到期，或收到相应的恢复指示后，发送可以继续。<sup class="cite"><a href="#ref-2">[2]</a></sup><sup class="cite"><a href="#ref-3">[3]</a></sup>
+暂停只约束一个方向。B 发请求后，A 朝 B 发送的相应数据受影响，B 朝 A 的反向数据不会因此自动停下，全双工端口也没有被断开。定时器到期或收到恢复指示，发送便可继续。<sup class="cite"><a href="#ref-2">[2]</a></sup><sup class="cite"><a href="#ref-3">[3]</a></sup>
 
 这些控制消息由相邻设备处理。NIC 与交换机之间可以运行，交换机与交换机之间也可以运行。普通以太网业务也可以使用这些机制。
 
@@ -84,7 +83,7 @@ PAUSE、PFC 会因为队列积压而触发，但它们直接执行的是链路�
 <p><code>H ≥ R<sub>in</sub> × T<sub>stop</sub> + B<sub>margin</sub></code></p>
 {% endraw %}
 
-这里，H 是预留字节数；R<sub>in</sub> 是该缓冲区承受的输入字节速率；T<sub>stop</sub> 从触发暂停算到最后一批不可避免的数据抵达；B<sub>margin</sub> 为模型之外的实现裕量。若把整帧尾部和链路中在途数据的影响计入 T<sub>stop</sub>，就不要再用另一个“在途报文项”重复计算。
+H 是预留字节数，R<sub>in</sub> 是进入该缓冲区的字节速率，T<sub>stop</sub> 从触发暂停算到最后一批不可避免的数据到达，B<sub>margin</sub> 留给模型没覆盖的实现裕量。整帧尾部和链路在途数据如果已经折算进 T<sub>stop</sub>，就不能另加一项再算一遍。
 
 400 Gb/s 换算成字节速率是 50 GB/s。假设 T<sub>stop</sub> 为 2 μs，仅速率与时间的乘积就是 **100,000 B，约 97.7 KiB**。这只是量纲清楚的算例，不是“400G 端口统一配置 100 KB headroom”的建议。
 
@@ -92,7 +91,7 @@ PAUSE、PFC 会因为队列积压而触发，但它们直接执行的是链路�
 图 4｜理论缓冲需求 H = R × T。横纵轴均为线性刻度，GB 与 Gb 使用十进制，KiB = 1024 B；假设输入保持标称速率、暂停生效前没有排空，并且不含额外裕量。数据由随包脚本计算，非硬件测量。
 {% endvisual_svg %}
 
-真实设备还要看缓冲区按什么粒度分配、流控消息如何排队，以及同一共享池是否同时承受多个输入。若确实在估算共享池的总增量，就应累计流入它的各条输入，扣除期间的排空；不能拿某一端口的线速代替所有输入。
+到具体设备上，还要查缓冲按什么粒度分配、控制消息怎样排队，以及共享池是否同时承受多个输入。估算共享池的总增量，就得把各条输入加起来，再扣掉这段时间排出的数据。一个端口的线速代表不了整个池的输入。
 
 常见的 XOFF 与 XON 阈值也不相同：较高的 XOFF 触发暂停，降到较低的 XON 后再允许恢复，形成迟滞，避免占用量在一个阈值附近来回波动。具体阈值必须服从设备的缓冲架构。<sup class="cite"><a href="#ref-3">[3]</a></sup>
 
@@ -100,7 +99,7 @@ PAUSE、PFC 会因为队列积压而触发，但它们直接执行的是链路�
 
 考虑两条业务 A、B：它们经过同一条上游链路，使用同一优先级，但随后走向不同目的地。A 的目的方向拥塞，B 的目的方向空闲。一旦共享上游链路上的这个优先级被暂停，B 也要停。
 
-这就是 PFC 容易带来队头阻塞和无辜流受影响的原因：暂停的粒度比实际拥塞的流更粗。只把 QP 数量加大，或者把另一条业务的目的地换掉，都不保证能够绕开这条共享的暂停边界。<sup class="cite"><a href="#ref-4">[4]</a></sup>
+B 被迫跟着停，是因为暂停覆盖了整个优先级，范围比引发拥塞的流更大。这会造成队头阻塞，影响本来可以继续发送的流。增加 QP，或给 B 换个目的地，都不保证能避开这条共享暂停边界。<sup class="cite"><a href="#ref-4">[4]</a></sup>
 
 {% visual_svg flow-control/fig05_hol %}
 图 5｜A、B 共享上游链路的 priority 3。A 所在方向拥塞后，该优先级被暂停，去往空闲方向的 B 也受影响。下方为背压继续向上游传播的示意；每一跳生成自己的流控消息，并不是把原 PFC 帧一路转发。参考 <a href="#ref-4">[4]</a>、<a href="#ref-5">[5]</a>。
@@ -113,10 +112,9 @@ PAUSE、PFC 会因为队列积压而触发，但它们直接执行的是链路�
 <div class="v-figure paper-figure"><a href="/images/flow-control-papers/pfc-hol-blocking.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/pfc-hol-blocking.png" alt="论文原图：Head-of-Line Blocking。拥塞流触发的暂停，会波及共享队列或优先级的其他流。" loading="lazy" /></a><p class="v-caption">论文原图：Head-of-Line Blocking。拥塞流触发的暂停，会波及共享队列或优先级的其他流。 来源：<a href="https://www.techscience.com/cmc/v75n1/51518/html">Jin Wang et al. (2023), Figure 2</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
 {% endraw %}
 
+暂停还会向上游传。下游停收，上游缓冲无法排空，水位继续升高，便可能再向上一跳发 PFC。原本局部的拥塞因此影响了更大范围。
 
-暂停还可能向上游传播：下游暂停，上游无法排空，自己的缓冲继续升高，于是再向更上游发出 PFC。拥塞影响的范围由此扩大。
-
-拥塞传播未必形成死锁；**死锁需要形成循环等待等条件**，例如几组缓冲区互相等待对方先释放资源。持续发送异常暂停消息造成的 PFC storm，也应与一般的短时背压区分开。把这几种现象统称为“PFC 导致卡死”，不利于定位问题。大规模部署论文分别讨论了这些故障模式和处理经验。<sup class="cite"><a href="#ref-5">[5]</a></sup>
+传播到更大范围，仍不一定是死锁。死锁还需要循环等待等条件，例如几组缓冲互相等对方释放资源。PFC storm 则涉及异常暂停消息持续发送，也不能与短时背压混在一起。排查“卡死”时，这几种情况要分开看；大规模部署论文分别记录了故障模式和处理经验。<sup class="cite"><a href="#ref-5">[5]</a></sup>
 
 ### 论文导读：先看“暂停为什么伤及无辜”
 
@@ -141,12 +139,11 @@ ECN 是 Explicit Congestion Notification，显式拥塞通知。对具备 ECN �
 <div class="v-figure paper-figure"><a href="/images/flow-control-papers/dcqcn-vs-timely-hpcc.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/dcqcn-vs-timely-hpcc.png" alt="论文原始 NS-3 仿真：在指定突发流量场景下 DCQCN、TIMELY、HPCC 和 FACC 的交换机队列长度与发送速率恢复。这里对比的是拥塞响应，不是 PAUSE/PFC 控制帧时序。" loading="lazy" /></a><p class="v-caption">论文原始 NS-3 仿真：在指定突发流量场景下 DCQCN、TIMELY、HPCC 和 FACC 的交换机队列长度与发送速率恢复。这里对比的是拥塞响应，不是 PAUSE/PFC 控制帧时序。 来源：<a href="https://link.springer.com/article/10.1186/s13677-025-00830-0">Xin He et al. (2025), Figure 2</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
 {% endraw %}
 
+DCQCN 的降速和恢复取决于算法状态，不能概括成“收到 CNP 就固定减半”。速率上下限、更新周期和状态粒度，还与工程实现有关。PFC 在一跳内决定某优先级此刻能否发送，DCQCN 则通过拥塞反馈调整源端流速，两者作用的位置和时间尺度不同。
 
-“收到 CNP 就固定减半”不是 DCQCN 的准确概括。减速与恢复由算法状态决定；工程实现中的速率上下限、更新周期和状态粒度，也要看具体实现。最重要的区别是：PFC 直接控制一跳内的优先级能否发送，DCQCN 让源端根据拥塞反馈调整流的发送速率。
+于是，拥塞控制可以先减少积压，必要时再用 PFC 保护接收缓冲。反馈仍要花时间，这种配合也无法保证接住任意突发而不丢包。
 
-因此，两者可以配合：先用拥塞控制减少积压，必要时再由 PFC 保护相应接收缓冲。但这个配合不会消除反馈时延，也不意味着任意突发都一定不丢包。
-
-还要小心“ECN 阈值一定低于 PFC 阈值”这句配置口诀。其意图是让拥塞反馈早于紧急暂停发挥作用；但交换机的 ECN 可能依据出口队列，PFC 可能依据入口优先级组及共享池。**观察对象不同的两个数值，不能不看缓冲架构就直接比较大小。** DCQCN 论文对交换机缓冲与阈值配置的讨论，正是为了处理这类问题。<sup class="cite"><a href="#ref-4">[4]</a></sup>
+“ECN 阈值要低于 PFC 阈值”是希望拥塞反馈先起作用，尽量别走到紧急暂停。但 ECN 可能看出口队列，PFC 可能看入口优先级组和共享池。两个阈值若在量不同的东西，直接比大小就没有意义，必须对照缓冲架构。DCQCN 论文也专门讨论了缓冲和阈值配置。<sup class="cite"><a href="#ref-4">[4]</a></sup>
 
 ### 论文导读：同样使用 ECN，为什么不等于同一种算法
 
@@ -158,7 +155,7 @@ ECN 是 Explicit Congestion Notification，显式拥塞通知。对具备 ECN �
 
 ## 6. 除了 ECN，还能观察什么
 
-源端要减速，总得先知道网络正在发生什么。ECN 之外，还可以观察往返时延，或让报文携带沿途设备测得的负载信息。
+除了 ECN，源端还可以从往返时延感知积压，或读取报文携带的沿途负载信息。观测信号不同，所需的设备能力也不同。
 
 QCN，Quantized Congestion Notification，是二层以太网中的拥塞通知机制，由网络中的拥塞点向支持速率限制的源端反馈。它与 DCQCN 的名字相近，但不能把二者当成同一协议的两个拼法；作用域和通知路径都不同。<sup class="cite"><a href="#ref-9">[9]</a></sup>
 
@@ -175,10 +172,9 @@ TIMELY 选择 RTT，即往返时延，尤其关注时延变化。队列开始积
 <div class="v-figure paper-figure"><a href="/images/flow-control-papers/burst-throughput-recovery.png" target="_blank" rel="noopener"><img src="/images/flow-control-papers/burst-throughput-recovery.png" alt="论文原始仿真曲线：突发流量发生后，ICC、DCQCN、TIMELY 与 PCN 的流吞吐恢复过程。属于论文 NS-3 场景，不是现代 400G 网卡实测。" loading="lazy" /></a><p class="v-caption">论文原始仿真曲线：突发流量发生后，ICC、DCQCN、TIMELY 与 PCN 的流吞吐恢复过程。属于论文 NS-3 场景，不是现代 400G 网卡实测。 来源：<a href="https://www.techscience.com/cmc/v75n1/51518/html">Jin Wang et al. (2023), Figure 5</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。原图未修改；点击查看大图。</p></div>
 {% endraw %}
 
-
 ### 论文导读：信号更丰富，控制一定更好吗
 
-读 **TIMELY**，先看它为什么使用 RTT 梯度，再看主机端算法如何与低延迟测量配合。其原始方案在主机端运行拥塞控制算法，并利用 NIC 提供的低延迟测量能力。读 **HPCC**，重点看遥测信息怎样变成发送速率，以及反馈回来之前网络又可能发生什么变化。不要只比较两篇摘要里的性能数字；它们采用的设备能力、工作负载和实验设置并不相同。
+TIMELY 使用 RTT 梯度，值得关注的是测量如何支撑主机端控制算法：原始方案在主机运行算法，利用 NIC 提供低延迟测量。HPCC 则要看遥测怎样转换为发送速率，以及反馈抵达前网络已经发生的变化。两篇论文的设备、负载和实验条件不同，不能只拿摘要里的性能数字直接比较。
 
 {% raw %}
 <p><a class="glass-pill" href="https://research.google/pubs/timely-rtt-based-congestion-control-for-the-datacenter/" target="_blank" rel="noopener"><i class="fas fa-file-alt" aria-hidden="true"></i> TIMELY · SIGCOMM 2015</a> <a class="glass-pill" href="https://liyuliang001.github.io/publications/hpcc.pdf" target="_blank" rel="noopener"><i class="fas fa-file-pdf" aria-hidden="true"></i> HPCC · SIGCOMM 2019</a></p>
@@ -194,7 +190,7 @@ PAUSE/PFC 允许数据持续前进，等接收资源紧张时再要求停下。�
 图 8｜以一个 credit 对应一个固定槽位的教学模型说明空间许可。真实协议可能按字节、块或不同报文类别计数，并通过累计计数更新额度；“返还 credit”不要求逐条发送确认。参考 <a href="#ref-12">[12]</a>、<a href="#ref-13">[13]</a>。
 {% endvisual_svg %}
 
-实际记账要覆盖在途数据和已经承诺出去的空间，并处理反馈延迟。发送端“当前可用 credit”不一定等于接收端此刻实际空闲的槽位数：有些空间已经释放，但更新还没传回来；有些数据还在路上，空间却已经为它预留。
+真实系统得把在途数据、已承诺的空间和反馈延迟都记进账里。接收端释放了槽位，发送端可能尚未收到更新；数据还没到，接收端也可能已经为它留好了位置。因此，两端看到的“可用空间”不会时时相等。
 
 InfiniBand 的数据虚拟通道使用链路级 credit 管理；PCIe 也有接收流控额度。例如 AMD 的传统 7 系列 PCIe IP 文档把 Posted、Non-Posted、Completion 各自拆成 Header 与 Data 两类，共六组 credit。这个例子说明额度可以按资源类别隔离，并不是在概括所有 PCIe 版本的全部流控细节。<sup class="cite"><a href="#ref-12">[12]</a></sup><sup class="cite"><a href="#ref-13">[13]</a></sup>
 
@@ -206,7 +202,7 @@ InfiniBand 的数据虚拟通道使用链路级 credit 管理；PCIe 也有接�
 <p><code>R ≤ min(C, B<sub>credit</sub> / T<sub>return</sub>)</code></p>
 {% endraw %}
 
-这个上界尚未计入报文开销、仲裁冲突和其他瓶颈。即使下游并不满，发送端也可能因为额度更新尚未到达而停等。预留足够缓冲，不仅为了避免溢出，也可能是为了覆盖 credit 的往返时间。
+下游还没满，发送端也可能停住：额度已经用完，更新却还在路上。这个上界还没有计算报文开销、仲裁冲突等瓶颈，但足以说明，缓冲除了接住数据，也要留得够大，覆盖 credit 的循环时间。
 
 {% visual_svg flow-control/fig09_credit_window %}
 图 9｜理论上界：固定 128 KiB 的循环额度，链路容量为 400 Gb/s。当额度循环时间为 4 μs 时，上界降到约 262.1 Gb/s；2 μs 时，额度本身允许约 524.3 Gb/s，但实际仍受 400 Gb/s 链路限制。线性坐标，非设备实测。
@@ -222,7 +218,7 @@ InfiniBand 与 PCIe 的官方资料适合先理解资源账本。随后可以读
 
 ## 8. 回到 RTL：ready/valid 是更近的一层流控
 
-把视角缩到芯片内部，流控就不再表现为网络报文，而可能只是一根 `ready` 信号。
+到了芯片内部，同样的等待可能表现为一根被拉低的 `ready`。
 
 以 AXI-Stream 为例：发送方用 `TVALID` 表示当前数据有效，接收方用 `TREADY` 表示这一拍可以接收。只有在时钟上升沿二者同时为高，才完成一次传输。遇到 `TVALID=1`、`TREADY=0`，发送方必须保持有效数据和相关控制信息，等到握手成功；发送方也不能把“先等到 ready”作为提出 valid 的前提。<sup class="cite"><a href="#ref-15">[15]</a></sup>
 
@@ -246,9 +242,9 @@ assert property (@(posedge clk) disable iff (!rst_n)
 
 ### 片内背压怎样变成链路级流控
 
-接收 DMA 变慢，可能使内部 FIFO 积压；FIFO 的空间不足又可能通过 ready/valid 向前一级传播。但“拉低内部 `ready`”与“向链路对端发送 PFC”之间，必须有明确的缓冲监测、优先级映射和流控生成逻辑。这些逻辑决定了内部资源压力何时、以哪个优先级通知链路对端。
+接收 DMA 变慢，内部 FIFO 可能积压，再通过 ready/valid 把压力传给前一级。要把这种片内压力变成外部 PFC，还需要缓冲监测、优先级映射和流控生成逻辑。它们决定何时通知链路对端，以及暂停哪个优先级；内部 `ready` 拉低本身并不会自动完成这些工作。
 
-物理链路已经到达的数据也不能因为某个内部模块拉低 `ready` 而凭空撤回。可停顿的内部接口可以等待；无法及时停下的外部输入则要由缓冲接住，或最终面临丢弃。设计 `almost_full` 阈值时，同样要为检测、流水和背压传播的延迟留出空间。这与 headroom 的问题结构相似，只是控制距离和数据单位变了。
+内部接口可以停顿，物理链路上已经到达的数据却收不回去。停不下来的外部输入，需要缓冲接住，接不住就可能丢弃。设置 `almost_full` 时，检测、流水和背压传播期间继续进入的数据也得算进去。它与 headroom 面对的是同一种延迟问题，只是距离和数据单位变了。
 
 **AXI-Stream 规范 §2.2** 给出了这组接口的直接约束。重点核对 source 和 destination 各自的义务，尤其是停止接收以后哪些信号必须保持稳定。
 
@@ -258,7 +254,7 @@ assert property (@(posedge clk) disable iff (!rst_n)
 
 ## 9. 接收资源不足：TCP 窗口与 RDMA 的 RNR
 
-到达终点以后，还有一类问题：网络能够送达，不代表接收端已经准备好相应的软件或传输资源。
+即使网络已经把数据送到，接收端的软件或传输资源也可能没有准备好。
 
 TCP 同时面对两个限制。接收窗口 **rwnd** 是接收端通告的接收空间约束；拥塞窗口 **cwnd** 是发送端维护的网络拥塞约束。为理解窗口大小的作用，可以把允许新增的在途字节近似写成：<sup class="cite"><a href="#ref-16">[16]</a></sup><sup class="cite"><a href="#ref-17">[17]</a></sup>
 
@@ -274,13 +270,13 @@ FlightSize 表示已经发送、尚未被确认的数据量。这个简化式省
 
 RDMA 中对应的资源并不一定是同一种“接收字节缓冲”。例如在可靠连接 RC 传输下，SEND 或 RDMA WRITE with Immediate 需要接收端预先准备相应的 Receive WQE，Work Queue Element。没有可用接收 WQE 时，可能返回 **RNR NAK**，Receiver Not Ready Negative Acknowledgement，要求请求方按规则等待、重试。<sup class="cite"><a href="#ref-18">[18]</a></sup>
 
-这里有个容易忽略的区别：WRITE with Immediate 的数据仍然写到指定远端地址，接收 WQE 服务于相关接收完成通知，并不是把数据改写进这份 WQE 指定的接收缓冲。普通 RDMA WRITE 和 RDMA READ 也不能一概套用“每次都需要接收方先 post receive”的说法。<sup class="cite"><a href="#ref-18">[18]</a></sup><sup class="cite"><a href="#ref-19">[19]</a></sup>
+WRITE with Immediate 的数据写入指定的远端地址，接收 WQE 用于相关接收完成通知，并不接管这次写入的数据缓冲。普通 RDMA WRITE 和 RDMA READ 也不能套用“每次必须先 post receive”的规则。<sup class="cite"><a href="#ref-18">[18]</a></sup><sup class="cite"><a href="#ref-19">[19]</a></sup>
 
-因此，RNR 是特定操作下的端点资源反馈，不能替代交换网络的拥塞控制。即使硬件操作成功完成，应用自己的环形队列是否还有空位，也可能要通过应用层 credit 另外协商。判断“接收方准备好了没有”，必须先说清楚准备的是链路缓冲、WQE，还是应用数据结构。
+因此，RNR 指向特定操作需要的端点资源。它解决不了交换网络拥塞，硬件操作完成也未必意味着应用环形队列还有空位；应用可能还要单独交换 credit。说“接收方准备好了”，得说清楚准备好的是链路缓冲、WQE，还是应用数据结构。
 
-## 10. Shaper 和调度器，别再混成同一种流控
+## 10. Shaper 与调度器各管哪一段
 
-网卡或交换机里出现一个叫 `credit` 的寄存器，不足以证明它在做接收缓冲流控。先看额度由什么事件增加，会更可靠。
+遇到名为 `credit` 的寄存器，我会先查它因为什么事件增加。这个更新规则，比寄存器名字更能说明它是不是在管理接收缓冲。
 
 在 token bucket，令牌桶，模型里，令牌按本地配置的速率随时间补充，发送消耗令牌。若桶容量为 B，补充速率为 r，那么对任意长度为 Δt 的区间，理想字节模型允许的发送量满足：<sup class="cite"><a href="#ref-20">[20]</a></sup>
 
@@ -294,23 +290,23 @@ B 允许短时突发，r 约束较长时间尺度的平均发送量。它不意�
 图 12｜同样是计数器，“为什么增加”决定了含义。令牌桶按时间补充预算，接收 buffer credit 对应下游释放并重新授予的空间。下方表示调度、速率资格与暂停条件共同约束发送的概念关系，不规定固定的硬件排列顺序。参考 <a href="#ref-13">[13]</a>、<a href="#ref-20">[20]</a>。
 {% endvisual_svg %}
 
-buffer credit 的物理含义不同：接收方必须确实拥有可以承诺的资源。仅仅“等了足够久”，不能凭空多发几个接收槽位的额度。
+接收 buffer credit 必须对应接收方确实能承诺的资源。时间过去了，并不能保证又多出了几个空槽位。
 
-还有一种容易造成名字误会的机制：以太网 AVB/TSN 的 **Credit-Based Shaper**。它的 credit 依据发送和空闲时的斜率调整，用于发送仲裁与带宽分配；不是 PCIe 或 InfiniBand 那种远端缓冲许可。区分两者，要看 credit 是按本地斜率更新，还是代表远端授予的接收空间。<sup class="cite"><a href="#ref-21">[21]</a></sup>
+以太网 AVB/TSN 的 Credit-Based Shaper 也用 credit 这个名字，不过它按发送、空闲时的斜率更新额度，服务于仲裁和带宽分配。PCIe 与 InfiniBand 的接收 credit 则代表远端授予的空间许可。区分两者，查更新依据就够直接。<sup class="cite"><a href="#ref-21">[21]</a></sup>
 
 调度器则主要回答“在当前有资格发送的队列中选谁”。例如轮询或加权调度负责服务分配，shaper 负责速率资格，PFC 状态可能让某类队列暂时失去发送资格。拥塞控制器还可以动态修改发送速率目标。实际硬件往往把这些模块组合起来，但任何一个都不能只凭名字替代另外几个。<sup class="cite"><a href="#ref-20">[20]</a></sup>
 
 ## 11. 把这些机制装回同一张网卡
 
-把这些机制放回一张 NIC，可以看到几个不同的控制边界。发送路径要协调取数、队列选择、速率资格和链路状态；接收路径要接住外部流量，把数据送进主机，并监测自身的资源压力。两端之间还有传输与拥塞反馈。
+在 NIC 发送路径上，取数、队列选择、速率资格和链路状态需要协调；接收路径则负责接住流量、送往主机，并监测自己的资源。传输与拥塞反馈又把两端连起来，图 13 标出了这些不同的控制边界。
 
 {% visual_svg flow-control/fig13_composition %}
 图 13｜一个概念性的控制分层。实线表示主要数据方向，虚线表示不同作用范围的控制；片内背压与 PFC 的连接必须由实现明确建立。该图不是任何厂商网卡的模块框图，也不暗示所有网卡都实现全部机制。综合 <a href="#ref-1">[1]</a>、<a href="#ref-4">[4]</a>、<a href="#ref-13">[13]</a>、<a href="#ref-15">[15]</a>、<a href="#ref-18">[18]</a>、<a href="#ref-20">[20]</a> 绘制。
 {% endvisual_svg %}
 
-**流控分布在端点软件、芯片内部接口、主机互连、以太网链路和交换网络中。** 同一条数据路径会经过多个控制边界，RDMA NIC 只是其中的一部分。
+同一条数据路径，会接连经过端点软件、片内接口、主机互连、以太网链路和交换网络的约束。RDMA NIC 参与其中，但这些流控并不都发生在网卡里。
 
-排查吞吐下降时，也应沿着这个分层检查，而不是看到速度变低就只盯着 PFC 计数。
+吞吐下降时，也要沿这条路径排查。只盯 PFC 计数，容易漏掉其他边界上的等待。
 
 {% raw %}
 <div class="v-figure"><table class="v-matrix"><thead><tr><th>观察到什么</th><th>优先追问</th><th>尚不能据此断言</th></tr></thead><tbody><tr><td>某优先级暂停时间增加</td><td>哪一跳、哪个池触发 XOFF？</td><td>所有业务都发生端到端拥塞</td></tr><tr><td>CNP 或 CE 标记增加</td><td>哪条路径积压，源端速率如何变化？</td><td>接收端没有 Receive WQE</td></tr><tr><td>credit 经常耗尽</td><td>下游未释放，还是更新还在路上？</td><td>链路物理带宽不够</td></tr><tr><td>内部 ready 长时间为低</td><td>从哪个模块开始无法排空？</td><td>外部 PFC 一定已经生效</td></tr><tr><td>RNR 重试增加</td><td>操作类型与接收 WQE 补充是否匹配？</td><td>交换机 buffer 溢出</td></tr><tr><td>吞吐稳定停在某个值</td><td>是否命中 shaper、窗口或处理上限？</td><td>一定是某种流控故障</td></tr></tbody></table><p class="v-caption">表 2｜诊断线索而非自动判定规则。计数器名称、统计窗口和可见粒度取决于实现；应结合队列占用与速率变化验证因果。</p></div>
@@ -320,19 +316,19 @@ buffer credit 的物理含义不同：接收方必须确实拥有可以承诺的
 
 InfiniBand 把逐跳 credit 纳入自己的链路设计；RoCE 运行在以太网之上，PFC 为特定优先级提供链路级暂停，ECN/DCQCN 则是一条端到端拥塞控制路径。这些是不同体系下的组合选择，不是“所有 RDMA 天生只能用 PFC”。RDMA 也不等同于 RoCE：基于 TCP 的 iWARP 就属于另一条协议路线。<sup class="cite"><a href="#ref-12">[12]</a></sup><sup class="cite"><a href="#ref-4">[4]</a></sup><sup class="cite"><a href="#ref-23">[23]</a></sup>
 
-链路级 credit 也不能替代全网拥塞控制：每一跳都不溢出，仍可能有长期排队、热点争抢和不公平。局部空间安全与端到端资源分配，是不同的问题。
+逐跳不溢出，依然可能长期排队、争抢热点或分配不公。链路 credit 保护局部空间，全网还需要处理端到端的拥塞与资源分配。
 
 **IRN** 论文进一步追问：改进 RDMA NIC 的丢包恢复和在途数据约束，能否降低对 PFC 的依赖？这是一条 NIC 与网络共同设计的研究路线。它支持的判断是“PFC 不是 RDMA 语义上的必要条件”，而不是“把任何现有 RoCE 网络的 PFC 直接关闭都没问题”。<sup class="cite"><a href="#ref-22">[22]</a></sup>
 
 ### 论文导读：区分协议语义与实现选择
 
-读 **Revisiting Network Support for RDMA**，重点看 selective retransmission 如何减少丢包后的重复工作，以及基于带宽时延积的在途约束如何限制积压。然后回头检查自己的系统：这些前提真的具备了吗？研究设计证明了一条路线可行，不会自动给未修改的设备增加同样的能力。
+Revisiting Network Support for RDMA 中，selective retransmission 用来减少丢包后的重复工作，基于带宽时延积的在途约束用来控制积压。读完需要核对的，是自己的系统有没有这些能力。论文验证了改过的设计，并没有给未经修改的设备补上同样的机制。
 
 {% raw %}
 <p><a class="glass-pill" href="https://arxiv.org/abs/1806.08159" target="_blank" rel="noopener"><i class="fas fa-file-alt" aria-hidden="true"></i> IRN · SIGCOMM 2018</a></p>
 {% endraw %}
 
-面对一种不熟悉的流控机制，先沿着图 1 找到它保护的资源，再看发送许可由谁发出、何时生效。缓冲不足、反馈太慢、速率目标过低和接收资源补充不及时，都可能表现为“发送停了”，处理办法却不相同。
+看到“发送停了”，我会先回到图 1，找它保护的资源，再查许可由谁发出、反馈多久生效。缓冲不足、反馈太慢、速率目标过低、接收资源补充不及时，表面上都在停发，修复位置却完全不同。
 
 ## 参考资料
 

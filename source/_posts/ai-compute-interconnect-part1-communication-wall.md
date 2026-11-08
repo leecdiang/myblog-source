@@ -20,8 +20,9 @@ tags:
 description: 从 MFU、并行策略、集合通信与网络拓扑出发，解释 AI 集群为什么会从计算密集型系统走向通信受限系统，以及为什么 400G、800G 链路并不自动等于更高的有效吞吐。
 keywords: 分布式训练, AI集群通信, 集合通信, 网络拓扑, MFU, 长尾同步, 并行策略,Scale-Up, Scale-Out
 ---
->**Abstract - Part 1**  
->As AI clusters scale from hundreds to tens of thousands of accelerators, peak compute no longer translates directly into usable throughput. This article examines how distributed parallelism, collective communication, network topology, synchronization, and tail latency reshape training efficiency, and explains why moving data has become one of the central constraints of large-scale AI systems.
+
+> **Abstract - Part 1**<br>
+> Adding accelerators increases peak compute, but synchronization can leave them waiting for data. This article follows the traffic created by data, tensor, pipeline, expert, and context parallelism, then examines how collectives, topology, and tail latency affect training throughput.
 
 {% note info %}
 本文是「智算互联」系列上篇。<a href="/series/ai-interconnect/">查看系列目录 →</a>
@@ -42,7 +43,7 @@ keywords: 分布式训练, AI集群通信, 集合通信, 网络拓扑, MFU, 长�
 
 ### 1. 从 FLOPS 到 MFU
 
-芯片规格表通常给出峰值浮点算力（Peak FLOPS），但训练系统真正关心的是：这些理论算力中，有多少被模型的有效计算使用。
+规格表给出 Peak FLOPS，训练时却还要看其中多少真的用于模型计算。
 
 模型 FLOPs 利用率（Model FLOPs Utilization, MFU）可以写成：
 
@@ -51,9 +52,9 @@ $$
 \frac{\text{模型每步所需 FLOPs}}{\text{单步时间}\times\text{加速器数量}\times\text{单卡峰值 FLOPS}}
 $$
 
-PaLM 论文将 MFU 定义为模型有效计算吞吐与硬件理论峰值吞吐之比。这个指标刻意不把通信、内存访问、重计算和系统等待算作“有用模型 FLOPs”，因此它能够直观暴露集群中的非计算开销。[PaLM: Scaling Language Modeling with Pathways](https://arxiv.org/abs/2204.02311)
+PaLM 用模型有效计算吞吐除以硬件理论峰值，定义 MFU。通信、访存、重计算和系统等待不计入分子的“有用模型 FLOPs”，这些开销会反映在利用率里。[PaLM: Scaling Language Modeling with Pathways](https://arxiv.org/abs/2204.02311)
 
-但 MFU 下降可能来自多种原因：
+但不能看到 MFU 低，就认定网络慢。原因还可能是：
 
 - GPU 内核没有充分利用 Tensor Core
 - HBM 带宽或访存模式成为瓶颈
@@ -63,9 +64,9 @@ PaLM 论文将 MFU 定义为模型有效计算吞吐与硬件理论峰值吞吐�
 - 数据加载、Checkpoint 或故障恢复打断训练
 - 某个 Rank 变成 Straggler，迫使其余设备等待
 
-网络只是其中一项。
+网络需要与这些因素一起排查。
 
-> 随着加速器变快、集群变大，通信成为越来越难以被计算隐藏的主要开销之一。
+加速器越快、同步规模越大，通信就越不容易藏在计算后面。
 
 ### 2. 单步时间应该怎样拆解
 
@@ -79,11 +80,11 @@ T_{\mathrm{sync}} +
 T_{\mathrm{I/O}}
 $$
 
-$T_{\mathrm{exposed\ comm}}$ 是**没有被计算覆盖、暴露在关键路径上的通信时间**，不同于总通信时间。
+$T_{\mathrm{exposed\ comm}}$ 只算没有被计算覆盖、落在关键路径上的通信，不能用总通信时间代替。
 
-例如，梯度 AllReduce 可能在反向传播过程中分桶并提前启动。如果网络足够快，通信可以与后续层的反向计算重叠；如果网络稍慢，最后一个 Bucket 仍未完成，优化器就必须等待。此时的性能往往不是平滑下降，而是在某个临界点后突然恶化。
+梯度 AllReduce 可以分桶，在反向传播尚未结束时提前启动。后续层计算得足够久，就能盖住这部分通信；若最后一桶迟迟未完成，优化器仍得等。于是某个临界点前只是网络慢一点，越过后却可能明显拖长 Step。
 
-只看“总通信量”不够实用。实际还要问：
+定位等待，要把消息放回 Step 的位置：
 
 - 通信发生在 Step 的什么位置？
 - 是否位于依赖链关键路径？
@@ -99,25 +100,25 @@ $$
 S(N)=\frac{1}{(1-P)+\frac{P}{N}}
 $$
 
-但大模型训练中的“串行部分”并不是固定常数。卡数增加后，通信范围、同步参与者和拓扑跨度也在变化。更接近现实的表达是：
+训练里的“串行部分”会随卡数改变，通信范围、同步参与者和拓扑跨度都不是常量。可以进一步写成：
 
 $$
 S(N)=\frac{T_1}{\frac{T_{\mathrm{compute}}}{N}+T_{\mathrm{comm}}(N)+T_{\mathrm{sync}}(N)+T_{\mathrm{imbalance}}(N)}
 $$
 
-这里的 $T_{\mathrm{comm}}(N)$ 和 $T_{\mathrm{sync}}(N)$ 可能随规模上升。于是，新增 GPU 一方面降低每张卡承担的计算量，另一方面也可能增加集体通信和等待成本。
+$T_{\mathrm{comm}}(N)$ 与 $T_{\mathrm{sync}}(N)$ 可能随规模上升。加 GPU 分摊了计算，也可能增加集合通信与等待。
 
-从系统视角看，真正应该观测的是**扩展效率（Scaling Efficiency）**：
+这时可以检查扩展效率（Scaling Efficiency）：
 
 $$
 \eta(N)=\frac{\text{使用 }N\text{ 张卡的实际加速比}}{N}
 $$
 
-如果 1024 张卡只获得相对单卡 600 倍的速度，扩展效率约为 58.6%。剩余部分并不一定全部被“网络吃掉”，但它提醒我们：卡数不是有效算力的等价单位。
+1024 张卡若只有单卡的 600 倍速度，扩展效率约 58.6%。其余时间要按瓶颈拆解，不能全算给网络，也不能再把卡数直接当有效算力。
 
-## 二、并行策略决定流量，而不是“AI”两个字
+## 二、并行方式怎样改变流量
 
-“AI 流量”并不是一种统一的网络负载。数据并行、张量并行、流水线并行、专家并行和上下文并行，会产生完全不同的通信指纹。
+DP、TP、PP、EP 和 CP 切分的维度不同，产生的消息大小、频率与依赖也不同。“AI 流量”这个名字不足以描述它们。
 
 NVIDIA Megatron Core 也把这些策略视为可以组合的不同维度：数据并行（DP）、张量并行（TP）、流水线并行（PP）、上下文并行（CP）与专家并行（EP）。[Megatron Core Parallelism Strategies Guide](https://docs.nvidia.com/megatron-core/developer-guide/latest/user-guide/parallelism-guide.html)
 
@@ -139,7 +140,7 @@ NVIDIA Megatron Core 也把这些策略视为可以组合的不同维度：数�
 - 最慢 Rank 会拖住整个同步点；
 - 梯度分桶后可以与反向计算重叠。
 
-DP 的流量不是单一的大尺寸 AllReduce。训练框架通常把梯度拆成多个 Bucket，形成一串具有依赖关系的中等或大消息。网络既要有持续吞吐，也要控制最后几个 Bucket 的尾延迟。
+梯度分桶以后，DP 通常是一串带依赖的中、大消息。持续带宽重要，最后几桶的尾延迟也重要。
 
 ### 2. Tensor Parallelism：每层都可能等待网络
 
@@ -152,9 +153,9 @@ DP 的流量不是单一的大尺寸 AllReduce。训练框架通常把梯度拆�
 - ReduceScatter；
 - 点对点交换局部结果。
 
-TP 的通信频率通常高于 DP，而且往往出现在每个 Transformer Layer 内部。即使单次消息没有 DP 梯度那么大，通信也更难隐藏，因为下一步矩阵计算可能依赖刚刚收到的结果。
+TP 往往在每个 Transformer Layer 内同步，频率比 DP 高。消息即使较小，下一步矩阵计算也可能要等它返回，因此难以隐藏。
 
-这使 TP 对以下指标格外敏感：
+需要重点看：
 
 - 单跳与端到端时延；
 - 小到中等消息效率；
@@ -173,7 +174,7 @@ TP 的通信频率通常高于 DP，而且往往出现在每个 Transformer Laye
 - Backward 阶段传递 Activation Gradient；
 - 相邻 Stage 间的点对点通信。
 
-PP 的核心问题不只是链路带宽，而是流水线 Bubble。Stage 计算量不均、通信延迟波动或 Micro-batch 数量不足，都会让部分设备空等。Megatron-LM 的交错流水线调度正是为了减少这种 Bubble。[Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM](https://arxiv.org/abs/2104.04473)
+PP 还受流水线 Bubble 影响。Stage 计算量不均、延迟波动、Micro-batch 太少，都会留出设备空等的区间。Megatron-LM 的交错调度就是为减少这些空泡。[Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM](https://arxiv.org/abs/2104.04473)
 
 ### 4. Expert Parallelism：All-to-All 与 Incast
 
@@ -194,15 +195,15 @@ EP 的网络难点包括：
 - 小消息与大消息混杂；
 - 尾延迟直接传导到下一层。
 
-相比规则、对称的 Ring AllReduce，MoE 流量更难仅靠静态 ECMP 哈希均衡。
+Token 路由会改变热点，不像规则对称的 Ring AllReduce 那样容易安排。只靠静态 ECMP 哈希，未必能均衡 MoE 流量。
 
 ### 5. Context Parallelism：长上下文把序列维度变成互联问题
 
 上下文并行（Context Parallelism, CP）沿序列长度切分输入。它主要服务于长上下文训练，减轻单卡 Activation 与 Attention 计算的内存压力。
 
-随着上下文窗口从数千扩展到数十万甚至更长，Attention 相关的 KV、Query 或中间状态需要跨设备交换。Megatron Core 支持 CP 与 TP、PP、DP 组合，这意味着长上下文的通信并不是一个孤立问题，而会叠加在原有并行维度之上。[Megatron Core Context Parallelism](https://docs.nvidia.com/megatron-core/developer-guide/latest/user-guide/features/context_parallel.html)
+上下文从数千增长到数十万甚至更长时，Attention 的 KV、Query 或中间状态需要跨设备交换。CP 还能与 TP、PP、DP 组合，因此长上下文流量会叠加在已有通信上。[Megatron Core Context Parallelism](https://docs.nvidia.com/megatron-core/developer-guide/latest/user-guide/features/context_parallel.html)
 
-### 6. 一张流量指纹表
+### 6. 各种并行方式的流量对照
 
 | 并行策略 | 常见通信原语 | 典型位置 | 更敏感的网络指标 | 主要风险 |
 | :------- | :----------- | :------- | :----------------- | :------- |
@@ -228,11 +229,11 @@ $$
 2\frac{N-1}{N}M
 $$
 
-当消息较大时，Ring 的带宽利用率通常很好；但它需要较多通信步，延迟项会随 Rank 数量增加。因此 Ring 更适合大消息，不一定适合延迟主导的小消息。
+Ring 大消息通常能较好用满带宽，Rank 增多却也增加通信步数和延迟项。小消息由固定开销主导时，未必适合它。
 
 ### 2. Tree：减少步数，但更依赖拓扑与上层链路
 
-Tree 或 Double Binary Tree 可以把通信步数降低到对数级，更适合小消息或延迟敏感场景。但树的上层节点和链路承担更多聚合流量，若物理拓扑与逻辑树不匹配，可能形成热点。
+Tree、Double Binary Tree 把步数降到对数级，更适合小消息与低延迟需求。不过上层节点和链路承担的聚合流量更大，逻辑树与物理拓扑没对齐，仍可能堵在少数位置。
 
 ### 3. Hierarchical Collective：先节点内，再节点间
 
@@ -243,11 +244,11 @@ Tree 或 Double Binary Tree 可以把通信步数降低到对数级，更适合�
 - PCIe 与 CPU/网卡路径；
 - 跨节点 Ethernet 或 InfiniBand Scale-out Fabric。
 
-因此，集合通信往往采用分层算法：先在节点内归约，再由每个节点的代表参与跨节点归约，最后把结果广播回节点内。这一策略的本质是尽量减少穿过较慢、较拥塞层级的数据量。
+分层集合通信先做节点内归约，再由各节点代表参与跨节点归约，最后向节点内广播。它减少穿过较慢或较拥塞层级的数据量。
 
 ## 四、必须先区分 Scale-up 与 Scale-out
 
-很多智算互联讨论混淆了 NVLink、UALink、PCIe、RoCE 和 UET，因为它们都在“连接加速器”。但它们解决的层级并不相同。
+NVLink、UALink、PCIe、RoCE 和 UET 都能连接加速器，但不能只凭这一点互相比较，它们的控制范围与语义不同。
 
 ### 1. Scale-up：把一个 Pod 看成更大的计算节点
 
@@ -283,13 +284,13 @@ PCI Express（PCIe）首先是主机与设备之间的 I/O 互联。CXL 建立�
 <p style="font-size:.78rem;line-height:1.7;color:var(--text-muted);text-align:center;margin:.55rem 0 0">图 1：Scale-up 与 Scale-out 的工程边界。它们不是同一层的替代关系。</p>
 </div>
 
-这张图画的是工程边界，不是协议分层：**每一层的延迟预算、可靠性语义和可扩展范围不同。**
+图中的边界按工程需求划分，各层延迟预算、可靠性语义和扩展范围不同，并非协议分层图。
 
-## 五、拓扑决定了“400G”能不能变成 400G
+## 五、端口标称速率之外，还要看拓扑
 
 ### 1. Clos / Fat-tree：用多级交换换取规模
 
-大型数据中心常采用 Clos 或 Fat-tree 类拓扑。服务器通过 Leaf 交换机接入，再经 Spine 层互联。它提供多条等价路径和较好的横向扩展能力，但也引入了几个关键问题：
+Clos、Fat-tree 通过 Leaf 接入服务器，再用 Spine 互联，提供多条等价路径和扩展空间。实际带宽还受以下配置影响：
 
 - 上行带宽是否与下行带宽匹配；
 - Leaf-to-Spine 是否过订阅；
@@ -301,15 +302,15 @@ PCI Express（PCIe）首先是主机与设备之间的 I/O 互联。CXL 建立�
 
 假设一个 Leaf 交换机有 32 个 400G 下行端口，却只有 16 个 400G 上行端口，那么下行总带宽为 12.8 Tbps，上行只有 6.4 Tbps，过订阅比为 2:1。
 
-单台服务器做点对点测试时可以跑满 400G，但当大量服务器同时跨 Leaf 通信时，每台服务器可获得的平均带宽可能远低于端口标称值。
+一台服务器点对点跑满 400G，不能说明大量服务器跨 Leaf 时也都能跑满。共享上行会压低平均可用带宽。
 
-因此，集群网络不能只看：
+单端口速率、交换芯片容量和单链路延迟，只能说明一部分：
 
 - 单端口速率；
 - 交换芯片总容量；
 - 单条链路延迟。
 
-还应关注：
+放到集群里还要查：
 
 - Bisection Bandwidth（二分带宽）；
 - Oversubscription Ratio（过订阅比）；
@@ -321,7 +322,7 @@ PCI Express（PCIe）首先是主机与设备之间的 I/O 互联。CXL 建立�
 
 AI 集群常把每台服务器内相同编号的 GPU 或网卡连接到同一条 Rail。这样，跨节点 Collective 可以尽量沿固定 Rail 进行，减少不必要的横向跳转。
 
-但 Rail 优化并非自动生效。训练框架、NCCL 拓扑发现、容器调度、GPU/NIC NUMA 亲和性和交换网络布线必须一致。否则硬件拥有多条 Rail，软件却可能把流量集中到少数路径。
+Rail 是否被用好，要同时看训练框架、NCCL 发现、容器调度、GPU/NIC NUMA 亲和性和布线。硬件铺了多条路，软件若没对齐，流量仍会挤到少数路径。
 
 {% mermaid %}
 flowchart TB
@@ -359,7 +360,7 @@ flowchart TB
 - 路径竞争；
 - 接收端处理与完成队列更新。
 
-当 Collective 包含多个阶段、多个跳数和全局同步时，一次通信的有效延迟远高于单链路序列化下限。
+多阶段、多跳和全局同步叠加以后，有效通信延迟会高于这里的单链路序列化下限。
 
 ### 2. 小消息看时延，大消息看带宽，混合消息看调度
 
@@ -375,13 +376,13 @@ $$
 - $\beta$ 是每字节传输时间；
 - $M$ 是消息大小。
 
-小消息由 $\alpha$ 主导，提高链路速率的收益有限；大消息由 $\beta M$ 主导，更快的 SerDes 和更多 Lane 更有效。AI 集群的难点在于两者同时存在：控制消息、Doorbell、Completion、小 Bucket 与大规模 Activation/Gradient 可能共享同一 Fabric。
+小消息主要受 $\alpha$ 影响，只加线速收益不大；大消息主要受 $\beta M$ 影响，更快 SerDes、更多 Lane 才更直接。集群往往同时有 Doorbell、Completion、小 Bucket 和大 Activation/Gradient，共享 Fabric 还要靠调度协调。
 
-### 3. 尾延迟比平均带宽更危险
+### 3. 同步点在等最后一个 Rank
 
-同步训练遵循“木桶效应”。999 个 Rank 按时完成，而第 1000 个 Rank 因拥塞晚了 200 微秒，整个 Collective 仍要等它。
+999 个 Rank 已完成，第 1000 个因拥塞晚 200 微秒，Collective 仍得等这 200 微秒。平均值会把这段等待藏掉。
 
-因此，AI 网络不仅追求平均吞吐，还要追求：
+因此除了平均吞吐，还要看：
 
 - 低抖动；
 - 低 P99/P999；
@@ -390,7 +391,7 @@ $$
 - Incast 下的队列可控；
 - 避免无关流量污染训练关键路径。
 
-### 4. Goodput 比 Line Rate 更诚实
+### 4. 应用最终得到了多少 Goodput
 
 Line Rate 表示端口能够处理的物理线速；Goodput 表示应用最终获得的有效数据吞吐。两者之间可能损失在：
 
@@ -402,11 +403,11 @@ Line Rate 表示端口能够处理的物理线速；Goodput 表示应用最终�
 - 拥塞与路径不均；
 - Collective 算法本身。
 
-所以一张“400G 网卡”只说明它具备进入高性能网络的必要条件，并不能单独证明它能在千卡或万卡训练中维持高扩展效率。
+“400G 网卡”给出端口能力。千卡、万卡训练能否持续利用，还要在实际拓扑和负载下测。
 
 ## 七、从工作负载到网络需求
 
-把以上内容压缩成一条因果链：
+前面这些依赖可以连成下图：
 
 {% mermaid %}
 flowchart LR
@@ -418,7 +419,7 @@ flowchart LR
     F --> G[MFU 与扩展效率下降]
 {% endmermaid %}
 
-这条链条说明，通信墙不是“网速不够快”这么简单。它同时涉及：
+要减少暴露的通信时间，可以从这些位置逐项检查：
 
 - 模型切分；
 - Collective 算法；
@@ -440,13 +441,13 @@ flowchart LR
 | Collective | 单次带宽测试 | 真实模型下 AllReduce / All-to-All JCT |
 | 集群 | GPU 数量 | 作业完成时间、利用率、故障恢复时间 |
 
-## 结语：真正稀缺的是“按时抵达的数据”
+## 下一步计算何时能开始
 
-AI 集群的演进正在改变基础设施的价值排序。过去我们习惯把 GPU 看作计算主体，把网络看作外设；但在多维并行和大规模同步下，网络已经参与决定每一步计算能否按时开始。
+多维并行下，网络决定数据什么时候就绪，也就参与决定下一步计算什么时候开始。
 
-更多 GPU 仍然能够提供更高的理论算力，但只有当通信、拓扑和调度共同跟上，理论算力才会转化为训练吞吐。
+更多 GPU 提高理论算力，通信、拓扑和调度跟上以后，才有机会变成更高训练吞吐。
 
-上篇回答了通信压力从哪里来。接下来更尖锐的问题是：传统 RoCE 网络为什么如此依赖 PFC？当“绝不丢包”的代价越来越高，可靠性应该由交换机、网卡还是端点承担？
+中篇继续查这条路径上的可靠性：RoCE 为什么依赖 PFC，逐跳暂停有什么代价，又能否把丢包恢复更多交给端点。
 
 <link rel="stylesheet" href="/css/series-page.css">
 

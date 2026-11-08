@@ -34,39 +34,31 @@ tags:
 </style>
 
 > **Abstract**  
-> This post is not a tutorial on building an agent. It is a reflection on turning AI from a chat interface into a personal workflow system. Through the deployment of Main Agent, Code Lab, evidence tracking, approval queues, validators, and Obsidian dashboards, I gradually realized that the real value of an agent is not full automation, but structured collaboration. A useful agent does not replace human judgment; it participates in a workflow where facts are traceable, decisions are explicit, and failures can be detected.
-
-
----
-
-
-## 这不是一篇教程。
-
-我不想把这次部署包装成某种一键复刻的效率神话。如果只看最后的成品，它看起来很像一个"AI 留学助手" : 它会晨检，会查学校，会整理 deadline，会同步 Obsidian，还会把待审批事项写进 Mac 备忘录等等等。
-
-但这次部署真正让我开心的，是我第一次比较完整地把一个 AI 工具放进了自己的长期工作流。它更像一个被约束、拆分、审计、校验、可视化之后的工作台，而不是一个能检索的聊天窗口。
-
-回头看，这次我做的事情可以概括成一句话:
-
-> 我搭的不是 Agent，而是一套工作方式
-
-这套工作方式的核心是让 AI 参与我的长期任务: 它搜索、整理、生成候选项、提醒我、维护文件。但必须留下证据，接受校验，走审批流，也得承认失败——不能因为"看起来完成了"就被我信任。
-
-这篇文章就是这次部署的复盘。
+> I built a personal workflow around AI for long-running tasks: Main Agent handles planning and records, Code Lab handles engineering, and evidence files, approval queues, and validators track their work. The failures were instructive. An agent could report a successful update without writing the records, or pass validation by using the wrong status. This post follows those problems and the boundaries I added to make the workflow usable.
 
 ---
 
-## 1. 我不是在搭一个留学 Agent，而是在搭一个个人工作台
+## 从留学申请开始
 
-我确实有一个很具体的需求: 我正在准备未来的留学申请，需要管理学校列表、项目要求、APS、IELTS、GRE、推荐人、材料时间线、CV 和 SOP 等一堆东西。
+这套系统会晨检、查学校、整理 deadline、同步 Obsidian，也会把待审批事项写进 Mac 备忘录。看成品，很容易叫它“AI 留学助手”。
 
-这类任务麻烦在它不是一次性问答。
+我更在意的，是这些动作能否接进长期任务：资料过几天还能找到，政策更新能追溯，失败以后知道哪一步没做成。
 
-问"某个学校的 GRE 要不要交"，AI 很容易给出一个看起来有用的回答。但留学申请真正麻烦的地方在于这些答案会不断变化、互相关联，还会影响后续决策。
+因此，搜索、整理、候选项、提醒和文件维护都交给它参与，但证据、校验与审批不能省。
 
-deadline 可能变，语言要求可能和学院要求不一样，官方页面可能更新，APS 审核政策可能有新程序。你的背景也会随着实习、项目、成绩、竞赛而变化。这些信息最终要进入一个长期决策系统: 哪些学校是 Reach，哪些是 Target，哪些是 Safety; 哪些信息已经核验，哪些只是低置信度; 哪些需要马上行动，哪些只是以后再看。
+“看起来完成了”不够，实际状态要能查。
 
-所以我慢慢意识到，除了尽早摆脱 Gemini 网页版等对话聊天助手，我需要一个能承载长期任务的个人工作台，而不是一个能回答留学问题的 Agent。选择转向 agent 的一大原因是最近被 Gemini 气的不行，觉得它的能力和效率满足不了我的需求。
+---
+
+## 1. 聊天记录装不下申请流程
+
+我在准备留学申请，要同时管理学校、项目要求、APS、IELTS、GRE、推荐人、材料时间线、CV 和 SOP。
+
+问一次“这所学校要不要 GRE”，容易得到答案。难的是答案以后可能变化，还会影响选校和材料安排。
+
+deadline 会变，学院与项目的语言要求可能不同，APS 程序也可能调整。我的实习、项目、成绩和竞赛经历还在更新。最终要据此决定 Reach、Target、Safety，区分已核验和低置信度信息，再安排哪些现在做、哪些以后看。
+
+当时 Gemini 网页版的能力和效率已经让我很烦，来回对话也很难承载这些状态。我想换成能持续维护资料和任务的工作台。
 
 这个工作台后来长成了这样的结构:
 
@@ -74,7 +66,6 @@ deadline 可能变，语言要求可能和学院要求不一样，官方页面�
 <svg class="v-arch" viewBox="0 0 880 500" role="img" aria-label="PERSONAL WORKBENCH · LAYERED CONTROL"><text x="40" y="34" font-size="10.5" font-weight="600" fill="var(--a-sub)" letter-spacing="1.6" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">PERSONAL WORKBENCH · LAYERED CONTROL</text><text x="40" y="56" font-size="11" fill="var(--a-sub)" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Agent 只是其中一层；证据、控制与事实源决定了它能不能被信任</text><line class="a-spine" x1="48" y1="84" x2="48" y2="466"/><rect class="a-front" x="80" y="84" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="98" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="115" r="4"/><circle class="a-chip" cx="110" cy="115" r="14"/><text class="a-title" x="110" y="119" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">01</text><text class="a-title" x="136" y="110" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">View Layer</text><text class="a-sub" x="136" y="129" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Obsidian · Mac 备忘录</text><rect class="a-chip" x="670" y="102" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="119" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">只读视图</text><rect class="a-front" x="80" y="164" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="178" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="195" r="4"/><circle class="a-chip" cx="110" cy="195" r="14"/><text class="a-title" x="110" y="199" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">02</text><text class="a-title" x="136" y="190" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Agent Layer</text><text class="a-sub" x="136" y="209" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Main Agent · Code Lab</text><rect class="a-chip" x="670" y="182" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="199" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">职责与权限</text><rect class="a-front" x="80" y="244" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="258" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="275" r="4"/><circle class="a-chip" cx="110" cy="275" r="14"/><text class="a-title" x="110" y="279" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">03</text><text class="a-title" x="136" y="270" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Control Layer</text><text class="a-sub" x="136" y="289" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Validator · 健康检查</text><rect class="a-chip" x="670" y="262" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="279" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">格式与语义</text><rect class="a-front" x="80" y="324" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="338" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="355" r="4"/><circle class="a-chip" cx="110" cy="355" r="14"/><text class="a-title" x="110" y="359" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">04</text><text class="a-title" x="136" y="350" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Evidence Layer</text><text class="a-sub" x="136" y="369" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">source · run · claim · approval</text><rect class="a-chip" x="670" y="342" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="359" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">可追溯记录</text><rect class="a-front" x="80" y="404" width="770" height="62" rx="14"/><rect class="a-accent" x="80" y="418" width="3" height="34" rx="1.5"/><circle class="a-dot" cx="48" cy="435" r="4"/><circle class="a-chip" cx="110" cy="435" r="14"/><text class="a-title" x="110" y="439" text-anchor="middle" font-size="9.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">05</text><text class="a-title" x="136" y="430" font-size="14.5" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">Source of Truth</text><text class="a-sub" x="136" y="449" font-size="10.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">OpenClaw workspace</text><rect class="a-chip" x="670" y="422" width="160" height="26" rx="13"/><text class="a-chip-text" x="750" y="439" text-anchor="middle" font-size="9.5" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">正式事实源</text><text x="40" y="486" font-size="9.5" fill="var(--a-sub)" font-family="-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,sans-serif">2D 分层：层级只由顺序和缩进表达，不用透视和阴影。</text></svg>
 <p class="v-caption">图 1：个人工作台的分层控制。Agent 只是其中一层，证据、控制与事实源决定它能否被信任。</p>
 </div>
-
 
 ```text
 System Structure
@@ -88,54 +79,48 @@ Mac 备忘录:轻提醒副本
 OpenClaw workspace:事实源
 ```
 
-
-留学只是第一个被跑通的场景。更大的目标是: 把 AI 放进我的工程、学习、毕业设计、博客、申请这些长期任务之间，让它成为一个稳定的工作流节点，而不是一个随时失忆、随时飘走的聊天框。
-
+留学是第一个跑通的场景。之后，工程、学习、毕业设计、博客和申请都可以接进来；我不想每次换聊天窗口，就重新交代一遍上下文。
 
 ---
 
-## 2. 为什么一个 Agent 不够:Main Agent 与 Code Lab 的分工
+## 2. Main Agent 与 Code Lab 怎样分工
 
-为了在一开始确立正确的系统架构，我参考了两篇关于 single-agent 与 multi-agent 的论文，它们直接影响了我对这套系统的设计判断。
+设计时，我参考了两篇 single-agent 与 multi-agent 论文。
 
 > **论文一:When Single-Agent with Skills Replace Multi-Agent Systems and When They Fail**
 > arXiv: [https://arxiv.org/abs/2601.04748](https://arxiv.org/abs/2601.04748)
 >
 > 这篇论文的核心是如果一个 multi-agent system 里的多个 agent 只是承担不同角色，并通过显式通信协作，那么这些角色可以被编译成一个 single-agent 内部可调用的多个 skills。论文的结论是: 在共享上下文、同一模型 backbone、任务流程可以序列化的情况下，single-agent with skills 往往可以用更低的 token、延迟和 API 调用成本，达到接近甚至相当的效果。但它也指出，skill library 不能无限扩张; 当 skills 数量过多，尤其是语义相似时，模型的 skill selection 会出现明显退化。论文中这个分界点大概在 20 个 skills，但具体分界点与不同 skill 易混淆程度和是否采用了正确的 skills  路由器有关。
 
-
 > **论文二:Single-Agent LLMs Outperform Multi-Agent Systems on Multi-Hop Reasoning Under Equal Thinking Token Budgets**
 > arXiv: [https://arxiv.org/abs/2604.02460](https://arxiv.org/abs/2604.02460)
 >
 > 这篇论文的核心观点是: 很多 multi-agent 系统看起来更强，可能只是因为它用了更多 test-time compute。多个 agent 轮流发言、互相总结、互相修正，本质上消耗了更多 thinking tokens、更多上下文传递和更多中间推理。当把 reasoning-token budget 控制到相同水平时，single-agent 在多跳推理任务中经常可以匹配甚至超过 multi-agent。这说明，multi-agent 的优势不应被默认归因于"架构更聪明"，而要先排除计算预算、上下文组织和通信开销带来的影响。
 
+据此，我决定先查是否真的需要独立角色，再考虑增加 Agent。
 
-这两篇论文放在一起，给了我一个部署原则:**不要因为多 agent 看起来很厉害，就把系统拆成很多 agent。**
+最初想按主题拆：留学、芯片、代码、博客各一个，需要时再加。
 
-一开始我想的是：做一个留学 Agent、一个芯片 Agent、一个代码 Agent、一个博客 Agent。后面再按需部署更多。这种拆法按主题划分: 留学一类，数字 IC 一类，代码一类，博客一类。
+但按这个办法，一个“博客 Agent”既要写作又要改主题、管 Git，留学 Agent 也要同时规划、搜索、整理和改文件。
 
-但真正开始设计后我发现，这样切得太碎。
+看起来分了领域，执行权限却没有分开。
 
->主题不是最重要的边界，**职责才是**。
+芯片 Agent 同样会混合知识讲解与毕业设计文档维护，每个角色仍有很多杂事。
 
-按主题拆的话，"博客 Agent"既要写作、改 Hexo 主题、还要管理 Git; "留学 Agent" 既要做长期规划、搜索资料、整理文档、甚至改本地文件; "芯片 Agent" 既要讲知识，又要参与毕业设计文档管理。每个 agent 都要参与太多杂事，边界反而更模糊。
+论文里的 Skills 方案给了我另一个思路：没有独立状态、权限、工具链或决策目标的角色，可以先合在一个 Agent 内，用少量边界清晰的 Skills 处理，减少来回转述。
 
-论文里关于 single-agent with skills 的观点解释了这个问题: 如果多个 agent 之间没有真正独立的状态、权限、工具链或决策目标，只是换几个角色说同一套话，那它们未必需要被拆开。很多时候让一个 agent 拥有少量边界清晰的 skills，比让一组 agent 互相转述上下文更合理。
+需要另外隔开的，是工程执行。长期规划和记忆维护一旦同时带着改代码、运行 shell、重写配置的权限，理解错上下文时就可能直接改变工程，副作用也难追踪。
 
-但另一方面，我也没有让一个 Agent 什么都做。
-
-因为在真实部署中，问题不只是推理能力，还有权限、风险和执行边界。一个负责长期规划和记忆的 agent，不应该同时拥有随手改代码、执行 shell、重写配置文件的能力。否则它一旦理解错上下文，就可能把策略判断和工程执行混在一起，造成很难追踪的副作用。
-
-所以我最后没有按照主题拆分，而是按照职责和风险拆分。系统收敛成两个常驻角色:
+最后保留两个常驻角色，按职责与风险分开。
 
 ```text
 Main Agent = 长期规划 / 策略 / 资料库 / 记忆 / 决策支持
 Code Lab = 工程执行 / 脚本 / 测试 / 本地工具维护
 ```
 
-Main Agent 是长期工作流中枢。它负责帮我理解目标、拆分路径、维护资料库、生成待办、管理审批。它可以处理留学规划、数字 IC 学习、毕业设计、实习项目分析、长期资料归档。它的价值在于"想清楚"和"记下来"。
+Main Agent 维护目标、路径、资料库、待办和审批。留学规划、数字 IC 学习、毕业设计、实习分析和长期归档，都可以留在这一层。
 
-更准确地说，Main Agent 承担的是 **规划层、解释层和记忆层** 的工作。它应该帮我回答:
+它承担规划、解释和记忆，主要回答这些问题：
 
 ```text
 这个目标应该怎么拆？
@@ -145,11 +130,11 @@ Main Agent 是长期工作流中枢。它负责帮我理解目标、拆分路径
 哪些资料还只是草稿，不能写入正式记录？
 ```
 
-但 Main Agent 不应该直接动工程。它不应该递归扫描代码仓库，不应该重写脚本，不应该随手改项目文件，也不应该把未经审批的信息写进正式资料库。它更像一个 PM、研究助理和长期笔记管理员的结合体。它可以提出方案、生成任务单、记录决策，但不应该越过边界直接执行危险操作。
+它可以提方案、发任务单、记决策，但不能递归扫描仓库、重写脚本、随手改项目，未经审批的信息也不能直接进入正式资料库。
 
 ---
 
-Code Lab 则是工程执行器。它负责 Apple-Health-Pro、Hexo 博客、Obsidian 同步脚本、validator、CSS、Git、测试和本地 shell。它可以改文件，可以跑命令，可以调试，可以修脚本。它的价值在于能够把明确的工程任务做完，并留下可验证的证据。
+Code Lab 接工程任务：Apple-Health-Pro、Hexo、Obsidian 同步脚本、validator、CSS、Git、测试与本地 shell。它改文件、运行命令和调试，交回可验证的执行证据。
 
 Code Lab 应该回答的是另一组问题:
 
@@ -163,13 +148,11 @@ diff 是否最小？
 是否需要回滚？
 ```
 
-但 Code Lab 不应该替我做留学策略判断，也不应该把"信息判断"直接写成"正式事实"。它可以执行 Main Agent 派发的工程任务，也可以把执行结果反馈回来，但它不应该直接决定我的 APS 路线、学校优先级、申请策略或长期学习方向。
+APS 路线、学校优先级、申请策略和学习方向，不由 Code Lab 决定。它执行 Main Agent 的工程任务，再返回结果，也不能把待判断的信息写成正式事实。
 
-这层分工听起来有点形式主义，但它其实非常关键。
+这个边界能阻止一种具体的混乱：晨检失败后，规划 Agent 顺手重写脚本；或者执行 Agent 因为能改文件，就替我更改选校策略。
 
-如果 Main Agent 同时负责策略判断和脚本维护，它会变成一个不受控的"万能助手"。它可能在晨检失败时顺手重写脚本，也可能在理解错上下文时污染正式文件。如果 Code Lab 也开始替我判断 APS 路线、学校优先级、申请策略，那代码执行和人生决策就混在一起了。
-
-从 agent 架构角度看，这里需要隔离的是权限和风险，而不是"知识领域":
+需要隔离的，是权限、风险和职责。
 
 ```text
 上下文隔离：长期规划和工程执行的上下文不要互相污染。
@@ -177,30 +160,21 @@ diff 是否最小？
 风险隔离：低风险的信息整理和高风险的文件修改，应该在不同边界里。
 ```
 
-这也是我最后没继续拆出"留学 Agent / 芯片 Agent / 博客 Agent"的原因。留学、芯片、博客这些主题，完全可以作为 Main Agent 内部的长期 skill 或资料库; 代码修改、脚本调试、Git 操作、本地测试这些，交给 Code Lab。前者是认知和记忆问题，后者是工程和执行问题。
+留学、芯片和博客可以作为 Main Agent 的 Skills 或资料库。工程修改、脚本、Git 和测试交给 Code Lab，不必再为每个主题养一个常驻角色。
 
-最后我的结论是:
+过多拆分会增加通信、上下文传递和工具选择的成本；全部合并，又隔不开权限。两个角色是我在这次部署里的取舍。
 
-> 一个 Agent 不够，是因为不同职责需要边界;
-> 太多 Agent 也不好，因为过度拆分制造通信成本、上下文损耗和选择混乱。
-> 
-> Agent 越强，越需要边界。
-> 分工不是为了复杂，而是为了降低混乱。
-
-对我来说，Main Agent 和 Code Lab 的分工刚好卡在中间。Main Agent 负责长期记忆、策略判断和任务分解;Code Lab 负责本地工程、代码修改和测试验证。按权限、风险和职责隔离，而不是按主题分裂。
-
-
+Main Agent 留下长期记忆、策略与任务分解，Code Lab 负责工程实现和验证。
 
 ---
 
+## 3. 记忆之外，还需要证据文件
 
-## 3. 为什么光有记忆不够: 事实源、证据链和审批流
+记得一条信息，不等于核验过它。
 
-AI 的"记忆"很诱人——它似乎可以记住背景、偏好、项目、学校列表和长期目标。但在长期任务里，记忆不能当事实源。
+比如“Purdue GRE 可能 optional”，可以作为后续查询的上下文，却不能直接进正式 tracker。来源、时间、置信度、核验日期和变更记录都要补齐。
 
-它能提供上下文，但不能直接作为依据。它记得我说过"Purdue GRE 可能 optional"，但不能因为记得，就把这条写进正式 tracker。事实必须有来源、有时间、有置信度、有核验日期、有变更记录。
-
-所以我们建立了一层 evidence layer，由四个 JSONL 文件构成:
+为此建了四个 JSONL 证据文件。
 
 ```text
 source_registry.jsonl
@@ -217,19 +191,17 @@ approval_queue.jsonl
 
 `approval_queue.jsonl` 记录这些信息是否需要我介入。确认某条信息无变化时用 `no_action_required`。需要我行动是 `pending`。信息不足是 `needs_more_research`。路线选择——比如 APS 走 TestAS 还是标准面谈——是 `decision_item`，必须等我明确选。
 
-
 ---
-
 
 第一次测试 Purdue GRE 政策时，Main Agent 口头说已经记录了 retrieval run、注册了 source、生成了 claim、写入了 approval queue。但 validator 一跑，四个 JSONL 文件全是空的。
 
-如果没有 evidence layer，我可能以为晨检成功了。实际上它只更新了 human-readable summary，没形成机器可读的审计记录。这就是为什么后来所有晨检必须写入 JSONL。
+当时它只更新了可读摘要，没有落下机器可读的记录。后来晨检必须写 JSONL，就是为了解决这种口头完成、文件为空的情况。
 
 还有一次，`approval_queue` 里本来要写"核验无变化，无需审批"，但 validator 不接受 `no_action_required`。Agent 为了让 validator PASS，改成了 `rejected`。
 
-技术上通过了，语义上错了。
+验证器放行了，记录却写错了。
 
-这说明 validator 不能只检查格式，还要保护语义。`rejected` 只能表示我明确拒绝，不能代替"无需改动"。否则以后复盘，系统会以为我拒绝过某个事实更新。
+`rejected` 只能表示我明确拒绝，不能代替“无需改动”。否则以后查看历史，会误以为我拒绝过更新。验证器因此还得检查状态语义。
 
 于是我们补齐了 status 语义:
 
@@ -242,19 +214,15 @@ needs_more_research - 信息不足,不能写入正式 tracker
 no_action_required - 核验无变化,无需人工审批
 ```
 
-
-> AI 可以发现问题，但不能替我承担选择。
-> 它可以生成 action item，但 decision item 必须留给我。
-> 它可以干活，但必须留下证据。
-
+路线由我决定，Agent 可以先查资料、列行动项，并把每一步证据留下。
 
 ---
 
-## 4. 为什么光有 UI 不够:Obsidian 只是视图，不是系统本体
+## 4. Obsidian 展示状态，工作区保存事实
 
-这次部署里，Obsidian 是很重要的一环。它让整个系统终于"看得见"。
+Obsidian 让这些资料和任务可以一起查看。
 
-我最终有了这些页面:
+最终生成了这些页面：
 
 ```text
 Dashboard - Overview
@@ -267,26 +235,13 @@ Schools/
 
 ![](我搭的不是Agent而是一套工作方式-20260612-002150.png)
 
+Overview 汇总阶段、待审批、时间压力和下一步；Timeline 按 deadline 排序，By Tier 看选校梯度。Pending Approval 集中待确认事项，Kanban 按 Research、Needs Verification、Shortlist、Preparing、Applying、Submitted、Archived 展示流程，Schools 下则是一校一项目的页面。
 
-Overview 是总控台，告诉我当前阶段、待审批、时间压力和下一步重点。Timeline 看 deadline 和时间顺序。By Tier 看选校梯度。Pending Approval 看待我确认的事项。Kanban 看申请流程状态:Research、Needs Verification、Shortlist、Preparing、Applying、Submitted、Archived。Schools 下面则是每个项目的单独页面。
+时间、选校和审批各有视图，没必要都塞进一个 Dashboard。
 
-现在我的理解:
+Obsidian 与 Mac 备忘录保存的是生成视图、提醒副本。事实保留在 OpenClaw workspace 的 CSV、Markdown、JSONL、approval log 和 change log 中。
 
-- Timeline 看时间压力
-- Kanban 看流程状态
-- By Tier 看选校结构
-- Overview 看今天该做什么
-- Pending Approval 看等待我决定的事
-
-别把所有信息塞进一个页面，也别幻想一个 Dashboard 解决所有问题。
-
-更重要的是，Obsidian 不是事实源。
-
-这点非常关键。Obsidian 再漂亮，也只是生成视图。Mac 备忘录再方便，也只是提醒副本。真正的事实源在 OpenClaw workspace 里，在 CSV、Markdown、JSONL、approval log、change log 里。
-
-这层分离很重要，因为 UI 很容易让人产生错觉。一个页面看起来很完整，不代表系统可靠。一个看板颜色很漂亮，不代表背后的数据经过核验。一个学校卡片里有 deadline，不代表这个 deadline 一定来自官方来源。
-
-所以我的原则变成:
+页面齐全、看板漂亮，都不能证明 deadline 核验过。查依据时仍要回到这些工作区记录。
 
 ```text
 OpenClaw workspace = 事实源
@@ -295,26 +250,19 @@ Mac Notes = 轻提醒副本
 Excel/CSV = 结构化数据和快照
 ```
 
-我可以在 Obsidian 里理解系统，但不应该绕过系统直接改事实。下一次同步时，这些手动修改也可能被覆盖。
-
-
-> 一个好看的 Dashboard 不等于一个可靠的系统。
-> Dashboard 只是仪表，事实源才是本体。
-
+Obsidian 适合查看和理解。直接在那里改事实，会绕过记录流程，还可能被下次同步覆盖。
 
 ---
 
-## 5. 为什么模型不够聪明也能用: 用 validator、脚本和流程约束模型
+## 5. 模型会出错，文件更新要能验证
 
-这次部署让我对模型能力有了更真实的感受。先对比下各家当前的 api 价格。
-
+部署时的 API 价格对比如下。
 
 ![](我搭的不是Agent而是一套工作方式-20260612-002215.png)
 
+DeepSeek V4 Flash 便宜、快、上下文长，日常能用；复杂流程常需要多改几轮。识图、记忆检索和联网搜索等场景接了 Gemini API，因为 DeepSeek 没有多模态能力，Gemini 免费额度在这些用法里基本够用。
 
-DeepSeek V4 Flash 便宜、快、上下文长、日常可用，但在复杂 agent 工作流里并不省心，经常要多改几次。没有多模态能力，所以识图、记忆检索、联网搜索等场景我接入了 Gemini 的 api，免费额度在这些场景基本用不完。
-
-对于 DeepSeek，尤其是当任务变成多步骤执行时，它会犯一些经典错误:
+多步骤执行时，问题开始集中出现：
 
 ```text
 口头说完成，但实际没写 JSONL
@@ -325,7 +273,7 @@ DeepSeek V4 Flash 便宜、快、上下文长、日常可用，但在复杂 agen
 同步看板时写出 \n 或 \u000 这类转义污染
 ```
 
-模型能力不够强，所以系统必须足够完善来包容这些不完美。
+这些错误不能只靠提醒模型“认真一点”。
 
 以 `DAILY_BRIEF.md` 的更新逻辑为例：
 
@@ -335,7 +283,7 @@ DeepSeek V4 Flash 便宜、快、上下文长、日常可用，但在复杂 agen
 edit(oldText=..., newText=...)
 ```
 
-这个方式鲁棒性很弱：日期、空格、emoji、换行，有一点点不同就失败。实际也确实失败了——它以为文件里是 2026-06-11 的版本，真实文件还是 2026-06-09 的，oldText 匹配不上。更糟的是，工具已经报错，它还是口头说"写入完成"。
+日期、空格、emoji 或换行不一致，精确替换就会失败。它曾按 2026-06-11 的内容匹配，文件实际还停在 2026-06-09；工具报错以后，它仍说写入完成。
 
 后来我们把它改成 marker-based update:
 
@@ -345,25 +293,19 @@ edit(oldText=..., newText=...)
 <!-- DAILY_BRIEF:END -->
 ```
 
-然后写了 `update_daily_brief.py`，以后只替换 marker 之间的内容。更新后必须读取前 80 行确认，确认成功后才能汇报完成。
+后来用 `update_daily_brief.py` 只替换 marker 之间的内容。写后再读前 80 行确认，确认成功才能汇报。
 
+validator 继续检查 JSONL、字段和 status 语义，也查 Obsidian 坏转义、Kanban 错列、学校页面 frontmatter。检查结果要对应实际产物，不能用 Agent 的一句总结代替。
 
-类似的防线还有 validator。它检查 JSONL 格式、字段是否完整、status 是否符合语义、Obsidian 生成文件是否有坏转义、Kanban 是否出现错误列、学校页面 frontmatter 是否包含必要字段。不是为了显得高级，而是防止 Agent 口头完成、实际失败。
-
-
-> 当模型不够可靠时，不要要求它"更自觉"。
-> 要把它放进流程里，让它必须留下证据，必须通过校验，必须承认失败。
-
+写入、读取和校验连起来，失败才有机会在进入后续步骤前被发现。
 
 ---
 
 ## 6. 留学申请只是第一个被跑通的场景
 
-虽然这次最完整跑通的是留学申请，但我不想把这套系统定义成"留学 Agent"。
+留学申请需要检索、核验、材料、时间线与个人决策，又要长期维护，很适合用来检验这套工作方式。
 
-留学只是一个足够复杂、真实、容易出错的验证场景。有信息检索、官方来源、时间线、材料清单、个人决策、审批、可视化、长期维护。用它来测试这套工作流，很合适。
-
-最后我们把"执行留学晨检"固化成了一个 skill。它不再是一个模糊指令，而是一套明确的 11 步工作流:
+后来把“执行留学晨检”固化成 Skill，按明确的 11 步执行：
 
 ```text
 写入 retrieval_runs.jsonl
@@ -389,36 +331,29 @@ edit(oldText=..., newText=...)
 
 - APS 审核: 生成了 action_item 和 decision_item。比如材料清单需要补充，TestAS 060 vs 标准面谈则需要我自己决策。
 
+这些测试分别走通了无变化核验、行动项和决策项三条路径。
 
-这证明系统能处理"无变化的事实核验"，也能处理"需要行动"和"需要决策"的事项。
-
-但它真正的意义不在于 Purdue，也不在于 APS。意义在于: 这套工作流可以迁移。
-
-它以后可以服务我的工程项目，可以服务毕业设计，可以服务数字 IC 学习路径，可以服务博客内容管理，也可以服务实习项目分析。留学申请只是第一块被跑通的样板间。
-
+后续可以把同样的证据、审批和验证接到工程、毕业设计、数字 IC 学习、博客及实习分析中。它们还需要各自适配，留学申请只完成了第一轮验证。
 
 ---
 
+## 7. 接下来少搭系统，多用它做事
 
-## 7. 接下来它会服务工程、博客、毕业设计和长期学习
+系统基本成型，我想先把它用起来。
 
-现在系统基本成型，我反而应该少折腾、多使用。
+继续接飞书、Telegram、iMessage、日历、监控，或继续增加 Agent 和 Dashboard，都有理由。但一直加这些，也会挤掉申请和工程本身的时间。
 
-这也是这次部署最后一个重要结论。
+现在这套工作台已阶段性可用，接下来应该服务具体产出。
 
-系统搭到一定程度后容易陷入另一种陷阱: 继续加功能，继续调 UI，想接飞书、Telegram、iMessage、日历插件、全自动监控、更多 Agent、更多 Dashboard。每个功能看起来都合理，但也会把精力从真正的工作上带走。
+Code Lab 继续维护 Apple-Health-Pro、Hexo 和同步脚本。每轮先看 `git status`，限制读取文件和命令数量，避免递归扫描，小步修改、提交。
 
-现在我更愿意把这套系统看成一个阶段性可用的工作台。接下来它要服务具体产出。
+Main Agent 继续按证据流程晨检 APS、推荐人、High priority 项目、IELTS/GRE/deadline、CV_FACTS 和 SOP 主线，涉及选择时仍走审批。
 
-在工程上，Code Lab 会继续维护 Apple-Health-Pro、Hexo 博客和各种同步脚本。规则也很明确: 先 `git status`，不要递归扫描，每轮最多读几个文件、跑几条命令，小步修改，小步提交。Code Lab 是工程执行器，不是人生规划师。
+数字 IC、实习和毕业设计，则用它维护长期资料、拆阶段任务，记录每次选择的依据。
 
-在留学上，Main Agent 会继续按 evidence-first workflow 执行晨检。它要关注 APS、推荐人、High priority 项目、IELTS/GRE/deadline 核验、CV_FACTS、SOP 主线等。但它不能越过审批流。
+博客里，Code Lab 管 Hexo 和样式，Main Agent 整理结构、复盘和主题线索，最终怎样表达由我决定。
 
-在毕业设计和学习上，Main Agent 更适合做长期路径规划和资料整理。比如数字 IC 学习路线、实习项目理解、毕业设计拆解，这些应该变成长期资料库和阶段性决策，而不是一次性问答。
-
-在博客上，这套系统也会继续有用。Code Lab 可以维护 Hexo 和样式，Main Agent 可以帮我梳理文章结构、复盘经验、保存主题线索。但最终表达仍然是我的。
-
-我现在对这套系统的理想使用方式是:
+日常使用时，我希望按下面的关系分配工作：
 
 ```text
 Main Agent：帮我想清楚、记下来、形成决策流
@@ -428,39 +363,16 @@ Evidence Layer：让一切有迹可循
 Validator：让错误尽早暴露
 ```
 
-这不是什么"全自动 AI 人生操作系统"。它更像一套被我慢慢磨出来的个人工作方式。
-
 ---
 
-## 结尾: 把 AI 放回工作流里
+## 以后出错时，至少知道去哪里查
 
-回头看，这次部署让我最开心的是：我终于把 AI 放回了工作流里，而不是只"拥有了一个 Agent"。
+以前主要靠问答推进，方便，却很难持续保存任务状态。现在多了文件、历史、审批和人的决策位置，代价是必须维护这些约定。
 
-以前我对 AI 工具的使用，更多是对话式的: 我问，它答; 我再问，它再答。这个模式很轻，很快，也很有用。但它不适合承载长期任务。长期任务需要状态，需要边界，需要历史，需要审计，需要可视化，需要失败处理，也需要人的决策位置。
+模型、脚本和 Obsidian 都还会出错，Main Agent 也可能忘记规则。我不能保证每次都拦住，但至少可以沿 validator、approval queue 和 evidence 文件查到哪一步出了问题，再交给 Code Lab 修。
 
-现在这套系统仍然不完美。模型会犯错，脚本可能出 bug，Obsidian 看板以后也许还会坏，Main Agent 也可能偶尔忘记规则。但不同的是，错误不再完全漂浮在聊天里——它们会被 validator 发现，被 approval queue 拦住，被 evidence layer 留痕，被 Code Lab 修复。
+这套系统是否有用，要在接下来的长期任务里继续看。我会把重复整理和执行逐步交出去，把申请路线与重要选择留给自己。
 
-我对 Agent 的理解也变得更具体了。
-
-Agent 是我能组织进流程的执行者，不是一个替我生活的东西或永远正确的答案机器。它很有用，但我得知道什么该交给它、什么必须留给我。
-
-
->让 AI 参与我的长期任务，但不让它越过边界;
-  让它替我处理重复劳动，但不替我承担判断;
-  让它生成信息，但必须留下证据;
-  让它执行流程，但必须接受校验。
-
-如果你的部署遇到什么问题，可以写邮件给我，我们一起解决。
-
+部署中遇到问题，也可以写邮件给我交流。
 
 ---
-
-
-## TL;DR
-
-I was building a workflow, not a single agent.
-
-The key: keep AI accountable rather than just autonomous.  
-Separate planning from execution, keep evidence trails, add approval gates, validate outputs, treat dashboards as views—not sources of truth.
-
-A useful agent is one that can safely participate in my long-term work, not one that does everything for me.

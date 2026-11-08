@@ -19,11 +19,11 @@ keywords: Silemetry, macOS, SwiftUI, Rust, Metal, Apple Silicon, 遥测, 散热�
 
 > **Silemetry — See what your silicon can sustain.**
 
-Silemetry 是一个面向 Apple Silicon 的原生 macOS 遥测与持续负载测试工具。它能记录温度、功耗、频率、每核心利用率、电源状态和测试阶段，也能主动制造 CPU、GPU 或混合负载，把芯片从空闲、升温、稳态到冷却的全过程保存下来。
+Silemetry 面向 Apple Silicon，记录温度、功耗、频率、每核心利用率、电源状态和测试阶段。它既能制造 CPU、GPU、混合负载，也能把空闲、升温、稳态到冷却的过程保存下来。
 
-项目从 7 月 28 日第一个 commit 开始，到 8 月 3 日完成 v0.2.1，前后正好一周。最初我只是想更准确地观察 MacBook Air 在长时间负载下的降频过程，最后却做出了一套包含 SwiftUI、Rust、C、Metal、SwiftData、JSONL、CI 和 DMG 打包的完整应用。
+7 月 28 日第一次提交，8 月 3 日完成 v0.2.1，正好一周。我原本只是想观察 MacBook Air 的持续负载降频，后来陆续加上了 SwiftUI 界面、Rust 遥测、C 与 Metal 负载、SwiftData 和 JSONL 存储，以及 CI 与 DMG 分发。
 
-这篇文章不是一份 README，也不是逐行代码说明。它更像一份开发复盘：为什么要做、架构为什么这样拆、测量数据怎样保证可信，以及那些只有真正跑起来以后才会出现的并发、文件事务和跨语言边界问题。
+这篇记下实现里的取舍，尤其是数据口径、并发、文件事务和跨语言边界上实际出过的问题。
 
 项目仓库：<a href="https://github.com/leecdiang/Silemetry-mac" target="_blank" class="glass-pill"><i class="fab fa-github"></i> leecdiang/Silemetry-mac</a>
 
@@ -33,11 +33,11 @@ Silemetry 是一个面向 Apple Silicon 的原生 macOS 遥测与持续负载测
 
 ## 1.1 MacBook Air 的持续性能问题
 
-我的主力机是一台 M4 MacBook Air。它的优点很明显：安静、轻薄、续航好；它的限制也同样明显——无风扇设计意味着芯片产生的热量只能依靠均热结构、外壳和自然对流慢慢散出去。
+我的主力机是 M4 MacBook Air。它安静、轻薄、续航好，也没有风扇；持续负载产生的热量，要靠均热结构、外壳和自然对流散出。
 
-日常浏览网页、写文档当然没有问题，但只要进入持续编译、视频导出、本地推理、科学计算这类长负载，机身温度就会逐渐上升。系统为了把温度和整机功耗控制在安全范围内，会动态调整频率、电压和调度策略。于是用户能感受到一种很典型的现象：任务刚开始很快，几分钟后速度开始波动，停下来以后又逐渐恢复。
+浏览网页、写文档时不明显，长时间编译、导出视频、本地推理和科学计算时，温度则会逐渐上升。系统调整频率、电压与调度来控制温度、功耗，任务速度可能从开始的快，变成几分钟后的波动，停下后再恢复。
 
-这种行为本身并不奇怪，困难在于我很难准确描述它：
+我想知道这些变化具体发生在什么时候：
 
 - 第几分钟开始降频？
 - 降频前后的频率和功耗分别是多少？
@@ -45,13 +45,13 @@ Silemetry 是一个面向 Apple Silicon 的原生 macOS 遥测与持续负载测
 - 机身冷却后，性能恢复需要多久？
 - 两次测试之间的差异究竟来自散热条件，还是来自供电、低电量模式和后台进程？
 
-只凭体感和一个最终分数，回答不了这些问题。
+一个最终分数和“感觉慢了”，都不足以核对。
 
 ## 1.2 跑分不能回答什么
 
-常见跑分工具更擅长回答“这台机器最快能跑多快”。Geekbench 偏短时峰值，Cinebench 循环测试能看到一定的性能衰减，但仍然很难把温度、功耗、频率和时间完整对齐。
+Geekbench 更偏短时峰值，Cinebench 循环能观察部分衰减。要把温度、功耗、频率按同一条时间轴对起来，仍需要另外记录。
 
-我真正想看的不是一个孤立的分数，而是一个过程：
+我想保存下面这段过程：
 
 ```text
 空闲状态 → 开始负载 → 温度爬升 → 功耗稳定 → 频率变化 → 停止负载 → 冷却恢复
@@ -59,23 +59,23 @@ Silemetry 是一个面向 Apple Silicon 的原生 macOS 遥测与持续负载测
 
 如果第 6 分钟频率下降，我希望同时知道那一刻温度是多少、CPU/GPU 功耗是否发生变化、系统是否切换了 Thermal State；如果更换环境或散热条件，我还希望把两轮测试放在一起比较。
 
-这也是 Silemetry 和普通跑分工具最大的区别：它首先是一个**测量工具**，其次才是压力测试工具。
+所以先做好测量，再考虑怎样产生压力。
 
 ## 1.3 我真正想测量的：芯片能持续维持什么性能
 
-峰值性能通常很好测，持续性能更难。持续性能不是单个硬件指标，而是芯片、封装、机身散热、系统调度、供电状态和软件负载共同作用的结果。
+持续性能由芯片、封装、机身散热、调度、供电与负载共同决定，不能用一个硬件参数代替。
 
-要回答“这颗芯片能持续维持什么状态”，至少需要三个能力：
+要记录这个过程，需要连续采样、可重复负载和完整保存。
 
 1. **连续采样**：温度、功耗、频率和利用率需要按时间记录；
 2. **稳定负载**：必须有可控、可重复的 CPU/GPU 工作负载；
 3. **完整保存**：测试结束后能够回看、导出和比较，而不是只显示一个瞬时数字。
 
-前两个能力让测试能够发生，第三个能力决定测试有没有意义。没有历史记录，就无法比较不同系统版本、不同室温、不同供电模式，也无法验证一次优化究竟有没有效果。
+保存下来以后，才能比较系统版本、室温、供电和优化前后的差别。
 
 ## 1.4 项目边界：原生、轻量、不关闭 SIP、不安装内核扩展
 
-立项时我给项目设了几条很明确的边界：
+立项时定下的范围如下。
 
 - **原生应用**：使用 SwiftUI 和 macOS 原生框架，不使用 Electron 套壳；
 - **开箱即用**：拖入 Applications 即可，不依赖 Homebrew、Python 或外部服务；
@@ -83,23 +83,23 @@ Silemetry 是一个面向 Apple Silicon 的原生 macOS 遥测与持续负载测
 - **不关闭 SIP**：不修改系统安全策略；
 - **不安装内核扩展**：所有采样和负载都在用户态完成。
 
-这些边界直接影响了后面的实现。比如，CPU 核心目标不能依赖受限的硬绑定机制，只能通过 QoS 给调度器表达倾向；遥测也不能每秒拉起一个需要 root 的 `powermetrics` 进程，而要把采样能力嵌入应用内部。
+这些条件限制了实现：核心目标只能用 QoS 表达倾向，不能依赖受限硬绑定；遥测也要嵌进进程，不能不断启动需 root 的 `powermetrics`。
 
-需要说明的是，Silemetry 的底层遥测依赖 IOReport 相关能力。它可以在用户态工作，但并不是 Apple 面向普通第三方应用长期承诺稳定的公开高层 API。因此，“无需 root”不等于“接口永远不会变化”，跨系统版本兼容性始终是项目必须面对的风险。
+底层使用 IOReport 相关能力，虽然可在用户态运行，却不是 Apple 向普通第三方长期承诺稳定的公开高层 API。无需 root 解决的是权限，系统版本兼容仍要验证。
 
 ## 1.5 从 ThermalBench 到 Silemetry
 
-项目最早叫 ThermalBench，这个名字很直接：一个散热测试台。随着功能逐渐扩展，它已经不只是“跑一次压力测试”，而是开始承担设备识别、遥测记录、外部负载监控、历史管理和结果比较。
+最早叫 ThermalBench，后来增加设备识别、遥测、外部负载监控、历史与比较，名称已经装不下这些功能。
 
 于是我把公开名称改成了 Silemetry：`Silicon + Telemetry`。
 
-新的名字更接近项目真正做的事——观察 silicon 在真实时间尺度上的行为。工程目录和部分内部类型仍然保留 `ThermalBench`，因为内部命名不影响用户体验，也没有必要为了品牌重命名制造大范围无意义 diff。
+Silemetry 更接近观察芯片持续行为的目标。工程目录和部分类型仍用 `ThermalBench`，内部名称不影响使用，我没有为此大范围重命名。
 
 # 2. 一款 Swift、Rust、C 和 Metal 混合应用
 
 ## 2.1 整体架构
 
-Silemetry 同时使用 Swift、Rust、C 和 Metal。并不是为了堆技术栈，而是每种语言各自解决最合适的问题：
+Swift、Rust、C 和 Metal 在应用中分别负责以下部分：
 
 <div style="margin:1.8rem 0;padding:1rem 1.1rem;background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:14px">
 <svg viewBox="0 0 900 640" role="img" aria-label="Silemetry 四语言架构分层"><text x="30" y="40" font-size="11" fill="#7b8b99" letter-spacing="2" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">SILEMETRY · LAYERED ARCHITECTURE</text><text x="30" y="64" font-size="11" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">不是堆技术栈，而是把 UI、状态机、采样、负载和存储的责任边界划清</text><polygon points="475.26,725 665.78,615 94.22000000000003,505 284.74,395" fill="#7aa6c6" stroke="rgba(255,255,255,.35)"/><polygon points="665.78,615 475.26,725 475.26,747 665.78,637" fill="#2b5578"/><polygon points="475.26,725 284.74,395 284.74,417 475.26,747" fill="#3f6f96"/><polygon points="94.22000000000003,505 284.74,395 284.74,417 94.22000000000003,527" fill="#3f6f96" opacity=".55"/><rect x="650" y="552" width="10" height="10" rx="2" fill="#3f6f96"/><text x="668" y="561" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">SwiftUI Views</text><text x="668" y="576" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">页面 · 路由 · 状态绑定</text><polygon points="483.92,670 691.76,550 68.24000000000001,430 276.08,310" fill="#bcd6e4" stroke="rgba(255,255,255,.35)"/><polygon points="691.76,550 483.92,670 483.92,692 691.76,572" fill="#6e8fa3"/><polygon points="483.92,670 276.08,310 276.08,332 483.92,692" fill="#8fb0c4"/><polygon points="68.24000000000001,430 276.08,310 276.08,332 68.24000000000001,452" fill="#8fb0c4" opacity=".55"/><rect x="650" y="482" width="10" height="10" rx="2" fill="#8fb0c4"/><text x="668" y="491" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">TestCoordinator</text><text x="668" y="506" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">@MainActor 状态机</text><polygon points="492.58,615 717.74,485 42.25999999999999,355 267.42,225" fill="#78b7ae" stroke="rgba(255,255,255,.35)"/><polygon points="717.74,485 492.58,615 492.58,637 717.74,507" fill="#1f5f5b"/><polygon points="492.58,615 267.42,225 267.42,247 492.58,637" fill="#2f7f7a"/><polygon points="42.25999999999999,355 267.42,225 267.42,247 42.25999999999999,377" fill="#2f7f7a" opacity=".55"/><rect x="650" y="412" width="10" height="10" rx="2" fill="#2f7f7a"/><text x="668" y="421" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">Services / Workloads</text><text x="668" y="436" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">Telemetry · CPU · GPU 管理</text><polygon points="501.24,560 743.72,420 16.28000000000003,280 258.76,140" fill="#d2ad72" stroke="rgba(255,255,255,.35)"/><polygon points="743.72,420 501.24,560 501.24,582 743.72,442" fill="#77551f"/><polygon points="501.24,560 258.76,140 258.76,162 501.24,582" fill="#9a7434"/><polygon points="16.28000000000003,280 258.76,140 258.76,162 16.28000000000003,302" fill="#9a7434" opacity=".55"/><rect x="650" y="342" width="10" height="10" rx="2" fill="#9a7434"/><text x="668" y="351" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">Rust / C / Metal</text><text x="668" y="366" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">采样 · 线程 · 计算</text><polygon points="509.9,505 769.7,355 -9.699999999999989,205 250.1,55" fill="#8fa7b6" stroke="rgba(255,255,255,.35)"/><polygon points="769.7,355 509.9,505 509.9,527 769.7,377" fill="#455c6c"/><polygon points="509.9,505 250.1,55 250.1,77 509.9,527" fill="#5c7383"/><polygon points="-9.699999999999989,205 250.1,55 250.1,77 -9.699999999999989,227" fill="#5c7383" opacity=".55"/><rect x="650" y="272" width="10" height="10" rx="2" fill="#5c7383"/><text x="668" y="281" font-size="12" fill="currentColor" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">JSONL / SwiftData</text><text x="668" y="296" font-size="9.5" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">原始样本 · 摘要索引</text><text x="30" y="616" font-size="10" fill="#7b8b99" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">跨语言边界统一走 C ABI；Rust 静态链接进 App，不启动外部进程。</text></svg>
@@ -107,7 +107,7 @@ Silemetry 同时使用 Swift、Rust、C 和 Metal。并不是为了堆技术栈�
 </div>
 
 {% note info %}
-这种拆分的核心不是“多语言”，而是把 UI、状态机、采样、负载和存储之间的责任边界划清。跨语言边界统一通过 C ABI 连接，避免 Swift 直接依赖 Rust 内部类型。
+UI、状态机、采样、负载和存储各管自己的生命周期。跨语言统一走 C ABI，Swift 不依赖 Rust 的内部类型。
 {% endnote %}
 
 ![](silemetry-swiftui.png)
@@ -125,7 +125,7 @@ SwiftUI 负责应用外观、页面路由和状态展示。界面主要由几类
 
 全局导航和上下文由 `AppModel` 管理，测试运行状态由 `TestCoordinator` 统一发布。SwiftUI View 不直接控制 CPU/GPU worker，也不直接触碰 FFI handle，只根据状态更新界面并提交用户意图。
 
-这条边界后面非常重要：如果 View 自己持有底层资源，窗口切换、页面销毁和任务取消都会让生命周期变得不可控。
+View 如果持有 worker 或 FFI handle，切页面、销毁窗口、取消任务就都可能介入资源生命周期，因此这些资源留在服务层。
 
 ## 2.3 TestCoordinator：测试调度与状态机
 
@@ -150,7 +150,7 @@ final class TestCoordinator {
 }
 ```
 
-状态机的价值不是让代码“看起来正规”，而是避免隐式状态组合。例如，“测试已经取消但 GPU 仍在跑”“记录已经保存但页面还认为测试进行中”，都属于没有明确状态所有权时很容易出现的问题。
+显式状态能限制错误组合。例如测试已取消却仍跑 GPU，记录已保存而页面仍显示运行，都需要明确由谁发布状态、由谁收尾。
 
 ## 2.4 Rust 遥测核心
 
@@ -162,7 +162,7 @@ final class TestCoordinator {
 4. 给每条样本分配递增序列号；
 5. 通过 FFI 向 Swift 提供等待、读取、停止和销毁接口。
 
-Rust 适合做这一层，一方面是因为 macmon 已经提供了 IOReport 通道枚举和指标聚合能力，另一方面是因为它能把采样线程、队列和错误处理封装成相对独立的模块。
+macmon 已有 IOReport 通道枚举和聚合能力，Rust 模块再封装采样线程、队列和错误处理。
 
 应用运行时不会启动外部 Rust 进程。Rust 被编译成静态库，直接链接进 macOS App。
 
@@ -172,7 +172,7 @@ CPU 负载由 C 实现。每个 worker 使用 pthread 启动，在循环中执�
 
 每核心利用率也放在 C 层，通过 `host_processor_info` 读取每个逻辑核心的 tick 变化，再计算相邻采样之间的 busy ratio。
 
-这部分不需要复杂抽象。C 的优势就是路径短、运行时开销低，且与 Swift、Rust 都能通过稳定的 C ABI 连接。
+C 层路径短、运行时开销低，也便于通过 C ABI 连接另外两种语言。
 
 ## 2.6 Metal：GPU 计算负载
 
@@ -196,11 +196,11 @@ Application Support/Silemetry/
         └── samples.jsonl
 ```
 
-为什么不把每条样本都放进 SwiftData？因为一次长测试可能产生几千甚至几万条记录，把它们全部建模成数据库实体会增加写入、查询和迁移成本。JSONL 可以流式追加，单行损坏也不至于让整个文件无法读取。
+长测试可能有几千甚至几万条样本，逐条建成数据库实体会增加写入、查询和迁移成本。JSONL 可以流式追加，坏一行也仍能读其余部分。
 
-为什么摘要还要进 SwiftData？因为 History 需要排序、检索、重命名和快速显示。数据库更适合管理“每次测试一条记录”的元数据。
+History 则需要排序、检索、重命名和快速显示，所以把每次测试的元数据和摘要放进 SwiftData。
 
-这套设计的本质是：**文件保存事实，数据库保存索引和摘要。**
+原始样本在文件里，数据库保留索引和摘要。
 
 # 3. 如何测量 Apple Silicon
 
@@ -269,13 +269,13 @@ Silemetry 记录的主要指标包括：
 - **电源状态**：AC、Battery 或 Unknown；
 - **Low Power Mode**：测试期间是否启用及是否发生变化。
 
-最重要的不是字段数量，而是**口径不能混用**。平均温度适合展示整体趋势，Hottest 适合计算峰值；测试持续时间和样本跨度也必须分别保存。
+平均温度看趋势，Hottest 算峰值；测试总时长与样本跨度也分别记录。字段再多，这几种口径都不能混。
 
 ## 3.5 Average 与 Hottest Sensor
 
-芯片内部有多个温度传感器。使用 Average 可以让曲线更平滑，使用 Hottest 才能准确回答“测试中最高到过多少度”。
+多个传感器可以聚合出平滑的 Average，峰值则要从每次采样的 Hottest 继续取。
 
-早期版本在摘要中错误地用 Average 计算峰值，结果看起来合理，却系统性低估最高温度。这个 Bug 很危险，因为它不会崩溃，也不会产生明显异常，只会给出“稍微不准确”的答案。
+早期摘要错用 Average 算峰值，系统性低估了最高温度。它不崩溃，结果也看似合理，比明显报错更难发现。
 
 最终实现把两种口径完全分开：
 
@@ -315,7 +315,7 @@ Swift 根据 bit 决定字段是 `Double` 还是 `nil`。这条规则贯穿整�
 底层不可用 → Optional 为 nil → 摘要不参与统计 → UI 显示 Not available
 ```
 
-不再使用 0 伪装缺失数据。
+缺失保留为缺失，不用 0 补齐。
 
 ## 3.7 不同 Apple Silicon 设备的兼容性
 
@@ -331,7 +331,7 @@ Silemetry 不把设备写死成 M4，也不假设所有芯片都有固定的 P/E
 - `MTLCreateSystemDefaultDevice()`：Metal 设备；
 - `ProcessInfo.operatingSystemVersion`：系统版本。
 
-如果 P/E 拓扑读取失败，代码把类型标为 Unknown，而不是武断地把一半核心当作 E、一半当作 P。GPU 核心数没有可靠接口时也保持为空，不猜一个看似漂亮的数字。
+拓扑读取失败，就标 Unknown；GPU 核心数没有可靠接口，就留空。把一半核心猜成 P、一半猜成 E，只会制造错误的确定值。
 
 每次测试开始时，设备信息会被快照到 RunRecord。这样即使把数据库迁移到另一台 Mac，历史记录仍然描述测试发生时的设备，而不是当前设备。
 
@@ -372,7 +372,7 @@ Apple Silicon 是异构核心架构。P 核追求性能，E 核追求能效，�
 - Performance Cores；
 - Efficiency Cores。
 
-需要强调的是，这里的“选择”是对调度器表达意图，而不是绝对绑核。
+这项选择通过调度倾向实现，并不保证绝对绑核。
 
 ## 4.3 为什么不能硬编码 P/E 拓扑
 
@@ -380,7 +380,7 @@ Apple Silicon 是异构核心架构。P 核追求性能，E 核追求能效，�
 
 核心拓扑由 `sysctl` 动态读取，UI 标签也从设备快照生成。如果系统无法提供可靠拓扑，核心只保留逻辑编号和 Unknown 类型。
 
-这种处理看起来没有“猜一个结果”那么漂亮，但对于测量工具来说，不确定就应该明确保留不确定。
+这里宁可显示未知，也不能把猜测混进设备记录。
 
 ## 4.4 QoS 与线程调度
 
@@ -400,7 +400,7 @@ case CPU_CORE_TYPE_EFFICIENCY:
 QoS 是调度提示，不是硬绑定。系统仍然可以根据热状态、前台任务和整体负载迁移线程。因此结果页描述的是 P/E preference，而不是绝对核心隔离。
 {% endnote %}
 
-这也是为什么 Silemetry 同时记录每核心利用率：用户可以从实际利用情况判断调度是否大体符合预期。
+每核心利用率也会同时记录，方便事后看调度是否大体符合预期。
 
 ## 4.5 Metal Compute GPU Workload
 
@@ -435,7 +435,7 @@ GPU 强度分两档：
 - **Moderate**：较轻的 kernel，并在提交之间保留间隔；
 - **Maximum**：更高迭代次数，连续提交，尽量保持 GPU 饱和。
 
-这两档不是精确的“30% 和 100% 功率限制器”，而是两种不同的 duty cycle。实际占用会随芯片、系统版本和后台图形任务变化，所以 UI 描述为负载强度，而不是承诺绝对百分比。
+两档改变的是 duty cycle，不是精确的 30% 或 100% 功率上限。芯片、系统和后台图形任务都会改变实际占用，界面只称为负载强度。
 
 ## 4.7 CPU Only、GPU Only 与 Combined Test
 
@@ -485,7 +485,7 @@ Monitor Only 不启动内部 CPU/GPU worker，只负责连续采样。它适合�
 
 阶段时长来自 `TestConfiguration`。进 Loading 前启动 workload，进入 Transition 时停止 workload，采样本身持续贯穿全部阶段。
 
-这种分段让一条曲线不只是“温度随时间变化”，而是能明确回答每一段变化发生在什么上下文里。
+阶段标签让曲线的变化有了上下文：当时在空闲、加负载，还是停止后冷却。
 
 ## 5.2 正常完成、Stop and Save 与 Discard
 
@@ -497,7 +497,7 @@ Monitor Only 不启动内部 CPU/GPU worker，只负责连续采样。它适合�
 
 UI 按钮不会直接创建 RunRecord，也不会直接删除文件。它们只提出终止请求，真正的清理、刷盘和状态切换由主测试任务完成。
 
-这条规则解决了后来最棘手的一类 Bug：双终态。
+让按钮只提交意图，是为了避免两个路径各自结束一次测试。
 
 ## 5.3 为什么只能有一个 finalization owner
 
@@ -533,7 +533,7 @@ case nil:
 
 Stop、Discard 和 fatal failure 只设置 `finishReason`。一旦已经有终止原因，后来的请求不会覆盖它。
 
-这不是某个 API 的技巧，而是一条普遍适用的状态机原则：**终结动作必须有唯一所有者。**
+收尾只由主任务执行，其余路径提交原因，不再各自创建终态。
 
 ## 5.4 测试开始时间、总时长和样本跨度
 
@@ -578,7 +578,7 @@ lowPowerModeChanged
 4. 基于 accumulator 生成 partial summary；
 5. 让用户选择保存部分记录或丢弃。
 
-失败并不等于所有数据都无价值，但必须明确标记“这不是完整测试”。
+已采到的部分仍可保留，但必须明确标为不完整。
 
 # 6. 数据采到之后，怎样保证它可信
 
@@ -597,13 +597,11 @@ Silemetry 有两个主要数据模型：
 采样 → 有效性判断 → 流式统计 → JSONL → RunRecord → History → Compare
 ```
 
-任何一层都不能把“未知”偷偷变成“0”，也不能把“部分数据”升级成“完整数据”。
+数据经过每一层时，都保留未知与部分完成的状态。
 
 ## 6.2 缺失数据不是零
 
-这可能是整个项目最重要的数据原则。
-
-传感器未提供 GPU 温度时，`gpuTemp` 必须是 `nil`。如果写成 0：
+传感器没有提供 GPU 温度，`gpuTemp` 就应为 `nil`。填 0 会影响整条统计链：
 
 - 平均值会被拉低；
 - 峰值逻辑可能错误；
@@ -611,7 +609,7 @@ Silemetry 有两个主要数据模型：
 - UI 会显示一个看似真实的 0°C；
 - Compare 会把两个不存在的值当作相同。
 
-所以从 Rust mask、Swift Optional、RunAccumulator 到 RunRecord，缺失值一直保持 Optional。UI 最终显示 `Not available` 或 `—`，而不是制造数字。
+因此 Rust mask、Swift Optional、RunAccumulator 到 RunRecord 都保留缺失语义，最终显示 `Not available` 或 `—`。
 
 ## 6.3 流式 RunAccumulator
 
@@ -647,9 +645,9 @@ struct RunAccumulator {
 - 0.5 秒采样：约 1 小时；
 - 2 秒采样：约 4 小时。
 
-早期版本在测试结束时直接分析 `samples` 数组。测试一旦超过缓冲范围，最早的数据就会被移除。于是可能出现一种非常隐蔽的错误：JSONL 文件里仍有最早的高温峰值，但 Summary 和 Compare 已经看不到它。
+早期直接用结束时的 `samples` 分析摘要，超出环形缓冲的旧样本已经被淘汰。于是 JSONL 还保留早期高温，Summary 和 Compare 却把它漏掉了。
 
-流式 accumulator 把“UI 显示缓存”和“统计事实”彻底分开：
+现在实时显示和完整统计各走一条路径：
 
 ```text
 环形缓冲 → 只服务实时 UI
@@ -687,7 +685,7 @@ struct ArchiveLoadResult {
 
 运行时会把存储的状态与磁盘实际情况交叉校验。即使数据库里写着 Complete，只要文件后来被删掉或损坏，UI 也会降级成 Partial/Unavailable。
 
-这保证了同一页面不会出现“顶部 Highly Comparable，下面却说原始文件损坏”的矛盾结论。
+这样页面不会一边说 Highly Comparable，一边又说原始文件损坏。
 
 ## 6.7 文件和数据库的一致性
 
@@ -705,7 +703,7 @@ struct ArchiveLoadResult {
 
 ## 6.8 History 与 Compare
 
-History 负责管理测试记录，支持打开、重命名和删除。Results 主要回答“这一轮发生了什么”，Compare 则回答“这两轮能不能比较，以及差异是否有意义”。
+History 管打开、重命名与删除；Results 展示一轮过程；Compare 先判断两轮能不能比，再展示差别。
 
 Compare 页面分成三层：
 
@@ -736,11 +734,11 @@ Compare 页面分成三层：
 - `Comparable with Warnings` / 可以看，但必须注意差异；
 - `Invalid` / 不应该生成误导性差值。
 
-对测量工具来说，拒绝比较有时比给出一个漂亮百分比更诚实。
+条件不够时，少给一个百分比比硬比更有用。
 
 # 7. 开发中最值得记录的 Bug
 
-这一章是整篇文章最想保留的部分。每个问题都不是“少写一个分号”，而是典型的软件工程边界错误：它们可能只在快速停止、长时间运行、磁盘异常或旧 SDK 编译时出现。
+这些 Bug 大多出在快速停止、长期运行、磁盘异常或旧 SDK 编译时。正常启动并跑完一轮，并不能覆盖它们。
 
 ## 7.1 Metal 输出缓冲区越界
 
@@ -754,7 +752,7 @@ output[id] = c;
 
 当 `id` 大于 15 时就是越界写。
 
-**为什么难发现**：Swift 侧的对象创建和 command submission 都能成功，错误发生在 GPU 执行阶段。没有开启验证时，表现不一定是稳定崩溃，也可能只是偶发 command buffer error。
+Swift 创建对象和提交命令都能成功，越界到 GPU 执行阶段才发生。没开验证时，还可能只表现为偶发 command buffer error，未必稳定崩溃。
 
 **最终修复**：输出 buffer 大小严格由 dispatch element count 派生，并检查 command buffer 状态：
 
@@ -765,7 +763,7 @@ let bufferSize = elementCount * MemoryLayout<SIMD4<Float>>.stride
 
 同时把 grid size 收敛到单一常量，避免 Swift 与 shader 两边各自硬编码。
 
-**教训**：CPU 与 GPU 之间共享的尺寸、步长和布局就是 ABI。只要有两处独立常量，就迟早会不一致。
+buffer 和 dispatch 数量必须共用一份尺寸来源。两边各写一个常量，会留下不一致的机会。
 
 ## 7.2 GPU Stop / Start 竞争
 
@@ -773,11 +771,11 @@ let bufferSize = elementCount * MemoryLayout<SIMD4<Float>>.stride
 
 **根因**：`stop()` 很快把 `isRunning` 改成 false，但旧 dispatch loop 仍在等待最后一个 command buffer 完成。新的 `start()` 看到 false 后重新启动，并把共享 stop flag 重置。
 
-**最初修复为什么不够**：加锁只能保护 Bool 的读写，不能保证异步循环已经退出。`DispatchWorkItem.cancel()` 也不会自动终止正在执行的代码，循环必须主动检查取消条件。
+锁只保证 Bool 读写，不能证明旧循环退出；`DispatchWorkItem.cancel()` 也要循环主动检查才生效。
 
 **最终修复**：使用 generation token 和串行状态队列。每次 start 获取一个 generation，循环在每轮提交前验证自己仍然是当前 generation；stop 让旧 generation 失效，并等待 loop 确认退出。
 
-**教训**：异步资源的“停止”不是修改一个标志，而是完成一次生命周期交接。
+Stop 要等异步循环确认退出，不能在改完标志后就把同一资源交给下一轮。
 
 ## 7.3 Stop、Cancel 和 Discard 的双终态
 
@@ -787,7 +785,7 @@ let bufferSize = elementCount * MemoryLayout<SIMD4<Float>>.stride
 
 **最终修复**：按钮只提交意图，主任务统一消费 `finishReason`，所有 workload cleanup、telemetry stop、archive flush 和 RunRecord 构造只执行一次。
 
-**教训**：状态机最危险的不是状态太少，而是多个执行路径都认为自己有权进入终态。
+两个入口都能收尾，才产生了终态覆盖。最后把清理和记录生成收归主任务。
 
 ## 7.4 遥测读取期间销毁 FFI Handle
 
@@ -803,7 +801,7 @@ private let queue = DispatchQueue(
 )
 ```
 
-**教训**：actor 保护 Swift 状态，不自动保护跨 `await` 的外部资源生命周期。FFI handle 必须有自己的串行化规则。
+actor 挂起时可重入，保护不了外部裸指针跨 `await` 的使用期。FFI 生命周期需要自己的串行队列。
 
 ## 7.5 第一条 Rust 样本被跳过
 
@@ -819,7 +817,7 @@ sample.sequence_id > after_sequence_id
 
 **最终修复**：Rust 序列号从 1 开始，Swift 保持 `lastSeq = 0`。并增加测试锁定两端初始化约定。
 
-**教训**：跨语言协议最容易出错的往往不是复杂算法，而是“第一条从几开始”这种默认假设。
+这次错误来自两端对第一条序列号的不同约定，初始化也需要作为协议测试。
 
 ## 7.6 `Sendable`、裸指针与 `@unchecked Sendable`
 
@@ -848,7 +846,7 @@ final class TelemetryHandleBox: @unchecked Sendable {
 
 这里使用 `@unchecked Sendable` 的安全前提非常具体：所有 FFI 访问都在同一个串行队列，stop/destroy 不会与 wait 并发。
 
-**教训**：`@unchecked Sendable` 不是关闭警告的开关，而是开发者对并发不变式签下的承诺书。
+`@unchecked Sendable` 依赖这里明确的队列约束。只加标注消除警告，并不能保证指针访问安全。
 
 ## 7.7 SwiftData 保存失败后的幽灵记录
 
@@ -864,7 +862,7 @@ final class TelemetryHandleBox: @unchecked Sendable {
 - 重命名失败恢复旧值；
 - 任何数据库错误都向用户可见，不再 `try?` 静默吞掉。
 
-**教训**：数据库事务失败后，“什么也不做”并不等于回到操作前状态。
+保存失败后必须处理 pending 状态，不操作并不等于回到了插入之前。
 
 ## 7.8 JSONL 写盘失败导致摘要与曲线不一致
 
@@ -881,7 +879,7 @@ final class TelemetryHandleBox: @unchecked Sendable {
 - Results 和 Compare 读取磁盘后再次核验；
 - 用户能看到“摘要完整但原始曲线不完整”的明确提示。
 
-**教训**：数据系统不能只问“有没有算出结果”，还要问“这个结果能否被原始数据复核”。
+摘要完整不代表归档完整。两种状态必须分别记录，用户才能判断能否用原始数据复核。
 
 # 8. 从能运行到可以发布
 
@@ -917,7 +915,7 @@ macOS 应用不能假设用户始终最大化窗口。开发中出现过状态�
 - 指标区使用 adaptive grid；
 - 异步文件加载显示 `ProgressView`。
 
-这些改动没有算法含量，但决定了应用是否像一个真正的 macOS 工具，而不是一张只能在开发机固定尺寸下工作的 Demo。
+这些改动处理小窗口里实际出现的遮挡、折行和挤压，避免界面只能在开发时的固定尺寸下使用。
 
 ## 8.4 Swift、Rust、C、Metal 混合构建
 
@@ -948,7 +946,7 @@ macOS 应用不能假设用户始终最大化窗口。开发中出现过状态�
 
 最后一轮修复把测试套件整体放到 `@MainActor`，让 `RunRecord` 不再跨隔离边界；Telemetry handle 改为捕获 Sendable wrapper；CI 同款编译参数下 Swift warning 清零。
 
-这段经历让我重新认识 CI：它不是代码上传后的仪式，而是项目明确支持的最低工具链。
+CI 的工具链也是项目承诺支持的环境。本地能编译，不能替代在那套最低工具链上检查。
 
 ## 8.6 Swift 5 与 Swift 6 严格并发检查
 
@@ -962,7 +960,7 @@ macOS 应用不能假设用户始终最大化窗口。开发中出现过状态�
 - 资源清理不依赖 actor “看起来是串行的”；
 - 在 CI 中把 concurrency warning 当作未来 error 处理。
 
-最终本地和 CI 的 Swift 编译警告都清零。这个工作短期没有新功能，却大幅降低了未来迁移 Swift 6 的成本。
+本地和 CI 最终都清零 Swift 编译警告。虽然没增加功能，但后续迁移 Swift 6 时可以少处理一批已知并发问题。
 
 ## 8.7 70 项测试与 GitHub Actions
 
@@ -1003,7 +1001,7 @@ DMG 是标准拖拽安装布局，ZIP 方便直接解压，SHA256 用于校验�
 - 两条有效记录 Compare；
 - 删除记录并确认样本目录同步清理。
 
-只有最终分发包通过验收，才创建 tag 和 GitHub Release。构建成功不等于发布成功，CI 绿色也不能替代真实 Apple Silicon 传感器验证。
+最终 DMG 的验收通过以后才创建 tag 和 Release。构建、CI 与真实传感器、安装包验证各检查不同环节，不能彼此代替。
 
 # 9. 回头看这段开发经历
 
@@ -1011,9 +1009,9 @@ DMG 是标准拖拽安装布局，ZIP 方便直接解压，SHA256 用于校验�
 
 开发前半段主要在加功能：动态设备、GPU workload、自定义测试、History、Compare。后半段几乎都在修数据可信度和异常路径。
 
-这其实是一个很明显的分水岭：功能让应用“能用”，可信度决定应用“值不值得用”。对于普通工具，一个偶发错误可能只是体验问题；对于 benchmark 和 telemetry 工具，一个安静地算错峰值的 Bug 会直接误导用户判断。
+后期最不能接受的是测量悄悄出错。多一个页面容易看见，峰值少算了却可能一直误导使用者。
 
-所以后期我逐渐把优先级从“再加一个页面”改成：
+于是后半段优先查这些问题：
 
 ```text
 采集是否真实 → 缺失是否诚实 → 存储是否完整 → 比较是否有条件 → 错误是否可见
@@ -1021,9 +1019,9 @@ DMG 是标准拖拽安装布局，ZIP 方便直接解压，SHA256 用于校验�
 
 ## 9.2 为什么异常路径比正常路径更难
 
-正常路径很简单：启动、采样、结束、保存。
+启动、采样、结束、保存，是最先跑通的路径。
 
-真正复杂的是：
+更多修复发生在这些情况：
 
 - Stop 时后台 wait 还没有返回；
 - GPU command buffer 正在执行时又重新 Start；
@@ -1033,11 +1031,11 @@ DMG 是标准拖拽安装布局，ZIP 方便直接解压，SHA256 用于校验�
 - Monitor Only 偶发读取失败，但下一次采样又成功；
 - 两条记录摘要可比，原始曲线却只有一条完整。
 
-异常路径之间还会组合。比如“用户 Stop 的同时写盘失败”，就不再是两个独立问题。最终测试套件中大量用例都围绕这些组合情况，因为它们才是长期运行工具最容易出问题的地方。
+异常还会碰到一起，例如 Stop 时恰好写盘失败。测试因此需要组合这些状态，不能只把每一种错误孤立测一遍。
 
 ## 9.3 Benchmark 工具首先是测量工具
 
-做完 Silemetry 后，我对 benchmark 工具最大的理解是：**测量工具的第一要求是诚实。**
+测量中遇到未知或数据不全，应用要直接呈现出来。
 
 - 没测到就是 `nil`，不是 0；
 - 文件坏了就是 Partial，不是 Complete；
@@ -1045,11 +1043,11 @@ DMG 是标准拖拽安装布局，ZIP 方便直接解压，SHA256 用于校验�
 - QoS 只是调度倾向，就不能写成 P-Core 硬绑定；
 - IOReport 存在兼容性风险，就应该在局限里写清楚。
 
-有时候最专业的结果不是给出更多数字，而是明确告诉用户：这组数字不应该被这样解释。
+数字不满足解释条件时，结果页应该告诉使用者差在哪里。
 
 ## 9.4 跨语言工程的难点往往在边界
 
-Swift、Rust、C 和 Metal 各自内部的代码并没有想象中复杂。最难的问题几乎都出现在边界：
+跨语言里最费时间的，常常是双方默认约定没对齐：
 
 - Rust 与 Swift 对序列号起点的约定；
 - C ABI 结构体的 Optional 语义；
@@ -1058,13 +1056,13 @@ Swift、Rust、C 和 Metal 各自内部的代码并没有想象中复杂。最�
 - actor 生命周期与 FFI handle 生命周期；
 - 数据库对象和文件目录之间的事务关系。
 
-跨语言工程不是简单地把四种代码放在同一个仓库里，而是要为每一条边界约定指定唯一责任方。能通过测试表达的约定，就不要只留在注释里。
+每条边界都要有一方负责定义约定。能用测试固定下来，就别只写在注释里。
 
 ## 9.5 AI Agent 在项目中的作用与局限
 
 Silemetry 的开发大量借助了 AI Agent：从 SwiftUI 页面、Rust FFI、测试补全，到多轮代码审查、CI 排障和发布流程。
 
-它最有价值的地方，不只是生成代码，而是能够围绕同一条数据链路反复审查：
+审查时，Agent 能沿同一条数据链往返追查：
 
 ```text
 采样 → 状态机 → 存储 → Results → History → Compare → 删除
@@ -1079,7 +1077,7 @@ Silemetry 的开发大量借助了 AI Agent：从 SwiftUI 页面、Rust FFI、�
 - 它无法替代真实 Mac 上的传感器和安装包验收；
 - 跨语言约定仍需要人来确认“哪一边才是事实来源”。
 
-AI 能显著加速实现和审查，但项目方向、数据口径和最终责任仍然属于开发者。
+AI 加快了实现与审查，方向、数据口径和最后验收仍由我确认。
 
 ## 9.6 当前局限与后续计划
 
@@ -1102,7 +1100,7 @@ AI 能显著加速实现和审查，但项目方向、数据口径和最终责�
 - 更多不同 Apple Silicon 机型的兼容性验证；
 - 标准 XCTest / SwiftPM 测试集成。
 
-这些工作可以慢慢做。v0.2.1 已经完成了最重要的基础：它不只是能显示数据，而是开始对数据的来源、完整性和可比性负责。
+v0.2.1 先把数据来源、完整性和比较条件做了明确记录，后续再逐项补这些能力。
 
 ## 9.7 项目地址和下载方式
 
@@ -1116,7 +1114,7 @@ AI 能显著加速实现和审查，但项目方向、数据口径和最终责�
 - 仓库内容：源码、测试、构建脚本、发布说明和验收记录
 
 {% note default %}
-最初我只是想看清楚 MacBook Air 在持续负载下到底发生了什么。一周以后，这个问题变成了一个完整的软件工程练习：如何采集、如何制造负载、如何跨语言传递数据、如何面对失败，以及如何保证最后展示给用户的数字值得相信。
+最初想测的是 MacBook Air 长时间负载以后怎样降频。做完一周，我花了很多时间在另一个问题上：数据没读到、文件没写完、任务没停干净时，界面还会不会给出一个貌似完整的结果。
 
-这可能也是 Silemetry 最终留下的价值：它不仅让我看见 silicon 能持续维持什么，也让我重新理解了一个测量工具应该怎样对自己的结果负责。
+后续版本我会继续沿这条线检查，再增加新的测量功能。
 {% endnote %}

@@ -20,12 +20,11 @@ tags:
   - 工程实践
 ---
 
-
 ![](openclaw-reliable-search-20260619-115308.png)
 
 > **Abstract**
 >
-> This article traces the evolution of a reliability layer for web search in AI agents. The work began as an attempt to stabilize OpenClaw's Gemini-backed search, but quickly exposed deeper problems: provider-specific parameters, ambiguous failure states, uncontrolled retries, proxy failures, response-envelope mismatches, tool-policy bypasses, and missing execution records. I first built an OpenClaw runtime gate that governed search calls, classified failures, bounded retries, normalized responses, and wrote auditable JSONL records. The design was then generalized into `reliable-web-search`, a policy-driven multi-provider search runtime with provider priorities, structured errors, real request cancellation, circuit breaking, fallback/race/aggregate strategies, multi-credential routing, a unified CLI, and a stdio MCP server. The central lesson is simple: reliable agent systems are not defined by never failing, but by knowing precisely what failed, what evidence remains usable, what action is permitted next, and when execution must stop.
+> OpenClaw's unstable Gemini-backed search led me to build a runtime gate for parameter checks, failure classification, bounded retries, response normalization, and JSONL records. I then extracted those controls into `reliable-web-search`: a multi-provider runtime with cancellation, circuit breaking, fallback/race/aggregate strategies, credential routing, a CLI, and a stdio MCP server. This post records the failures behind those features, including proxy outages, response-envelope mistakes, and tool-policy bypasses. The runtime reports what failed and what can happen next; it leaves factual judgments to the caller.
 
 > **2026-06-26 更新**
 >
@@ -33,25 +32,21 @@ tags:
 >
 > <a href="https://github.com/leecdiang/reliable-web-search/tree/main" target="_blank" class="glass-pill"><i class="fab fa-github"></i> leecdiang/reliable-web-search</a>
 
-这次改造的起因很简单:OpenClaw 的联网搜索不稳定。
+OpenClaw 的联网搜索时好时坏，是这次改造的起点。
 
-最开始我把它当成普通配置问题--也许 API Key 没填对,也许本地代理偶尔掉线,也许重启一下 Gateway 就恢复了。结果排查下来发现,整条 Tool Calling 链路缺的是**状态语义**。
+我先查 API Key、本地代理和 Gateway，起初以为修配置就够了。后来发现，调用链连失败发生在哪一层都没有说清。
 
-搜索失败时,Agent 知道失败发生在哪一层吗?
+网络没连上、过载、配额、鉴权、解析错误和空结果，可能都只返回“搜索失败”。Agent 还可能把调用失败写成“没有相关资料”。而重试次数、超时后是否取消、Provider 顺序、结果可用性和执行记录，也都缺少统一约定。
 
-网络没连上、Provider 服务过载、配额耗尽、鉴权失败、响应解析错误和真正没有结果,最后可能都被压缩成一句"搜索失败"。Agent 也可能进一步把"调用失败"误解成"网上没有相关资料"。一次请求该重试几次?超时后底层请求还在消耗额度吗?多个 Provider 同时可用时,按什么顺序调用?哪个结果才算真正可用?整个过程能不能回溯?
+要修好搜索，就得把这些状态和下一步动作写进运行时。
 
-这些问题不断冒出来,任务也从"修好搜索"变成了:
-
-> 为 Agent 建立一个受控、可测试、可取消、可审计,并且能够正确失败的搜索运行时。
-
-下面是一条从故障排查、运行时治理到通用搜索基础设施的演化路径。
+请求需要可测试、可取消、可审计，失败以后也要知道是否还有可用证据。
 
 ---
 
-## 1. 搜索失败不是一个状态,而是一组完全不同的故障
+## 1. 先分清请求到底在哪一步失败
 
-OpenClaw 原本已经有 `web_search` 工具,通过 Gemini 获取联网结果。调用链看起来是这样的:
+OpenClaw 已有通过 Gemini 搜索的 `web_search`，调用路径如下：
 
 ```text
 Agent
@@ -60,9 +55,9 @@ Agent
 → 搜索结果
 ```
 
-这条链路藏了一个问题:Agent 看到的是工具调用结果,但故障到底发生在哪个层级,它不知道。
+Agent 能看到返回，却未必能从返回中定位故障层级。
 
-排查时我遇到过这些状态:
+排查时遇到的状态包括：
 
 ```text
 unsupported_language
@@ -75,11 +70,11 @@ response_parse_failure
 401 authentication failure
 ```
 
-它们不是同一类失败。
+这些状态需要不同处理。
 
 ### 1.1 参数错误、服务过载、网络故障和空结果不是一回事
 
-统一接口容易让人以为所有搜索 Provider 接受同一组参数。实际上 Gemini、Brave、Tavily、SearXNG 这些服务,在语言、国家、时间范围、结果数量和网页索引能力上各有差异。
+Gemini、Brave、Tavily、SearXNG 在语言、国家、时间范围、数量和索引能力上都有差异。统一工具接口不能保证底层接受同一组字段。
 
 早期 OpenClaw 调用中,Gemini 不接受部分通用字段:
 
@@ -90,7 +85,7 @@ country
 ui_lang
 ```
 
-Agent 按统一接口传这些字段,Provider 直接拒绝请求。问题不是网络,也不是"没有结果",是:
+Provider 拒绝的是参数，请求还没走到“有没有结果”这一步：
 
 ```text
 调用参数
@@ -109,9 +104,9 @@ Provider 能力
 | `response_parse_failure` | Provider 有响应,但适配器无法理解 | 记录兼容性错误并 fallback |
 | `no_results` | Provider 成功响应,但没有可用结果 | 不原样重试;可换索引或 Provider |
 
-只有两个条件都满足才算 `no_results`:Provider 成功响应,响应结构正确解析,且没有可用内容。
+只有 Provider 成功响应、结构解析正确，且内容确实不可用，才能归为 `no_results`。
 
-请求没发出去、响应解析不了、Provider 确实返回空结果--这是三种状态。
+没发出去、读不懂响应和返回为空，需要分别记录。
 
 ```text
 不应原样重试同一个 Provider
@@ -119,11 +114,11 @@ Provider 能力
 不应 fallback 到其他 Provider
 ```
 
-某个 Provider 返回空结果,可能只是索引覆盖范围不同、查询理解方式不同或者服务类型不同。可靠搜索不能把"当前 Provider 没找到"解释成"互联网中不存在"。
+某个 Provider 没找到，可能与索引范围、查询理解或服务类型有关，结论只能限定在这次调用。
 
-### 1.2 可靠性的关键是让失败决定下一步,不光是避免它
+### 1.2 给每种失败安排下一步
 
-需要回答的问题就那么几个:
+运行时需要明确这些决定：
 
 ```text
 这次请求发出去了没有?
@@ -136,9 +131,9 @@ Provider 能力
 什么时候必须停止?
 ```
 
-这些没有稳定答案,Agent 就只能自己猜。
+否则 Agent 每遇到一次错误，都得重新猜处理办法。
 
-可靠性设计的核心也变了:
+我把可靠性的要求写成下面这条规则：
 
 ```text
 "让搜索成功"
@@ -148,7 +143,7 @@ Provider 能力
 
 ---
 
-## 2. 先在 OpenClaw 里造一道 Agent 绕不过去的 Runtime Gate
+## 2. 在 OpenClaw 工具层加入 Runtime Gate
 
 最直接的做法,是在 Prompt 或 Skill 中加规则:
 
@@ -158,11 +153,11 @@ Provider 能力
 网络错误不能解释成没有结果。
 ```
 
-这些规则当然有用,但本质上仍然只是行为建议。
+这能引导行为，却不能限制实际调用能力。
 
-模型可能遵守,也可能随着上下文增长、工具变多、任务变复杂,把规则搁在一边。更关键的是,Prompt 管不住 Agent 绕过新流程。如果 Runtime 同时暴露 `web_search` 和 `reliable_web_search`,Skill 写着"优先用后者",模型仍然可能直接调用原始工具。
+上下文变长、工具变多时，模型可能忘记规则。若同时暴露 `web_search` 和 `reliable_web_search`，要求“优先后者”也拦不住它调用原始入口。
 
-所以关键不在继续扩写 Prompt,而是在工具层建立一道 Gate:
+所以需要在工具层统一入口：
 
 ```text
 Agent
@@ -176,17 +171,17 @@ Agent
 → 审计记录
 ```
 
-同时在权限层封死原始入口:
+再通过权限关闭原始路径：
 
 ```text
 web_search = denied
 ```
 
-可靠性不能依赖模型"记得遵守规则"。应该让未经治理的路径根本不存在。
+这样，即使模型选错工具，也不能绕过治理。
 
 ### 2.1 先建立隔离的 Test Agent
 
-我没有直接修改 Main Agent 或 Code Lab,而是单独建立了一个临时 `test` Agent,验证三件事:
+我先单独建立临时 `test` Agent，没有直接改 Main Agent 和 Code Lab，检查以下三件事：
 
 1. 插件是否被 OpenClaw Runtime 正确加载;
 2. 新工具是否真的可调用;
@@ -239,11 +234,9 @@ write = absent
 apply_patch = absent
 ```
 
-我还让 Agent 实际尝试调用 `write`。Runtime 返回"工具未注册",而不是由 Agent 自己说"我不会使用"。
+我还实际请求了 `write`，Runtime 返回“工具未注册”。这比 Agent 自述不会调用，更能证明权限限制生效。
 
-这一步验证了一条很重要的原则:
-
-> Tool Policy 必须是运行时能力边界,不是写在 Prompt 里的行为建议。
+Tool Policy 在这里控制的是运行时能力。
 
 ### 2.2 OpenClaw 原型只治理调用,不重写整套基础设施
 
@@ -272,7 +265,7 @@ api.runtime.webSearch.search({
 - Runtime 返回结构;
 - 基础日志。
 
-如果插件直接对 Gemini 发起 `fetch`,就等于绕过了现有的运行时管理能力。这个 wrapper 只负责搜索调用的治理,而不是复制一套搜索基础设施。
+直接向 Gemini `fetch` 会绕过 OpenClaw 已有管理，所以 wrapper 继续使用宿主 Runtime，只加治理。
 
 原型被拆成几个部分:
 
@@ -309,9 +302,9 @@ src/index.test.ts
 }
 ```
 
-这里刻意没有设计 `usable_for_claim`。
+结果没有加入 `usable_for_claim` 字段。
 
-因为:
+原因如下：
 
 ```text
 retrieval_succeeded
@@ -324,7 +317,7 @@ usable_for_claim
 = 不应由搜索层决定,而应由 Evidence Layer 判断
 ```
 
-搜索层负责取回数据和描述状态,不替 Agent 宣布事实成立。
+搜索层报告拿到了什么和调用状态，证据能否支持事实由后续步骤判断。
 
 ### 2.3 参数治理:统一请求经过 Provider capability check
 
@@ -365,7 +358,7 @@ sanitizeSearchArgs(provider, args)
 }
 ```
 
-这不只是删字段,而是建立一条显式转换链:
+请求经过的转换也要显式记录：
 
 ```text
 用户意图
@@ -374,7 +367,7 @@ sanitizeSearchArgs(provider, args)
 → Provider-specific request
 ```
 
-这个思路后来保留到 `reliable-web-search`。每个 Provider 都有显式 `capabilities`,系统可以判断它属于完整网页搜索、AI Search 还是 Instant Answer,是否支持 freshness,以及最大结果数量。
+独立项目保留了这一步。各 Provider 声明 `capabilities`，包括完整网页、AI Search 或 Instant Answer 类型，是否支持 freshness，以及结果数量上限。
 
 ### 2.4 失败语义、有限重试和停止条件
 
@@ -389,7 +382,7 @@ no_results
 response_parse_failure
 ```
 
-随后明确区分两个经常被混在一起的动作:
+然后把这两个动作分开：
 
 ```text
 retry
@@ -422,7 +415,7 @@ no_results
 → 可以换 Provider
 ```
 
-期间还修复过一个 `attempts` 计算问题,最终明确:
+`attempts` 曾计数出错，修复后按下面口径统计：
 
 ```text
 attempts
@@ -457,11 +450,11 @@ retryIndex
 → 明确停止
 ```
 
-可靠性不是死磕到成功,而是知道什么时候继续、什么时候切换、什么时候结束。
+继续重试、换服务或停止，都由错误类型和预算决定。
 
-### 2.5 最难判断的不是失败,而是失败发生在哪一层
+### 2.5 有正文，却被判成空结果
 
-排查时最容易混淆的是:
+响应封装层曾导致一次误判：
 
 ```text
 网络失败
@@ -493,9 +486,9 @@ rawRecord.content
 rawRecord.result.content
 ```
 
-一个包含正文的成功响应,被误判成 `no_results`。
+wrapper 在错误层级找正文，把有内容的成功响应归成了 `no_results`。
 
-正确做法是先解开 Runtime envelope:
+先解开 Runtime envelope，才能检查内容：
 
 ```ts
 const rawData =
@@ -509,9 +502,9 @@ const rawData =
 
 之后所有内容检测、引用读取和标准化都基于 `rawData`。
 
-教训:响应结构本身也是运行时契约。适配器看不懂响应,就该返回 parse failure,而不是解释成空结果。
+解析失败必须报 parse failure，不能因为适配器读错结构就宣布没有结果。
 
-期间还出过一次事故--用宽泛正则清理调试代码时,顺手删掉了刚修好的 envelope 解包逻辑。之后我给自己加了一条规矩:
+修好后又出过一次问题：宽泛正则清理调试代码，把解包逻辑也删了。此后增加了这条约束：
 
 ```text
 不使用宽泛正则批量改源码;
@@ -547,7 +540,7 @@ fetch failed
 transport_failure
 ```
 
-这解释了为什么同一套代码可能几分钟前成功、几分钟后又失败。
+同样的代码，代理在就成功，进程退出就失败。
 
 最终确认的代理配置是:
 
@@ -564,7 +557,7 @@ DNS 防污染:关闭
 退出时最小化:开启
 ```
 
-最需要区分的是:
+要把代码行为和基础设施状态分开：
 
 ```text
 关闭窗口
@@ -574,9 +567,9 @@ DNS 防污染:关闭
 
 `reliable_web_search` 可以正确识别代理故障,却不能自动恢复一个已经退出的代理服务。
 
-这也是可靠性工程的边界:软件可以描述基础设施失败、隔离影响并选择后续策略,但不能假装依赖永远可靠。
+搜索层可以识别依赖故障、隔离影响和选择下一步，恢复代理服务则是另一件事。
 
-### 2.7 JSONL:让搜索离开不可追踪的对话
+### 2.7 用 JSONL 还原调用过程
 
 原型会把每次搜索追加到:
 
@@ -619,15 +612,15 @@ DNS 防污染:关闭
 }
 ```
 
-过去 Agent 只丢一句"搜索失败",想追问都不知道从哪里下手:调用了哪个 Provider?实际调用了几次?是代理问题、限流还是解析失败?哪些参数被删除?有没有获得可用内容?总耗时多少?
+过去只看到一句失败，无法确定 Provider、次数、参数删减、错误类型、耗时和可用内容。
 
-有了结构化记录,这些问题都有答案。
+这些现在都可以回到结构化记录检查。
 
 日志中刻意不保存 API Key、Authorization Header、完整 Provider 原始响应和完整搜索正文。
 
 不过 query 本身也可能包含姓名、文件路径、项目代号等敏感信息。正式部署时,日志系统仍应支持关闭 query 日志、对 query 脱敏、只保存 query hash、设置日志保留期限。
 
-可审计不意味着无限记录。观测能力同样要服从隐私边界。
+审计只记录排障所需信息，也要受隐私与保留期限限制。
 
 ---
 
@@ -638,7 +631,7 @@ DNS 防污染:关闭
 
 ## 3. 从 OpenClaw 插件到通用搜索运行时
 
-OpenClaw 原型已经解决了当时的问题,但它仍然和本地环境高度绑定:
+原型能解决当时的问题，但仍绑在本地 OpenClaw 环境：
 
 - 依赖 OpenClaw Runtime;
 - Provider 路由写在插件内部;
@@ -646,7 +639,7 @@ OpenClaw 原型已经解决了当时的问题,但它仍然和本地环境高度�
 - 错误类型和返回结构服务于特定 Agent;
 - 其他 Node.js 应用无法直接复用。
 
-真正值得抽取的问题其实是:
+可以抽出的共性如下。
 
 ```text
 如何选择 Provider?
@@ -665,7 +658,7 @@ Provider 连续故障时如何隔离?
 reliable-web-search
 ```
 
-它的定位不再是"OpenClaw 搜索插件",而是应用与多个搜索 API 之间的策略运行时:
+独立项目在应用与多个搜索 API 之间安排调用策略：
 
 ```text
 Application / Agent
@@ -688,7 +681,7 @@ Search Providers
 
 ### 3.1 Provider registry:显式优先级、能力和配置门
 
-第一版按注册顺序排列,结果有时让无需密钥但能力有限的 Provider 排到前面。
+最初按注册顺序选择服务，无密钥但能力有限的 Provider 有时反而排在前面。
 
 现在每个 Provider 都具有:
 
@@ -706,7 +699,7 @@ registry 只加入真实配置完成的 Provider,并按优先级路由。SearXNG
 providers: ["brvae", "tavily"]
 ```
 
-系统会给出接近的拼写建议,而不是静默忽略。
+拼错时给出接近的名字，避免配置被悄悄忽略。
 
 当前内置八个 Provider:
 
@@ -758,11 +751,11 @@ B wins
 → abort C
 ```
 
-这不是简单调用 `Promise.all()`。winner 一旦确认,其他 Provider 的独立 `AbortController` 会立即触发,避免落败请求继续占用连接和额度。
+winner 确认后，会立即触发其他 Provider 的独立 `AbortController`，取消落败请求，避免它们继续占连接、耗额度。仅靠 `Promise.all()` 做不到这一步。
 
 #### `aggregate`
 
-并发调用多个 Provider,并汇总成功结果。当前版本已经完成统一执行和状态诊断,但复杂的 URL canonicalization、跨 Provider 去重、融合排序和域名多样性控制仍属于后续工作。
+aggregate 并发收集成功结果。当前版本完成统一执行与状态诊断，URL canonicalization、跨 Provider 去重、融合排序和域名多样性仍待实现。
 
 ### 3.3 超时现在真的会取消请求
 
@@ -772,7 +765,7 @@ B wins
 Promise.race([providerPromise, timeoutPromise])
 ```
 
-这只会让上层停止等待,底层 `fetch` 仍可能继续运行。
+上层虽然停止等待，底层 `fetch` 却可能还在执行。
 
 当前实现通过 `AbortController` 将 timeout 传入实际请求:
 
@@ -790,7 +783,7 @@ Promise.race([providerPromise, timeoutPromise])
 signal.aborted === true
 ```
 
-这解决了 Agent 系统里很隐蔽的一类成本问题:
+取消需要传到实际请求，否则出现的就是：
 
 > 表面已经超时,后台请求还在继续消耗额度。
 
@@ -819,7 +812,7 @@ no_results
 parse_error
 ```
 
-并决定要不要重试、要不要 fallback、要不要切换凭据、要不要计入熔断器、是否需要等待、最终返回什么状态。
+这些字段决定重试、切凭据、fallback、熔断计数、等待与最终返回状态。
 
 鉴权错误不应该当成瞬态服务故障记入熔断器。网络错误、超时和 5xx 才真正反映 Provider 健康状态。
 
@@ -884,7 +877,7 @@ HTTP 状态
 }
 ```
 
-这样一次搜索不只告诉调用者"最后谁成功了",还还原了整条执行路径。
+因此既能看到最终结果来自谁，也能还原中间试过哪些路径。
 
 缓存命中也会明确返回:
 
@@ -892,9 +885,9 @@ HTTP 状态
 cacheHit: true
 ```
 
-并保持和实时调用一致的主要字段,避免调用者因为结果来自缓存而拿到另一套残缺结构。
+缓存结果保留与实时调用一致的主要字段，调用者不必再适配一套残缺结构。
 
-### 3.6 发布包不只验证源码,而是验证真实安装路径
+### 3.6 从安装包检查实际入口
 
 项目通过 `tsup` 同时输出:
 
@@ -904,7 +897,7 @@ CommonJS
 TypeScript declarations
 ```
 
-发布前不仅执行源码测试,还验证:
+除了源码测试，发布前也检查：
 
 ```text
 ESM import
@@ -924,7 +917,7 @@ v0.4.0 发布前完成:
 0 failures
 ```
 
-这些测试覆盖了真实行为：
+覆盖的行为包括：
 
 - 空结果会继续 fallback；
 - timeout 会真正 abort；
@@ -940,7 +933,7 @@ v0.4.0 发布前完成:
 
 ## 4. v0.4.0:从"多个 Provider"走向"多个凭据、统一 CLI 与 MCP"
 
-到了 v0.4.0，问题从"Provider A 挂了切换 Provider B"变成了更贴近实际使用的场景：
+v0.4.0 又加入一层问题：同一 Provider 内也可能有多个凭据，需要明确它们怎样接替。
 
 ```text
 同一个 Provider 可能有多个合法凭据；
@@ -1006,11 +999,11 @@ tavily.*
 | `unusable_results` | 直接切换 Provider |
 | 用户取消 | 立即停止 |
 
-这里有一个刻意的限制:
+这里默认只做 failover：
 
 > 默认实现 failover,不做 round-robin。
 
-多个凭据的目的是备用、合法的团队 workspace、Key rotation 和故障隔离,不是让系统无条件在不同账号之间轮询消耗额度。
+多个凭据用于备用、团队 workspace、Key rotation 和故障隔离，没有默认做跨账号轮询消耗额度。
 
 ### 4.2 循环式 Setup Wizard
 
@@ -1114,7 +1107,7 @@ doctor --live --all-credentials
 export TAVILY_API_KEY="..."
 ```
 
-系统自动产生一个高优先级路由 `tavily.env`。它有这些特征:不写入 `config.json`,不写入 `credentials.json`,删除环境变量后自动消失,与本地相同 Key 去重,`routes list` 中标记为 `[env]`,不能通过 `credentials remove` 删除。
+系统把它临时生成为高优先级 `tavily.env` 路由，不写 `config.json` 或 `credentials.json`。它会与本地相同 Key 去重，在 `routes list` 标成 `[env]`，不能通过 `credentials remove` 删除；移除环境变量，路由就消失。
 
 CI、服务器和临时开发环境可以直接注入 Key,无需改写本地凭据文件。
 
@@ -1156,7 +1149,7 @@ Agent Host 只需要注册:
 reliable_web_search
 ```
 
-底下配置了多少 Provider、多少凭据、是否发生 fallback,Agent 不需要关心具体接入细节,只需要读取结构化结果。
+Agent 只需调用同一工具、读取结构化结果，Provider、凭据和 fallback 在下面统一管理。
 
 在 OpenClaw 实机验证中,新版 MCP 工具最终返回:
 
@@ -1167,17 +1160,15 @@ status: success
 credentialProfile: default
 ```
 
-这也暴露过一个迁移问题:旧版 OpenClaw 本地插件仍然注册了同名工具,导致模型先调用旧 Gemini 路由,再调用新版 MCP。最终通过禁用旧 `0.1.0` 插件、保留 `rws mcp` 注册,才让 OpenClaw 只剩新版工具。
+迁移时旧 `0.1.0` 插件仍注册同名工具，模型先走旧 Gemini，再调新版 MCP。禁用旧插件、只保留 `rws mcp` 后，调用才统一。
 
-这件事再次证明:
-
-> 工具发现、工具命名和运行时所有权,同样属于可靠性边界。
+因此，工具名和注册所有权也要查，不能只确认新工具本身能运行。
 
 ---
 
-## 5. 这套系统解决了什么,又仍然没有解决什么
+## 5. 当前范围与仍待处理的问题
 
-从原型到 SDK,项目经历了三次明显变化。
+从原型前到通用运行时，行为发生了这些变化。
 
 ### 原型之前
 
@@ -1220,7 +1211,7 @@ Application / Agent
 → CLI / MCP / SDK
 ```
 
-可以将这次演化总结为:
+对照如下：
 
 | 第一阶段 | 当前阶段 |
 | :-- | :-- |
@@ -1235,19 +1226,19 @@ Application / Agent
 | 工具权限治理 | Provider、凭据与 Host 三层治理 |
 | 能搜索吗 | 是否值得继续、切换或停止 |
 
-它仍然没有解决所有搜索问题。
+当前实现仍有缺口。
 
 当前版本还没有跨 Provider URL canonicalization、复杂重复结果融合、相关性重排序、域名多样性控制、round-robin 或健康权重、完整用量统计与成本预算、云端凭据管理、Web UI、通用 telemetry hooks。
 
-这些能力都有价值,但不需要一次性全部实现。更合理的顺序是发布、实际使用、观察真实故障、根据数据决定下一步。
+我想先发布、实际使用，再按观察到的故障决定扩展顺序。
 
-出现重复链接再做融合。多个 Agent 互相污染再引入更强实例隔离。费用失控再加预算治理。真实用户确实需要 GUI 再考虑 Web UI。
+例如重复链接出现后做融合，实例互相污染时加强隔离，费用难控时加预算，确有 GUI 需求再做 Web UI。
 
-可靠系统不等于功能最多的系统,而是承诺过的行为都能被测试证明。
+现阶段先保证已承诺的行为可以被测试检查。
 
-### 最后真正学到的东西
+### 几次“刚修好又坏了”
 
-最消耗精力的不是写代码,是判断问题出在哪一层:
+排障耗时最多的，是分清哪一层出了问题：
 
 ```text
 代码错误?
@@ -1261,15 +1252,11 @@ Runtime 没有加载新构建?
 旧日志和新日志混在一起?
 ```
 
-有几次看起来像"刚修好又坏了"。
+`tail` 曾把旧 `transport_failure` 和新成功记录一起显示，wrapper 曾读错响应层级，关代理窗口时也退出过后台进程。新 MCP 工作正常以后，还碰到了旧插件抢同名工具。看起来都像搜索又坏了，修复位置却不同。
 
-一次是旧的 `transport_failure` 和新成功记录同时出现在 `tail` 里。一次是 wrapper 检查错了对象层级。一次是关代理窗口时顺手退出了后台进程。还有一次,新版 MCP 已经正常工作,但旧 OpenClaw 插件仍在抢占同名工具。
+这些问题需要系统报告具体状态，单凭“成功/失败”两种描述追不下去。
 
-这些经历让我越来越确信:Agent 工程的核心不只是模型能不能完成任务,而是系统能不能准确描述自己当前的状态。
-
-一个可靠的 Agent 不能只有"成功"和"失败"两种答案。
-
-它至少应该知道这些:
+我希望调用结果至少能回答：
 
 ```text
 请求到底发出去了没有?
@@ -1286,17 +1273,13 @@ Runtime 没有加载新构建?
 整个过程是否留下了可追踪记录?
 ```
 
-这些问题都有明确答案,Agent 才开始从一个聊天界面变成一个可被信任的系统。
+这些记录齐全，下一次失败就有位置可查。
 
 ---
 
-## 结语
+## 搜索失败以后，还能做什么
 
-开头只是想修好 OpenClaw 的联网搜索。
-
-过程中绕过了代理、Tool Policy、插件加载、Runtime envelope、Provider 参数、重试循环、fallback、日志路径、Agent 权限、CLI 安装、MCP 注册和旧工具冲突。后来又把这些抽象成 registry、结构化错误、真实取消、race、熔断器、多凭据路由、稳定诊断和统一 Host 接入,最终发布成独立的 `reliable-web-search`。
-
-回头看,真正建起来的不是"永远不会失败的搜索工具":
+从 OpenClaw 插件走到 `reliable-web-search`，参数、权限、代理、响应封装、取消、路由与工具注册逐步进入同一套契约。CLI 和 MCP 则让其他宿主也能使用它。
 
 ```text
 一个 Agent 绕不过去的治理入口
@@ -1307,11 +1290,9 @@ Runtime 没有加载新构建?
 一个可以通过 CLI、MCP 和 SDK 复用的统一接口
 ```
 
-可靠性从来不是消灭失败。
+现在每次失败可以留下类型、边界和证据，再按预算重试、切换或停止。它仍可能拿不到资料，但不会把这件事悄悄写成检索成功。
 
-可靠性是让失败拥有明确的类型、边界、证据和后续动作;让系统知道自己没拿到什么,也知道什么时候不该继续假装成功。
-
-至少现在,某一个 Provider、某一把 Key,甚至某一条网络路径挂掉,都不再意味着整条搜索链路走到终点。
+单个 Provider、Key 或网络路径出故障时，也有机会继续走其他可用路线。
 
 ---
 

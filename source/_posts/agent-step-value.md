@@ -25,19 +25,17 @@ mathjax: true
 <div class="asv-paper-footer"><span>REALM Workshop · EMNLP 2026 · Poster<br>Chengzhan Li · Co-first author</span><a class="glass-pill" href="https://arxiv.org/abs/2607.04419v5" target="_blank" rel="noopener"><i class="fas fa-file-alt" aria-hidden="true"></i> Read on arXiv</a></div>
 </div>
 
-The question behind the paper is fairly simple: if an evaluator says an agent step helped, will it still say that after we change how it sees the step?
+An evaluator calls an agent step helpful. Does that judgment survive a change in how the evaluator sees the same step?
 
-In our frozen PubMed question-answering traces, cross-channel gain signs disagreed on **48.3%** of comparisons. Repeating the scoring within the same channel produced **0.3%** disagreement. The steps had not changed. The measurement channel had.
+In our frozen PubMed question-answering traces, changing the evaluation channel reversed gain signs in **48.3%** of comparisons. Scoring again within the same channel produced **0.3%** disagreement. We held the steps fixed in both comparisons.
 
-The practical concern is what happens when we reuse a step reward. A step labeled helpful under one scoring setup can become harmful under another, even when we replay exactly the same states. This post follows that measurement problem from a small example to the retrieval experiments and a source-restricted follow-up. The workshop recording is at the end.
-
-> **The central finding:** the same frozen steps often receive opposite reward signs across channels. A matched before/after comparison can reveal that sensitivity; retrieval controls can help locate it and test a repair.
+That gap matters if we reuse step rewards for search or training. The same states can receive a helpful label in one setup and a harmful label in another. We tested the gap, traced part of it to retrieval views, and ran a source-restricted follow-up. The workshop recording is included below.
 
 ## 1. What changes when the evaluator changes?
 
-Agents leave traces: a plan, a search call, retrieved evidence, a draft, a revision. A final outcome tells us whether the whole run succeeded. A step reward tries to say something about an intermediate update.
+An agent trace contains plans, search calls, evidence, drafts, and revisions. The final outcome evaluates the run as a whole. A step reward evaluates an update along the way.
 
-That reward can guide search, label training traces, or become a signal for policy optimization. Reusing it introduces a measurement problem. We may replace the judge, add a generated explanation, change the scoring prompt, or average several evaluator configurations. Before treating those scores as interchangeable, we need to know whether they agree on which direction the agent moved.
+We may use that reward to guide search, label traces, or optimize a policy. But replacing the judge, adding a generated explanation, changing a prompt, or averaging configurations can change the measurement. Before reusing the scores, we need to check whether those choices preserve the direction of the gain.
 
 We use *evaluation channel* for the full configuration that produces a score. It includes the prompt, the source rules, any added view, the readout, the evaluator stack, and presentation settings.
 
@@ -51,7 +49,7 @@ We compare three input arrangements:
 | Quote | The state plus a deterministic excerpt of the state |
 | Generated view | The state plus a frozen interpretation produced by an external generator |
 
-The generated view may be useful as a representation. But it can also express apparent support that the retrieved evidence does not contain. Since the state remains in the scorer input, the view introduces no newly observed task variable. It changes how the existing material reaches the evaluator.
+A generated view can make the state easier to interpret. It can also claim support that the retrieved evidence does not contain. The scorer still receives the state, so the view adds no newly observed task variable; it supplies another interpretation of the existing material.
 
 ## 2. ASV: measure the step within one channel
 
@@ -61,7 +59,7 @@ $$
 G^\rho = F_\rho(x^+) - F_\rho(x^-).
 $$
 
-A positive gain means the evaluator assigns more support to the reviewed target after the step. A negative gain means it assigns less. This is evaluator-assigned movement on a frozen trace; it does not establish the step's causal contribution to the actor's success.
+Positive gain means the evaluator assigns more support to the reviewed target after the step; negative gain means less. Both describe movement in an evaluator response on a frozen trace. Neither establishes how much the step causally contributed to the actor succeeding.
 
 <details>
 <summary>How the target margin is computed</summary>
@@ -80,7 +78,7 @@ For intuition, a margin gain of +0.16 multiplies target-versus-rest odds by abou
 
 ## 3. Four scores make a fair comparison
 
-Comparing a before-state score from one evaluator with an after-state score from another sounds tempting. It mixes two changes: the agent's state and the evaluation channel.
+Taking the before score from one channel and the after score from another changes two things at once: the state and the measurement setup. That difference cannot isolate either one.
 
 The matched design scores both endpoints under both channels. The interaction is the difference between the two gains:
 
@@ -92,7 +90,7 @@ $$
 \end{aligned}
 $$
 
-A constant channel offset cancels inside each bracket. A nonzero interaction records a channel response that depends on the state. Without structural restrictions, dropping any of the four scores leaves this interaction unidentified.
+Each bracket cancels a constant channel offset. A nonzero interaction therefore captures a channel response that changes with the state. Without structural restrictions, all four scores are needed to identify it.
 
 The presentation uses this illustrative example:
 
@@ -132,7 +130,7 @@ The first acquisition retained 1,004 transitions with complete scores across the
 
 These disagreements run in both directions. Among the 468 transitions whose disagreement orientation remained stable across all four cross-channel wave pairings, 218 were direct-positive/generated-negative, while 250 were direct-negative/generated-positive.
 
-That distinction matters. The result does not say that generated views make every step look worse, or that direct scoring always assigns the correct reward.
+Neither channel is being treated as the correct judge. Generated views do not push every gain downward: the reversals occur in both directions.
 
 <div style="text-align:center;"><img src="/2026/10/14/agent-step-value/effect-anatomy.jpg" alt="The distribution of gain pairs and interactions helps separate widespread sign disagreement from the direction of the cohort mean. Figure 5 of the paper." style="width:72%;max-width:900px;height:auto;"></div>
 
@@ -147,7 +145,7 @@ Changing the target weights changes the population summary. With equal weight on
 
 ## 5. Retrieval: locate the channel difference
 
-The global result tells us that the channels disagree. To investigate why, we focus on retrieval: the state changes when evidence arrives, while the generated interpretation changes too. Which coordinate accounts for the negative component?
+Retrieval lets us inspect two changes separately: evidence enters the state, and the generated interpretation is updated. We crossed them to ask which coordinate carried the negative component.
 
 We crossed the before and after states with the views generated at each endpoint. This gives a symmetric allocation of the retrieval change to the state coordinate and the view coordinate. On the 91 trajectories complete for that face, the state allocation was +0.224 [-0.029, 0.473], while the generated-view allocation was -0.915. The negative component sat in the view coordinate of this matched comparison.
 
@@ -155,11 +153,11 @@ We crossed the before and after states with the views generated at each endpoint
 
 We then held prompt structure fixed and changed only the view field. Under the shared template with neutral authority, the mean quote gain was +0.903 [0.443, 1.360], and the generated-view gain was -0.403 [-0.712, -0.104]. The generated-minus-quote interaction was -1.306 [-1.822, -0.797].
 
-Quote and empty views also differed. A deterministic excerpt is therefore not automatically equivalent to presenting the state alone. Still, the generated view added a further negative interaction within the same prompt structure, so the finding did not depend only on a direct-versus-buffered template difference.
+Quotes also differed from empty views, so deterministic excerpts cannot simply stand in for the state alone. Even with prompt structure held fixed, however, generated views produced a further negative interaction. A direct-versus-buffered template difference did not account for the whole result.
 
 ## 6. Check the direction with other instruments
 
-The retrieval contrast could depend on the particular scoring instrument. We therefore repeated the matched state-by-view comparison at three observed configurations:
+To check whether that direction depended on one scoring instrument, we repeated the matched state-by-view comparison at three observed configurations:
 
 | Configuration | Readout | Evaluator stack | Mean quote/generated gain signs |
 | :--- | :--- | :--- | :--- |
@@ -189,7 +187,7 @@ Quote-channel post-retrieval margins ranked stored task success better than gene
 
 ## 7. A source restriction tests the inflated baseline
 
-The presentation's mechanism is easiest to see in the subtraction itself: gain is after minus before. If generated text makes the evaluator unusually confident before evidence arrives, retrieval has a higher baseline to beat.
+The proposed explanation concerns the before score. Gain subtracts before from after. If generated text raises confidence before evidence arrives, retrieval must clear an inflated baseline.
 
 We tested this explanation in a separate matched follow-up. Both generators had a 512-token cap. One used the baseline contract without an explicit source-only clause; the other began with a restriction to information explicitly present inside `<EVIDENCE>`, and required absent support or contradiction to be marked as missing.
 
@@ -205,7 +203,7 @@ For the 65 retrieval transitions that acquired an evidence artifact, the matched
 
 The paired source-only shift was +5.809 [4.729, 6.902]. In the 35 transitions that acquired no artifact, the shift was -0.340 [-0.987, 0.284], without a corresponding positive result. Across all 100 retrievals, source-only generation lowered the mean before margin more than the mean after margin. Together, these observations support the inflated-baseline explanation in this matched setting.
 
-The original replay used 128-token views, and we did not audit its support claims. The 512-token intervention supports a mechanism for the follow-up, but does not verify that mechanism for the original headline result. The source instruction also changes several admissible-source rules at once, and we did not independently validate the parser by manual annotation. The artifact cohorts follow retrieval outcomes rather than randomized assignment.
+This follow-up does not verify the mechanism behind the original headline result. The original replay used 128-token views whose support claims we did not audit; the intervention used 512-token views. It also changed several source rules together, and the parser was not independently checked by manual annotation. Artifact cohorts were defined by retrieval outcomes, rather than randomized assignment.
 
 <div class="asv-diagram asv-evidence">
 
@@ -222,11 +220,11 @@ flowchart TD
 
 *The evidence sequence. The source-contract follow-up tests a mechanism in its own matched setting; it does not prove the mechanism for the original 128-token replay.*
 
-Restoring positive gain is also weaker than making the channels equivalent. Source-only and quote gains still differed. The intervention repaired the observed mean direction on artifact-bearing retrievals, not the full response law.
+The intervention restored the observed mean direction on artifact-bearing retrievals. Source-only gains still differed from quote gains, so it did not make the two channels equivalent or recover the full response law.
 
 ## 8. How I would audit a step reward
 
-For a new evaluator or process-reward setup, I would use this sequence:
+For a new evaluator or process-reward setup, I would start with fixed inputs:
 
 1. Freeze the before and after states, the candidates, and any generated views.
 2. Score both endpoints within each declared channel. Compute each gain before comparing channels.
@@ -234,7 +232,7 @@ For a new evaluator or process-reward setup, I would use this sequence:
 4. If the channel gap exceeds that instability, hold the template fixed and test the view or source rules.
 5. Recheck the repaired channel on the matched transitions before pooling or reusing its rewards.
 
-Averaging prompt variants can reduce variance. It also selects a mixture of channels. When their gains straddle zero, changing the mixture weights can change the reward's sign. An average by itself does not establish agreement.
+Averaging prompt variants may reduce variance, but the average also chooses a channel mixture. If the gains fall on opposite sides of zero, changing the weights can reverse the reward. Averaging does not resolve that disagreement.
 
 <details>
 <summary>Additional controls: length and authority instructions</summary>
@@ -243,9 +241,9 @@ Our buffered-scoring controls further show why interventions need matched compar
 
 </details>
 
-The four-corner design extends beyond our candidate-margin implementation. A scalar judge or process-reward model can supply the endpoint response directly. Hold the transition fixed and compare both endpoints within each declared channel. Interpret signs within an instrument, and link scales before comparing magnitudes across instruments.
+Other scalar judges and process-reward models can use the same four-score comparison: freeze the transition, score both endpoints in each declared channel, and compare the gains. Signs can be interpreted within an instrument. Comparing magnitudes across instruments requires linked scales.
 
-This study covers 100 PubMed tasks, one actor workflow, and the observed configurations. It does not establish a universal disagreement rate, causal actor credit, or a general rule that generated interpretations are harmful. It gives us a way to ask whether an evaluator-derived reward keeps its direction when the measurement channel changes, and to test a localized repair when it does not.
+The evidence here comes from 100 PubMed tasks, one actor workflow, and the observed configurations. It establishes neither a universal disagreement rate nor causal actor credit, and it does not show that generated interpretations are generally harmful. What we can test is narrower: whether a reward keeps its direction when the channel changes, and whether a localized intervention repairs an observed failure.
 
 ## 9. Paper and presentation
 
@@ -261,4 +259,3 @@ The recording below walks through the audit, the retrieval checks, and the sourc
   <source src="/2026/10/14/agent-step-value/asv-realm-2026-talk-web.mp4" type="video/mp4">
   Your browser does not support embedded video. <a href="/2026/10/14/agent-step-value/asv-realm-2026-talk-web.mp4">Download the presentation recording.</a>
 </video>
-
