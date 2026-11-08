@@ -1,5 +1,5 @@
 {
-  "status": "prepared",
+  "status": "published",
   "prepared_at": "2026-11-08T17:24:12.705489+08:00",
   "site": "https://leecdiang.com/",
   "authorization": "Explicit user request to publish the checked version",
@@ -13,8 +13,8 @@
     ],
     "included_current_preview_page_updates": true,
     "preserved_previous_social_covers": 10,
-    "preserved_previous_studio_assets": 13,
-    "deployment_workflow": "preserve existing bytes"
+    "preserved_previous_studio_assets": 15,
+    "deployment_workflow": "existing bytes preserved and SHA-256 verified"
   },
   "verification": {
     "article_page_views": 72,
@@ -25,7 +25,29 @@
     "content_check": "passed",
     "loading_check": "191 static expressions across 10 pages",
     "security_check": "9 regression tests and 155 HTML pages passed",
-    "source_invariants": "original numbers, formulas, code, images, references retained"
+    "source_invariants": "original numbers, formulas, code, images, references retained",
+    "github_pages": {
+      "status": "built",
+      "commit": "4459b96901d479cdaf8e8c77b712411adf1f25da",
+      "updated_at": "2026-11-08T09:26:14Z"
+    },
+    "live_article_titles": "18/18 matched",
+    "live_archive_titles": "motorcycle and digital IC titles matched",
+    "live_key_pages_and_resources": "8/8 HTTP 200; requested labels matched; local CSS/JS and widget bytes matched",
+    "live_widget_routes": "both tab=batch and tab=memory show revised title; SAMEORIGIN headers verified",
+    "live_browser_interaction": {
+      "batch_sequences": "16 to 32; total TPS 1140.8 to 1510.6",
+      "cached_sequences": "4 to 8; KV 4 to 8 GiB; total 13.725 GiB"
+    },
+    "cdn_cache": "targeted purge accepted for 27 article, index, interactive and XML URLs; public responses rechecked",
+    "photography_sources": "byte-identical to pre-release source",
+    "deployment_metadata": "preserved legacy workflow SHA-256 9a1b574ef81636f5714df03574d6a6927b281108b42e5b0778a9f5fcaab94abc",
+    "cloudflare_html_transform": "email obfuscation is the only observed archive body difference from generated output"
   },
-  "preview": "http://127.0.0.1:4000/archives/"
+  "preview": "http://127.0.0.1:4000/archives/",
+  "published_at": "2026-11-08T17:25:43+08:00",
+  "verified_at": "2026-11-08T17:37:15.096784+08:00",
+  "source_commit": "f1997a00b95c5712e7ce57c9b94d1a8710550f64",
+  "deployment_commit": "4459b96901d479cdaf8e8c77b712411adf1f25da",
+  "live_archive": "https://leecdiang.com/archives/"
 }
