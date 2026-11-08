@@ -9,7 +9,7 @@ const version = '2026-11-07';
 const executable = type => !type || /^(?:text|application)\/(?:java|ecma)script(?:;|$)/i.test(type) || type === 'module';
 const digest = script => "'sha256-" + crypto.createHash('sha256').update(script).digest('base64') + "'";
 
-function policy(hashes, allowLocalInferenceFrame = false) {
+function policy(hashes, allowLocalInferenceFrame = false, allowVisitorMap = false) {
   return [
     "default-src 'self'",
     "base-uri 'none'",
@@ -18,7 +18,7 @@ function policy(hashes, allowLocalInferenceFrame = false) {
     "script-src-attr 'none'",
     // Mermaid and the theme update SVG and CSS styles at runtime.
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https://leecdiang.com https://media.overclock3d.net",
+    "img-src 'self' data: https://leecdiang.com https://media.overclock3d.net" + (allowVisitorMap ? " https://mapmyvisitors.com/map.png" : ""),
     "font-src 'self' data:",
     "connect-src 'self'",
     "media-src 'self'",
@@ -82,7 +82,7 @@ hexo.extend.filter.register('after_generate', async function () {
     const head = $('head');
     const charset = head.children('meta[charset]').first();
     if (!charset.length) throw new Error('Missing HTML charset in ' + name);
-    charset.after($('<meta http-equiv="Content-Security-Policy">').attr('content', policy(hashes, name === '2026/11/08/llm-inference-from-token-to-cluster/index.html')));
+    charset.after($('<meta http-equiv="Content-Security-Policy">').attr('content', policy(hashes, name === '2026/11/08/llm-inference-from-token-to-cluster/index.html', name === 'index.html')));
     head.append('<meta name="referrer" content="strict-origin-when-cross-origin">');
     head.append($('<meta name="security-policy-version">').attr('content', version));
     this.route.set(name, $.html());

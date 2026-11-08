@@ -92,6 +92,19 @@ test('preview rejects remote clients even with a forged forwarding header', t =>
   assert.equal(next, true);
 });
 
+test('visitor maps permit only the image endpoint on the homepage and keep remote scripts blocked', async t => {
+  const f = fixture(t, page('<img src="https://mapmyvisitors.com/map.png?d=example">'));
+  f.routes.set('archives/index.html', page(''));
+  await f.filters.after_generate.call(f.hexo);
+  const cheerio = require('cheerio');
+  const policyFor = route => cheerio.load(f.routes.get(route))('meta[http-equiv="Content-Security-Policy"]').attr('content');
+  assert.match(policyFor('index.html'), /img-src[^;]* https:\/\/mapmyvisitors\.com\/map\.png(?:;|$)/);
+  assert.doesNotMatch(policyFor('index.html'), /script-src[^;]*mapmyvisitors/);
+  assert.doesNotMatch(policyFor('archives/index.html'), /mapmyvisitors/);
+  const remote = fixture(t, page('<script src="https://mapmyvisitors.com/map.js?d=example"></script>'));
+  await assert.rejects(remote.filters.after_generate.call(remote.hexo), /Unapproved remote script/);
+});
+
 test('deployment stops before copying sensitive files or symbolic links', t => {
   const f = fixture(t, page(''));
   fs.mkdirSync(f.hexo.public_dir);

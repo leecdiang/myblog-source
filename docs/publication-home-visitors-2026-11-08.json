@@ -1,0 +1,15 @@
+{
+  "baseline_pages_commit": "ef90f3aebe9316bb5cf9fc3c1e0250de2bba822a",
+  "changed": [
+    "css/studio.css",
+    "index.html",
+    "js/site-language.js"
+  ],
+  "added": [
+    "assets/studio/core.811ecf2d3148.js",
+    "assets/studio/style.c94088f671a9.css"
+  ],
+  "removed": [],
+  "workflow_preserved": ".github/workflows/publish-blog-from-source.yml",
+  "source_scope": "Homepage layout, mobile frame and halo animation, official MapMyVisitors image endpoint; unrelated in-progress articles excluded."
+}
