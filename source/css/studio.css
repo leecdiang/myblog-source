@@ -634,7 +634,7 @@ body .btc-orrery-modal :is(button,input,select):focus-visible{outline:2px solid 
 .post-body .arch-map-picker button:hover{border-color:var(--accent);color:var(--accent)}
 .post-body .arch-map-picker button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
 .post-body .arch-map-note{margin:0 0 8px;color:var(--muted);font-size:12px;line-height:1.6}
-.post-body .arch-map[data-map-active] .am-block,.post-body .arch-map[data-map-active] .am-core,.post-body .arch-map[data-map-active] .am-tag{opacity:.25;transition:opacity .2s ease}
+.post-body .arch-map[data-map-active] .am-block,.post-body .arch-map[data-map-active] .am-core{opacity:.5;transition:opacity .2s ease}
 .post-body .arch-map[data-map-active="roofline"] .am-gpu,.post-body .arch-map[data-map-active="roofline"] .am-matrix,.post-body .arch-map[data-map-active="roofline"] .am-mem,.post-body .arch-map[data-map-active="roofline"] .am-cache{opacity:1;stroke-width:2.5}
 .post-body .arch-map[data-map-active="amdahl"] .am-cpu{opacity:1;stroke-width:2.5}
 .post-body .arch-map[data-map-active="cpi"] .am-cpu{opacity:1;stroke-width:2.5}
@@ -649,6 +649,13 @@ body .btc-orrery-modal :is(button,input,select):focus-visible{outline:2px solid 
 :root[data-color=dark] .post-body .arch-map .am-block{fill:rgba(39,53,69,.88);stroke:rgba(145,189,233,.62);stroke-width:1.4}
 :root[data-color=dark] .post-body .arch-map .am-core{fill:rgba(145,189,233,.16);stroke:rgba(178,195,216,.38)}
 :root[data-color=dark] .post-body .arch-map .am-cache{fill:rgba(39,53,69,.94)}
+/* Keep component colors consistent when the dark palette raises contrast. */
+:root[data-color=dark] .post-body .arch-map .am-cpu{stroke:var(--chart-blue)}
+:root[data-color=dark] .post-body .arch-map .am-gpu{stroke:var(--chart-teal)}
+:root[data-color=dark] .post-body .arch-map .am-matrix{stroke:var(--chart-amber)}
+:root[data-color=dark] .post-body .arch-map .am-mem{stroke:var(--chart-red)}
+:root[data-color=dark] .post-body .arch-map .am-noc{stroke:var(--accent)}
+
 
 /* Reading geometry is shared across palettes. */
 :root[data-color] body.studio-reading .reading-main .post-body{font-size:18px;line-height:1.9}
