@@ -1,0 +1,144 @@
+{
+  "status": "published",
+  "verified_at": "2026-11-09T15:55:24.066521+08:00",
+  "site": "https://leecdiang.com/",
+  "authorization": "User explicitly requested publication after selecting original phone portrait and B desktop/landscape.",
+  "source_commit": "4d4b019404c77136a47b1ef7045107f1e0f92d15",
+  "deployment_commit": "6843ef03d1eb7889cf4c12a399c2e50fc1179e0f",
+  "scope": {
+    "phone_portrait": "original homepage, map, typography and introduction retained",
+    "desktop_and_landscape": "B layout, footer-adjacent right-aligned map, 17px body, 32px title, unboxed 16px introduction",
+    "preserved_previous_stylesheet": "style.671497fdc016.css",
+    "new_stylesheet": "style.612c7e967edd.css",
+    "previous_deployment_workflow": "byte-identical SHA-256 9a1b574ef81636f5714df03574d6a6927b281108b42e5b0778a9f5fcaab94abc"
+  },
+  "verification": {
+    "build": "passed",
+    "content": "passed",
+    "loading": "passed",
+    "security": "9 regression tests and 155 HTML pages passed",
+    "local_portrait_comparison": "8 homepage/article cases across 320px and 390px, light/dark; computed styles and geometry identical to original",
+    "local_landscape": "1440px and 844px, light/dark; no horizontal overflow",
+    "github_pages": "built",
+    "live": [
+      {
+        "theme": "light",
+        "w": 1440,
+        "h": 960,
+        "path": "/",
+        "status": 200,
+        "style": "/assets/studio/style.612c7e967edd.css",
+        "overflow": false,
+        "body": null,
+        "introRadius": null,
+        "mapPosition": "static",
+        "reviewTools": false
+      },
+      {
+        "theme": "light",
+        "w": 1440,
+        "h": 960,
+        "path": "/2026/11/08/llm-inference-from-token-to-cluster/",
+        "status": 200,
+        "style": "/assets/studio/style.612c7e967edd.css",
+        "overflow": false,
+        "body": "17px",
+        "introRadius": "0px",
+        "mapPosition": null,
+        "reviewTools": false
+      },
+      {
+        "theme": "light",
+        "w": 390,
+        "h": 844,
+        "path": "/",
+        "status": 200,
+        "style": "/assets/studio/style.612c7e967edd.css",
+        "overflow": false,
+        "body": null,
+        "introRadius": null,
+        "mapPosition": "absolute",
+        "reviewTools": false
+      },
+      {
+        "theme": "light",
+        "w": 390,
+        "h": 844,
+        "path": "/2026/11/08/llm-inference-from-token-to-cluster/",
+        "status": 200,
+        "style": "/assets/studio/style.612c7e967edd.css",
+        "overflow": false,
+        "body": "16px",
+        "introRadius": "12px",
+        "mapPosition": null,
+        "reviewTools": false
+      },
+      {
+        "theme": "dark",
+        "w": 1440,
+        "h": 960,
+        "path": "/",
+        "status": 200,
+        "style": "/assets/studio/style.612c7e967edd.css",
+        "overflow": false,
+        "body": null,
+        "introRadius": null,
+        "mapPosition": "static",
+        "reviewTools": false
+      },
+      {
+        "theme": "dark",
+        "w": 1440,
+        "h": 960,
+        "path": "/2026/11/08/llm-inference-from-token-to-cluster/",
+        "status": 200,
+        "style": "/assets/studio/style.612c7e967edd.css",
+        "overflow": false,
+        "body": "17px",
+        "introRadius": "0px",
+        "mapPosition": null,
+        "reviewTools": false
+      },
+      {
+        "theme": "dark",
+        "w": 390,
+        "h": 844,
+        "path": "/",
+        "status": 200,
+        "style": "/assets/studio/style.612c7e967edd.css",
+        "overflow": false,
+        "body": null,
+        "introRadius": null,
+        "mapPosition": "absolute",
+        "reviewTools": false
+      },
+      {
+        "theme": "dark",
+        "w": 390,
+        "h": 844,
+        "path": "/2026/11/08/llm-inference-from-token-to-cluster/",
+        "status": 200,
+        "style": "/assets/studio/style.612c7e967edd.css",
+        "overflow": false,
+        "body": "16px",
+        "introRadius": "12px",
+        "mapPosition": null,
+        "reviewTools": false
+      },
+      {
+        "asset": "style.612c7e967edd.css",
+        "status": 200,
+        "sha256": "612c7e967eddde7cc43dc659b10c92753fd6d33707c27d41b9ece1a1d79bd4f3",
+        "byteIdentical": true
+      },
+      {
+        "asset": "style.671497fdc016.css",
+        "status": 200,
+        "sha256": "671497fdc0165ba833e05c3514f720ee745082f56b3d989a3018d5738d68e446",
+        "byteIdentical": true
+      }
+    ],
+    "preview_files_in_deployment": false
+  },
+  "evidence_directory": "/Users/lee/Documents/ChatGPT/leecdiang.com/work/design-review-20261109"
+}
