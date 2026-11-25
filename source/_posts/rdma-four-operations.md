@@ -1,7 +1,7 @@
 ---
 title: "通信原语背后的 RDMA ——理解四种 RDMA 操作"
 date: 2026-11-25 18:00:00
-updated: 2026-11-25 18:15:00
+updated: 2026-11-25 20:02:00
 lang: zh-CN
 published: true
 categories: Silicon & Circuits
@@ -23,35 +23,137 @@ A 要给 B 发 4 KiB 数据。用 SEND，A 可以一直不知道这 4 KiB 最后
 
 <!-- more -->
 
-A 的网卡从本机内存把数据读出来，B 的网卡把收到的数据写进去。数据先经过 A 的 PCIe，再过网络，最后经过 B 的 PCIe。文末的 NCCL 例子里，还有一次沿反方向走的 WRITE。B 用它把接收地址告诉 A。有关这块数据为什么需要跨卡传输，可对照读[《大模型训练和推理中的通信》](/2026/11/25/llm-training-inference-communication/)。
+[上一篇](/2026/11/25/llm-training-inference-communication/)讲一块张量为什么要从 A 传到 B。这次沿着它走一遍，从 A 的主存出发，经过两张网卡，再落到 B 的主存。文末回到 NCCL，看 B 怎样把可写地址告诉 A。
+
+## 缩写速查
+
+{% raw %}
+<style>
+#rdma-glossary table { width: 100%; display: table; font-size: .92em; }
+#rdma-glossary th, #rdma-glossary td { padding: .28em .65em; text-align: start; vertical-align: top; }
+#rdma-glossary th[scope="row"] { width: 20%; font-weight: 500; }
+#rdma-glossary code { white-space: normal; overflow-wrap: anywhere; }
+#rdma-glossary [hidden] { display: none !important; }
+#rdma-glossary .rdma-term-action { text-align: start; margin: .3em 0; }
+#rdma-term-toggle { font: inherit; padding: .18em .6em; background: transparent; border: 1px solid currentColor; border-radius: .25em; color: inherit; cursor: pointer; }
+#rdma-term-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+#rdma-glossary tbody .rdma-term-group th { padding-top: .75em; }
+</style>
+<div id="rdma-glossary">
+<p class="rdma-term-action"><a href="#rdma-host-path">跳到图 1 和正文</a>　<button type="button" id="rdma-term-toggle" aria-controls="rdma-term-extra" aria-expanded="true" hidden>收起其余术语</button></p>
+<table aria-label="RDMA 缩写、代码名与中文含义">
+<thead><tr><th scope="col">缩写或代码名</th><th scope="col">中文含义</th></tr></thead>
+<tbody>
+<tr><th scope="row"><code>RDMA</code></th><td>远程直接内存访问</td></tr>
+<tr><th scope="row"><code>RNIC</code></th><td>支持 RDMA 的网卡</td></tr>
+<tr><th scope="row"><code>SQ</code></th><td>发送队列</td></tr>
+<tr><th scope="row"><code>RQ</code></th><td>接收队列</td></tr>
+<tr><th scope="row"><code>QP</code></th><td>队列对，由 SQ 和 RQ 组成</td></tr>
+<tr><th scope="row"><code>QPN</code></th><td>队列对编号</td></tr>
+<tr><th scope="row"><code>WR</code></th><td>工作请求，应用提交给网卡的工作</td></tr>
+<tr><th scope="row"><code>WQE</code></th><td>工作队列项，RNIC 从中读出要执行的工作</td></tr>
+<tr><th scope="row"><code>MR</code></th><td>已注册的内存区域</td></tr>
+<tr><th scope="row"><code>SGE</code></th><td>散布／聚集项，描述一段本地缓冲区</td></tr>
+<tr><th scope="row"><code>CQ</code></th><td>完成队列</td></tr>
+<tr><th scope="row"><code>CQE</code></th><td>完成队列项，由 RNIC 写入 CQ</td></tr>
+<tr><th scope="row"><code>WC</code></th><td>工作完成记录，应用轮询 CQ 时得到</td></tr>
+<tr><th scope="row"><code>MMIO</code></th><td>内存映射 I/O，CPU 用它访问设备寄存器</td></tr>
+<tr><th scope="row"><code>DMA</code></th><td>直接内存访问，设备可以主动读写内存</td></tr>
+</tbody>
+<tbody id="rdma-term-extra">
+<tr class="rdma-term-group"><th colspan="2">访问权限与接口</th></tr>
+<tr><th scope="row"><code>lkey</code></th><td>本地访问键</td></tr>
+<tr><th scope="row"><code>rkey</code></th><td>远程访问键</td></tr>
+<tr><th scope="row"><code>PD</code></th><td>保护域，关联 QP 和 MR</td></tr>
+<tr><th scope="row"><code>wr_id</code></th><td>应用给本地 WR 指定的标识</td></tr>
+<tr><th scope="row"><code>imm_data</code></th><td>立即数的字段名</td></tr>
+<tr><th scope="row"><code>verbs provider</code></th><td>将 verbs 调用适配到具体设备的软件</td></tr>
+<tr><th scope="row"><code>doorbell</code></th><td>门铃，软件用它通知 RNIC 有新工作</td></tr>
+<tr><th scope="row"><code>IBV_SEND_SIGNALED</code></th><td>发送标志，要求在 WR 成功时也报告完成</td></tr>
+<tr class="rdma-term-group"><th colspan="2">网络与分包</th></tr>
+<tr><th scope="row"><code>RC</code></th><td>可靠连接，一种 RDMA 传输服务</td></tr>
+<tr><th scope="row"><code>RoCEv2</code></th><td>基于以太网的 RDMA 第 2 版，使用 UDP/IP 封装</td></tr>
+<tr><th scope="row"><code>UDP</code></th><td>用户数据报协议</td></tr>
+<tr><th scope="row"><code>IP</code></th><td>网际协议</td></tr>
+<tr><th scope="row"><code>IB</code></th><td>InfiniBand，一种高性能互连标准</td></tr>
+<tr><th scope="row"><code>PMTU</code></th><td>路径最大传输单元，本文指 RC 分包采用的载荷上限</td></tr>
+<tr><th scope="row"><code>MTU</code></th><td>最大传输单元</td></tr>
+<tr><th scope="row"><code>PSN</code></th><td>包序列号</td></tr>
+<tr><th scope="row"><code>ACK</code></th><td>确认应答</td></tr>
+<tr><th scope="row"><code>RNR</code></th><td>接收端尚未就绪</td></tr>
+<tr><th scope="row"><code>RETH</code></th><td>RDMA 扩展传输头，含远端地址、rkey 和长度</td></tr>
+<tr class="rdma-term-group"><th colspan="2">操作与图中标识</th></tr>
+<tr><th scope="row"><code>SEND</code></th><td>发送消息</td></tr>
+<tr><th scope="row"><code>RECV</code></th><td>接收消息，由接收方预先提交 WR</td></tr>
+<tr><th scope="row"><code>WRITE</code></th><td>远程写</td></tr>
+<tr><th scope="row"><code>WRITE_WITH_IMM</code></th><td>带立即数的远程写</td></tr>
+<tr><th scope="row"><code>READ</code></th><td>远程读</td></tr>
+<tr><th scope="row"><code>Atomic</code></th><td>远程原子操作</td></tr>
+<tr><th scope="row"><code>FAA</code></th><td>原子取值并加，返回旧值</td></tr>
+<tr><th scope="row"><code>CAS</code></th><td>原子比较并交换，返回旧值</td></tr>
+<tr><th scope="row"><code>TX</code></th><td>发送端或发送缓冲区</td></tr>
+<tr><th scope="row"><code>RX</code></th><td>接收端或接收缓冲区，RX7 是图中的缓冲区名</td></tr>
+<tr><th scope="row"><code>DST</code></th><td>目的缓冲区</td></tr>
+<tr><th scope="row"><code>B</code></th><td>字节（用于标注长度）</td></tr>
+<tr><th scope="row"><code>KiB</code></th><td>二进制千字节，1 KiB = 1024 B</td></tr>
+<tr class="rdma-term-group"><th colspan="2">主机与 PCIe</th></tr>
+<tr><th scope="row"><code>CPU</code></th><td>中央处理器</td></tr>
+<tr><th scope="row"><code>DRAM</code></th><td>动态随机存取存储器</td></tr>
+<tr><th scope="row"><code>PCIe</code></th><td>高速外设互连总线</td></tr>
+<tr><th scope="row"><code>MRRS</code></th><td>PCIe 最大读请求大小</td></tr>
+<tr><th scope="row"><code>MPS</code></th><td>PCIe 最大载荷大小</td></tr>
+<tr><th scope="row"><code>MRd</code></th><td>PCIe 内存读请求</td></tr>
+<tr><th scope="row"><code>CplD</code></th><td>PCIe 带数据的完成包，用于返回读到的数据</td></tr>
+<tr><th scope="row"><code>MWr</code></th><td>PCIe 内存写请求</td></tr>
+<tr class="rdma-term-group"><th colspan="2">RecoNIC 与 NCCL</th></tr>
+<tr><th scope="row"><code>GbE</code></th><td>吉比特以太网，图中的 100 GbE 表示 100 Gbit/s</td></tr>
+<tr><th scope="row"><code>MAC</code></th><td>介质访问控制</td></tr>
+<tr><th scope="row"><code>CMAC</code></th><td>RecoNIC 使用的 AMD 100 GbE 以太网 MAC 核</td></tr>
+<tr><th scope="row"><code>IP 核</code></th><td>可复用的硬件设计模块</td></tr>
+<tr><th scope="row"><code>ERNIC</code></th><td>RecoNIC 使用的嵌入式 RDMA 网卡 IP 核</td></tr>
+<tr><th scope="row"><code>AXI</code></th><td>片上互连协议，ERNIC 通过它访问内存</td></tr>
+<tr><th scope="row"><code>QDMA</code></th><td>基于队列的 DMA 子系统</td></tr>
+<tr><th scope="row"><code>DDR</code></th><td>双倍数据速率内存，图中指板载内存</td></tr>
+<tr><th scope="row"><code>FIFO</code></th><td>先进先出队列</td></tr>
+<tr><th scope="row"><code>AllGather</code></th><td>全收集，每个参与方得到所有参与方的数据</td></tr>
+<tr><th scope="row"><code>NCCL</code></th><td>NVIDIA 集合通信库</td></tr>
+<tr><th scope="row"><code>AR</code></th><td>自适应路由，出现在 NCCL_IB_AR_THRESHOLD 中</td></tr>
+<tr><th scope="row"><code>GPU</code></th><td>图形处理器</td></tr>
+<tr><th scope="row"><code>CUDA</code></th><td>NVIDIA 的 GPU 并行计算平台</td></tr>
+</tbody>
+</table>
+</div>
+{% endraw %}
 
 ## 一、先找出缓冲区，再看网卡
 
-A、B 各有一张支持远程直接内存访问（RDMA）的网卡，下文简称 RNIC。两边已经建好可靠连接（RC），数据放在主机内存里。图 1 中间的以太网链路用的是 RoCEv2，两张网卡把 RDMA 传输包封装在 UDP/IP 里收发。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup>
+{% raw %}<span id="rdma-host-path"></span>{% endraw %}
 
-应用先把可用的内存范围注册为 **MR**（Memory Region）。程序用散布／聚集列表描述本地缓冲区。列表中的每一项叫 SGE（scatter/gather element），用地址、长度和 `lkey` 指出要访问哪一段。如果 B 还希望 A 能远程读或写某段内存，就要授予相应权限，并通过双方的协议把远端地址和 `rkey` 告诉 A。网卡据此检查请求访问的范围和权限。B 可以把一个区域开放给 A 读，另一个区域开放给 A 写。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-2">[2]</a></sup>
+A、B 各有一张 RNIC，两端已经建好 RC。图 1 中间是以太网，两张 RNIC 用 RoCEv2 收发数据，RDMA 传输包封装在 UDP/IP 中。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup>
+
+应用先把一块缓冲区注册为 MR，再用 SGE 标出这次要用的部分。每条 SGE 里有起始地址、长度和 `lkey`。如果 B 打算让 A 远程写入，就给这块 MR 开远程写权限，并把地址和 `rkey` 告诉 A。随后 B 的 RNIC 就能检查这次写入是否在允许的范围内。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-2">[2]</a></sup>
 
 {% visual_svg rdma-four-operations/01-two-hosts %}
-图 1｜两台主机、一条网络和两段 PCIe。发一次普通的 4 KiB 消息，A 的网卡从本地内存读出载荷，B 的网卡把载荷写进自己的主机内存。图中选用主存队列、网卡主动取发送 WQE、载荷不内联的路径。
+图 1｜两台主机、一条网络和两段 PCIe。发一次普通的 4 KiB 消息，A 的 RNIC 从本地内存读出载荷，B 的 RNIC 把载荷写进自己的主机内存。图中选用主存队列、RNIC 主动取发送 WQE、载荷不内联的路径。
 {% endvisual_svg %}
 
-图 1 里，A 的程序向发送队列（SQ）提交一条工作请求（WR）。负责适配设备的 verbs provider 会把它编码成网卡能读的队列项（WQE）。CPU 写门铃寄存器（doorbell），提醒网卡取新工作。CPU 用内存地址访问设备寄存器，称为内存映射 I/O（MMIO）。接下来由网卡通过 PCIe 主动读主存，先取 WQE，再读它指向的载荷。这就是直接内存访问（DMA）。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-13">[13]</a></sup>
+图 1 里，A 的程序提交一条 SEND WR。verbs provider 把它编码成 WQE，放进 SQ。CPU 随后通过 MMIO 写门铃，通知 A 的 RNIC 来取。RNIC 先用 DMA 从主存读出 WQE，再按里面的地址和长度取走要发的数据。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-13">[13]</a></sup>
 
-发送队列和接收队列（RQ）组成队列对（QP）。每个 QP 有自己的编号 QPN。包里的目的 QPN 让 B 的网卡找到连接的状态，至于到达的数据该往哪个地址写，还得看操作码。应用通过完成队列（CQ）取回已完成请求的状态。下文的单条示例给 A 的请求设置了完成标志（signaled），因此成功后也会报告。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup>
+B 的 RNIC 收到 SEND，先按包里的目的 QPN 找到 QP，再从 RQ 取出 B 预投的 WQE。A 只需指出从哪里读，往哪里写由 B 决定。写入完成后，B 的程序轮询 CQ，就能拿到这次接收的 WC。图中的发送 WR 设置了 `IBV_SEND_SIGNALED`，所以 A 也能从自己的 CQ 得知发送成功。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup>
 
 ### 一条 SEND 在主机里占几块内存
 
 设 A 注册了一块 12 KiB 的内存，基址为 P。第一段从 P 起取 1024 B，第二段从 P + 8192 起取 3072 B，中间的空隙不用发送。A 用一条 SEND 引用两段内存，先列 1 KiB 的 SGE，再列 3 KiB 的 SGE。B 可以用一个连续的 4096 B 缓冲区接收，接到的字节顺序就是第一段接第二段。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup>
 
 {% visual_svg rdma-four-operations/06-queue-walk %}
-图 2｜A 端的发送队列和载荷。上图按比例画出了两段源数据，中间空出的 7 KiB 不会上网。下图的读请求向左走，返回的数据向右走。最下面一行对应整条 SEND 的本地完成。
+图 2｜A 端的 SQ 和载荷。上图按比例画出了两段源数据，中间空出的 7 KiB 不会上网。下图的读请求向左走，返回的数据向右走。最下面一行对应整条 SEND 的本地完成。
 {% endvisual_svg %}
 
-提交函数返回成功时，网卡未必已把第二段读完。若 A 这时就覆写它，可能改掉本次要发的内容。A 可以在提交时给工作请求分配一个本地标识 `wr_id`，稍后轮询 CQ，通过完成记录认出是哪条请求成功了，再复用两段源缓冲区。这个标识留在本端。以 mlx5 为例，provider 会保存应用填的标识，轮询时能依据硬件返回的信息找到它。<sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup><sup class="cite"><a href="#rd-ref-13">[13]</a></sup>
+提交函数返回时，A 的 RNIC 可能还没读完第二段。如果程序这时覆写缓冲区，发出去的数据就可能变了。A 提交 WR 时可以给它一个 `wr_id`，等轮询 CQ 拿到这条 WR 的成功 WC，再复用两段内存。`wr_id` 留在本端。以 mlx5 为例，provider 会先把它存下来，轮询时再根据硬件返回的信息找回它。<sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup><sup class="cite"><a href="#rd-ref-13">[13]</a></sup>
 
 ## 二、同一对网卡，四种操作
 
-先播放 SEND，再切到 WRITE，看看 B 端哪一项给出了目的地址。WRITE 还可以切换成“带立即数”，这时数据仍然落在原处，变化的是 B 的接收队列和完成通知。动画把 A 的 4 KiB 统称为 TX。要看网卡怎样从两个地址读出这块数据，可以回看图 2。
+先播放 SEND，再切到 WRITE，看看 B 端的目的地址是从哪里来的。选“带立即数”时，数据仍写到同一个槽，可以留意 B 的 RQ 和 CQ 各有什么变化。动画把 A 要发的 4 KiB 统称为 TX，图 2 展示了它来自两个地址时的读法。
 
 {% raw %}
 <style>
@@ -176,30 +278,30 @@ A、B 各有一张支持远程直接内存访问（RDMA）的网卡，下文简�
   <div class="rd-map" aria-label="从 A 到 B 依次经过 A 主机内存、PCIe、A RNIC、网络、B RNIC、PCIe 和 B 主机内存">
     <div class="rd-node" data-node="am"><b>A 主机</b><small data-memory-label="a">DRAM · TX</small></div>
     <span class="rd-edge" data-edge="a"><small>PCIe</small><i aria-hidden="true"></i></span>
-    <div class="rd-node" data-node="an"><b>A 网卡</b><small>RNIC</small></div>
+    <div class="rd-node" data-node="an"><b>A 端 RNIC</b><small>发起端</small></div>
     <span class="rd-edge" data-edge="wire"><small>网络</small><i aria-hidden="true"></i></span>
-    <div class="rd-node" data-node="bn"><b>B 网卡</b><small>RNIC</small></div>
+    <div class="rd-node" data-node="bn"><b>B 端 RNIC</b><small>响应端</small></div>
     <span class="rd-edge" data-edge="b"><small>PCIe</small><i aria-hidden="true"></i></span>
     <div class="rd-node" data-node="bm"><b>B 主机</b><small data-memory-label="b">DRAM · RX7</small></div>
   </div>
   <div class="rd-story" role="status" aria-live="polite" aria-atomic="true">
     <span class="rd-counter" data-counter>0 / 5</span><strong data-event-title>SEND 的起点</strong>
-    <p data-event-text>A 有 4 KiB 待发数据。B 已提前投递一条接收请求，指定 RX7 用来存放这条消息。</p>
+    <p data-event-text>A 的 TX 有 4 KiB 待发数据。B 应用已预投接收 WR，用 RX7 存放这条消息。</p>
   </div>
   <div class="rd-ledger">
     <section aria-label="发起端状态"><strong>A 发起端</strong><dl>
       <dt>内存</dt><dd data-field="aMem">TX · 4 KiB</dd>
-      <dt>SQ</dt><dd data-field="sq">尚未提交</dd>
-      <dt>CQ</dt><dd data-field="aCq">等待</dd>
+      <dt>SQ</dt><dd data-field="sq">WR 尚未提交</dd>
+      <dt>CQ</dt><dd data-field="aCq">尚无本次 CQE</dd>
     </dl></section>
     <section aria-label="响应端状态"><strong>B 响应端</strong><dl>
       <dt>内存</dt><dd data-field="bMem">RX7 · 空</dd>
-      <dt>RQ</dt><dd data-field="rq">RX7 已投递</dd>
-      <dt>CQ</dt><dd data-field="bCq">等待</dd>
+      <dt>RQ</dt><dd data-field="rq">接收 WR 已投递 · RX7</dd>
+      <dt>CQ</dt><dd data-field="bCq">等待接收 CQE</dd>
     </dl></section>
   </div>
   <details class="rd-request" open>
-    <summary>请求字段与接收条件　<code data-wr-field="opcode">IBV_WR_SEND</code></summary>
+    <summary>WR 字段与接收条件　<code data-wr-field="opcode">IBV_WR_SEND</code></summary>
     <dl>
       <div><dt>A 的本地 SGE</dt><dd data-wr-field="local">源 TX · 4 KiB · lkey(TX)</dd></div>
       <div><dt>A 填的远端目标或源</dt><dd data-wr-field="remote">只指定已连接 QP，无远端地址和 rkey</dd></div>
@@ -208,75 +310,75 @@ A、B 各有一张支持远程直接内存访问（RDMA）的网卡，下文简�
       <div data-wr-extra hidden><dt data-wr-extra-label></dt><dd data-wr-field="extra"></dd></div>
     </dl>
   </details>
-  <div data-rdma-static><p>SEND 把数据送进 B 预投的 RX7。WRITE 写入 A 指定的 B 端 slot3。带立即数的写还消耗 B 的一条接收 WQE，B 轮询 CQ 后从返回的工作完成记录（WC）读到立即数 3。READ 把 slot3 的数据拉回 A。对 B 的计数器执行 Fetch &amp; Add (+1)，B 的值从 41 变为 42，A 收到旧值 41。</p></div>
-  <figcaption class="v-caption">图 3｜虚线箭头表示控制信息，实线箭头表示数据。每步跟踪一次逻辑动作，可以包含多个包。可靠连接的确认与重传从略。</figcaption>
+  <div data-rdma-static><p>SEND 把数据送进 B 的接收 WR 指定的 RX7。WRITE 写入 A 指定的 B 端 slot3。WRITE_WITH_IMM 还消耗 B 的一条接收 WQE。B 应用轮询 CQ，从 WC 中读到立即数 3。READ 把 slot3 的数据拉回 A。对 B 的计数器执行 Fetch &amp; Add (+1)，B 的值从 41 变为 42，A 收到旧值 41。</p></div>
+  <figcaption class="v-caption">图 3｜虚线箭头表示控制信息，实线箭头表示数据。每步跟踪一次逻辑动作，可以包含多个包。RC 的确认与重传从略。</figcaption>
 </figure>
-<script src="/js/rdma-four-operations.js" defer></script>
+<script src="/js/rdma-four-operations.js?v=cd5420df52" defer></script>
 {% endraw %}
 
 ### SEND 由 B 决定消息落在哪儿
 
-B 先挑一块够大的接收缓冲区，叫它 `RX7`。B 通过 `ibv_post_recv` 把它挂到 RQ 上，随后可以去做别的工作。A 只要在自己 SQ 的 SEND 请求里填写本地数据的位置、长度及本地密钥。A 的网卡从内存读出 4 KiB，沿连接发往 B。B 的网卡从自己的 RQ 取下一个接收项，才知道要把数据写入 `RX7`。缓冲区的地址始终由 B 管。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup>
+B 先留出一块够大的缓冲区 `RX7`，调用 `ibv_post_recv` 向 RQ 提交一条指向它的 WR。A 提交 SEND 时只填本地 SGE，不必知道 `RX7` 在哪里。A 的 RNIC 从主存读出 4 KiB 发往 B。B 的 RNIC 从 RQ 取下一条 WQE，才知道要把这 4 KiB 写在哪里。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup>
 
-B 轮询到这条接收完成后，可以凭接收请求的标识找到 `RX7`，并从完成项读出实际收到的长度。如果包已经到了，B 却还没有可用的接收项，RC 响应方可以回复 Receiver Not Ready（RNR），A 的网卡按配置重试。即使 A 的网卡已经收到对端的 ACK，B 的程序也可能还没来得及轮询 CQ。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup>
+B 轮询 CQ 后，从 WC 的 `wr_id` 找到对应的 `RX7`，也能读出实际收到的长度。如果包到了，RQ 里却没有可用的 WQE，B 的 RNIC 可以回复 RNR，A 的 RNIC 按配置重试。即使 A 已经收到 ACK，B 的程序也可能还没来得及轮询 CQ。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup>
 
 {% visual_svg rdma-four-operations/04-send-segments %}
 图 4｜同一条 SEND 可以装进一个包，也可以拆成四个。横向长度代表应用载荷字节数。两行均假设传输成功、无重传，B 预投了足够大的接收缓冲区。图中不计报头和 ACK。
 {% endvisual_svg %}
 
-把这条 SEND 的路径 MTU（PMTU）设为 1024 B，网卡在网络上依次发 First、Middle、Middle、Last 四个包。四个包合起来才是一条消息，B 总共消耗一个接收项，得到一次成功接收完成。改回 4096 B，网络上一个 Only 包就能发完，应用看到的完成数相同。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-9">[9]</a></sup>
+把这条 SEND 的 PMTU 设为 1024 B，RNIC 在网络上依次发 First、Middle、Middle、Last 四个包。四个包合起来才是一条消息，B 只消耗一条接收 WQE，轮询 CQ 也只拿到一条 WC。改回 4096 B，网络上一个 Only 包就能发完，应用看到的完成数相同。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-9">[9]</a></sup>
 
 {% raw %}<details><summary>同一笔 4 KiB，换到 PCIe 上会看到多少个事务？</summary>{% endraw %}
 
-只数载荷的搬运。假设两段源缓冲区和连续的目的缓冲区都从 4 KiB 页边界开始，PCIe 最大读请求大小（MRRS）为 512 B，两端相关路径的最大有效载荷（MPS）都为 256 B。下表按每次都取到上限计算。<sup class="cite"><a href="#rd-ref-15">[15]</a></sup>
+只数载荷的搬运。假设两段源缓冲区和连续的目的缓冲区都从 4 KiB 页边界开始，PCIe 的 MRRS 为 512 B，两端相关路径的 MPS 都为 256 B。下表按每次都取到上限计算。<sup class="cite"><a href="#rd-ref-15">[15]</a></sup>
 
 | 观察位置 | 在链路上数什么 | 4 KiB 这一例 |
 | --- | --- | ---: |
-| A 端 PCIe，RNIC 向主机发请求 | 内存读请求（MRd），每次请求 512 B | 8 个 |
-| A 端 PCIe，主机向 RNIC 返回数据 | 带数据的读完成（CplD），每个至多带 256 B | 16 个 |
+| A 端 PCIe，RNIC 向主机发请求 | MRd，每次请求 512 B | 8 个 |
+| A 端 PCIe，主机向 RNIC 返回数据 | CplD，每个至多带 256 B | 16 个 |
 | 两台机器之间的网络 | PMTU 为 1024 B 的 SEND 数据包 | 4 个 |
-| B 端 PCIe，RNIC 向主存写载荷 | 内存写事务（MWr），每个带 256 B | 16 个 |
-| B 的应用 | 轮询到的成功接收完成 | 1 条 |
+| B 端 PCIe，RNIC 向主存写载荷 | MWr，每个带 256 B | 16 个 |
+| B 的应用 | 从 CQ 取回的接收 WC | 1 条 |
 
-两端 PCIe 计数中的 8、16、16 是上述条件下的最少数量。真实设备可以拆得更细，取 WQE、写完成项也另有流量。比如 A 的网卡向主机读 512 B，至少要等两个 CplD 才收齐这一笔读请求的数据。B 的应用轮询时，只看到整条 4 KiB 消息的一次接收完成。
+两端 PCIe 计数中的 8、16、16 是上述条件下的最少数量。真实设备可以拆得更细，取 WQE、写 CQE 也另有流量。比如 A 的 RNIC 向主机读 512 B，至少要等两个 CplD 才收齐这一笔读请求的数据。B 的应用轮询时，只会得到一条对应整条 4 KiB 消息的 WC。
 
 {% raw %}</details>{% endraw %}
 
 ### WRITE 把数据放进约好的位置
 
-这次 B 在已注册区域里留出 `slot3`，开好远程写权限，把槽的地址和 `rkey` 告诉 A。A 提交 RDMA WRITE 时，同时填写本地 4 KiB 的来源和 B 的目的地址。A 的网卡照旧读本地内存，B 的网卡检查请求后，直接把数据写进 `slot3`。和刚才的 SEND 相比，两端 PCIe 上大块数据的方向完全一样，换掉的是 B 查找写入位置的方法。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-2">[2]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup>
+这次 B 在 MR 里留出 `slot3`，开好远程写权限，把槽的地址和 `rkey` 告诉 A。A 提交 RDMA WRITE 时，同时填写本地 4 KiB 的来源和 B 的目的地址。A 的 RNIC 照旧读本地内存，B 的 RNIC 检查请求后，直接把数据写进 `slot3`。和刚才的 SEND 相比，两端 PCIe 上大块数据的方向完全一样，换掉的是 B 查找写入位置的方法。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-2">[2]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup>
 
-普通 WRITE 不消耗 B 的接收 WQE，也不给 B 的应用产生这笔写入的接收完成。如果 B 还想知道哪一个槽可以读，可以约定用 **WRITE_WITH_IMM**。A 写入的目的地址仍是 `slot3`，同时附上一个 32 位立即数，比如槽号 3。B 为通知预投一个接收请求，给它取本地标识 7。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup>
+普通 WRITE 不消耗 B 的接收 WQE，B 轮询 CQ 也收不到这笔写入的 WC。如果 B 还想知道哪一个槽可以读，可以约定用 **WRITE_WITH_IMM**。A 写入的目的地址仍是 `slot3`，同时附上一个 32 位立即数，比如槽号 3。B 为通知预投一条接收 WR，把它的 `wr_id` 设为 7。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup>
 
 {% visual_svg rdma-four-operations/07-receive-placement %}
 图 5｜只看 B。实线跟踪 4 KiB 载荷，虚线跟踪接收通知。每一行是一次独立实验。最下一行，软件轮询所得的 wr_id = 7 由 B 填写，立即数 3 由 A 填写。
 {% endvisual_svg %}
 
-在 B 看到的这条完成记录里，`wr_id = 7` 告诉 B 哪一个接收请求被消耗了，`imm_data` 经双方约定的编码解读为 3，告诉 B 去哪个槽读数据。两项都出现在一次轮询结果里，却来自两台机器。普通 SEND 若遇上空的接收队列会触发 RNR，带立即数的 WRITE 同样需要可用的接收项。普通 WRITE 可以在不消耗接收项的情况下着陆，但仍得等上层协议允许，A 才能覆盖 B 正在读的槽。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup>
+B 轮询得到的 WC 有两个值得看的字段。`wr_id = 7` 对应 B 预投的那条接收 WR，`imm_data` 经双方约定的编码解读为 3，告诉 B 去哪个槽读数据。两项都出现在一次轮询结果里，却来自两台机器。SEND 和 WRITE_WITH_IMM 都需要 RQ 里有可用的 WQE，否则 B 的 RNIC 可以回复 RNR。普通 WRITE 可以直接写入，但仍得等上层协议允许，A 才能覆盖 B 正在读的槽。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-4">[4]</a></sup>
 
-还有一个细节在抓包时能看见。如果 WRITE 跨越多个传输包，远端起始地址、rkey 和总长度在 First 包的远端扩展传输头（RETH）里。Middle 和普通 Last 不再重发这三个字段。若是带立即数的多包 WRITE，立即数跟在 Last 包里。单包操作则在 Only 包里一次给齐所需字段。<sup class="cite"><a href="#rd-ref-16">[16]</a></sup>
+还有一个细节在抓包时能看见。如果 WRITE 跨越多个传输包，远端起始地址、rkey 和总长度在 First 包的 RETH 里。Middle 和普通 Last 不再重发这三个字段。若是带立即数的多包 WRITE，立即数跟在 Last 包里。单包操作则在 Only 包里一次给齐所需字段。<sup class="cite"><a href="#rd-ref-16">[16]</a></sup>
 
 ### READ 的请求和数据往相反方向走
 
 如果数据原本就在 B 的 `slot3`，而 A 想把它取回来，B 可以给这段内存开远程读权限，把地址和 `rkey` 交给 A。A 在 SQ 提交 READ，填的是 **B 的源地址和 A 的目的缓冲区**。离开 A 的先是一条读请求，写明从哪里读、读多少，4 KiB 载荷此时还在 B。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-2">[2]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup>
 
-看一笔 PMTU 为 1024 B、无重传的 4 KiB READ。A 只发一条读请求，B 的 RNIC 通过 B 端 PCIe 读出主存里的 4 KiB，把数据分进四个响应包。A 的 RNIC 收到它们后，按自己原先提交的 READ 请求，把数据写入 A 的目的缓冲区。B 只需要知道读自己哪块内存，A 的目的地址和本地 lkey 可以一直留在 A。A 轮询到成功完成后就可以读结果。B 无需为这次读取投递接收请求，但要保证源内存在读取期间有效。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-16">[16]</a></sup>
+看一笔 PMTU 为 1024 B、无重传的 4 KiB READ。A 只发一条读请求，B 的 RNIC 通过 B 端 PCIe 读出主存里的 4 KiB，把数据分进四个响应包。A 的 RNIC 收到它们后，按自己原先提交的 READ 请求，把数据写入 A 的目的缓冲区。B 只需要知道读自己哪块内存，A 的目的地址和本地 lkey 可以一直留在 A。A 拿到成功的 WC 后就可以读结果。B 无需为这次 READ 提交接收 WR，但要保证源内存在读取期间有效。<sup class="cite"><a href="#rd-ref-1">[1]</a></sup><sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-16">[16]</a></sup>
 
 ### Atomic 拿回计数器修改前的值
 
 把 4 KiB 的槽换成一个 8 字节对齐的 64 位计数器，初值为 41。B 为它所在的 MR 开启远程原子权限，并把地址和 rkey 交给请求方。两台请求方都想领一个编号。如果各自先 READ，再把旧值加一 WRITE 回去，它们可能同时读到 41，最后都写回 42。明明领了两次号，计数器只走了一步。
 
-支持远端原子的 RNIC 可以执行 **Fetch-and-Add（FAA）**。A 给出远端地址、`rkey` 和加数 1，并留出本地的 8 字节结果缓冲区。B 对这个字做一次不可分割的读改写，计数器变为 42，返回 A 的是**旧值 41**。若两个请求都通过同一响应 RNIC 对这个字做 FAA，并且中间没有其他写入，它们会分别领到 41 和 42，最终计数为 43。谁先领到哪个号取决于操作的执行顺序。<sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-10">[10]</a></sup>
+支持远端原子的 RNIC 可以执行 **FAA**。A 给出远端地址、`rkey` 和加数 1，并留出本地的 8 字节结果缓冲区。B 对这个字做一次不可分割的读改写，计数器变为 42，返回 A 的是**旧值 41**。若两个请求都通过同一响应 RNIC 对这个字做 FAA，并且中间没有其他写入，它们会分别领到 41 和 42，最终计数为 43。谁先领到哪个号取决于操作的执行顺序。<sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-10">[10]</a></sup>
 
 {% visual_svg rdma-four-operations/03-atomic-race %}
-图 6｜A 和 C 通过 B 的同一张 RNIC 更新一个计数器。左边是先 READ 再 WRITE 的一种交错次序，右边让两个请求都执行 Fetch-and-Add。两次返回的旧值可以直接用作不同的编号。
+图 6｜A 和 C 通过 B 的同一张 RNIC 更新一个计数器。左边是先 READ 再 WRITE 的一种交错次序，右边让两个请求都执行 FAA。两次返回的旧值可以直接用作不同的编号。
 {% endvisual_svg %}
 
-另一种经典操作是 **Compare-and-Swap（CAS）**。A 可以要求“若还是 41，就改成 99”。在演示的命中分支里，B 从 41 变为 99，A 收到 41。再切到未命中分支，这次 A 要求“若为 40，就换成 99”，B 的初值仍为 41，于是它保持 41，A 收到的也是 41。A 把返回的旧值与本次提交的期望值一比，就知道是否发生了替换。两条工作请求都可以正常完成。线上返回的是带旧值的 Atomic ACK，A 的网卡把旧值写进结果缓冲区，成功状态则通过 CQ 交给 A 的程序。因而查 CQ 可以知道请求是否执行完，查结果缓冲区才能知道旧值。<sup class="cite"><a href="#rd-ref-16">[16]</a></sup>
+另一种经典操作是 **CAS**。A 可以要求“若还是 41，就改成 99”。在演示的命中分支里，B 从 41 变为 99，A 收到 41。再切到未命中分支，这次 A 要求“若为 40，就换成 99”，B 的初值仍为 41，于是它保持 41，A 收到的也是 41。A 把返回的旧值与本次提交的期望值一比，就知道是否发生了替换。两种情况下，A 都能拿到成功的 WC。线上返回的是带旧值的 Atomic ACK，A 的 RNIC 把旧值写进结果缓冲区，A 从 WC 看执行状态，从结果缓冲区读旧值。<sup class="cite"><a href="#rd-ref-16">[16]</a></sup>
 
 经典 RC 原子操作针对一个 64 位字。能否与 B 的 CPU 或另一张网卡并发地对同一字做原子访问，取决于设备报告的原子能力范围。远端 RNIC 怎样实现这次读改写，verbs 也没有规定必须用某一种 PCIe 事务。<sup class="cite"><a href="#rd-ref-3">[3]</a></sup><sup class="cite"><a href="#rd-ref-10">[10]</a></sup>
 
-| A 提交的操作 | B 端访问哪里 | 网络上主要的数据方向 | B 消耗接收 WQE | B 轮询 CQ 时能否得到接收完成 |
+| A 提交的操作 | B 端访问哪里 | 网络上主要的数据方向 | B 消耗接收 WQE | B 轮询 CQ 时能否得到接收 WC |
 | --- | --- | --- | --- | --- |
 | SEND | B 从 RQ 取出的接收缓冲区 | 4 KiB 从 A 到 B | 是 | 是 |
 | WRITE | A 给出的远端目的地址 | 4 KiB 从 A 到 B | 否 | 否 |
@@ -286,27 +388,27 @@ B 轮询到这条接收完成后，可以凭接收请求的标识找到 `RX7`，
 
 ## 三、一条 WRITE 在 RecoNIC 里怎么走
 
-回到 WRITE 的例子。B 的网卡收到了包，准备往主机内存里的 `slot3` 写 4 KiB。这次把图 1 中 B 的方框展开，换成 Alveo U250 上的 **RecoNIC**。它的板级设计和软件都可以查源码，负责处理 RoCEv2 的是 AMD 的许可 IP ERNIC v3.1。<sup class="cite"><a href="#rd-ref-5">[5]</a></sup><sup class="cite"><a href="#rd-ref-6">[6]</a></sup>
+回到 WRITE 的例子。B 的 RNIC 收到了包，准备往主机内存里的 `slot3` 写 4 KiB。这次把图 1 中 B 的方框展开，换成 Alveo U250 上的 **RecoNIC**。它的板级设计和软件都可以查源码，负责处理 RoCEv2 的是 AMD 的许可 IP 核 ERNIC v3.1。<sup class="cite"><a href="#rd-ref-5">[5]</a></sup><sup class="cite"><a href="#rd-ref-6">[6]</a></sup>
 
 {% visual_svg rdma-four-operations/02-reconic %}
-图 7｜RecoNIC 的收包分流和内存访问。沿以太网入口看，普通包与 RoCE 包进不同模块。沿 ERNIC 的内存接口看，目标可以是主机内存，也可以是板载 DDR。两边的 ERNIC 是同一个硬件模块。<sup class="cite"><a href="#rd-ref-5">[5]</a></sup><sup class="cite"><a href="#rd-ref-6">[6]</a></sup>
+图 7｜RecoNIC 的收包分流和内存访问。沿以太网入口看，普通包与 RoCEv2 包进不同模块。沿 ERNIC 的内存接口看，目标可以是主机内存，也可以是板载 DDR。两边的 ERNIC 是同一个硬件模块。<sup class="cite"><a href="#rd-ref-5">[5]</a></sup><sup class="cite"><a href="#rd-ref-6">[6]</a></sup>
 {% endvisual_svg %}
 
-从网线进来，帧先到以太网 MAC（CMAC）。分类器把 RoCE 流量送给 ERNIC，普通网络流量另走常规收包路径。这个 WRITE 会进 ERNIC。找到目标缓冲区后，引擎从片上的 AXI 内存接口发出写入，经交叉开关和 QDMA 的 PCIe 桥到达主机内存。如果目的缓冲区在板载 DDR，写入就在板上结束。图里 QDMA 出现了两次。左边处理普通包的接收，右边给 ERNIC 提供通往主机内存的桥。<sup class="cite"><a href="#rd-ref-5">[5]</a></sup><sup class="cite"><a href="#rd-ref-7">[7]</a></sup>
+从网线进来，帧先到 CMAC。分类器把 RoCEv2 流量送给 ERNIC，普通网络流量另走常规收包路径。这个 WRITE 会进 ERNIC。找到目标缓冲区后，引擎从片上的 AXI 内存接口发出写入，经交叉开关和 QDMA 的 PCIe 桥到达主机内存。如果目的缓冲区在板载 DDR，写入就在板上结束。图里 QDMA 出现了两次。左边处理普通包的接收，右边给 ERNIC 提供通往主机内存的桥。<sup class="cite"><a href="#rd-ref-5">[5]</a></sup><sup class="cite"><a href="#rd-ref-7">[7]</a></sup>
 
 ### 网卡保存了什么，队列又放在哪里
 
-选 RecoNIC 示例的 `host_mem` 配置，SQ、RQ 和 CQ 的存储在主机里。那 ERNIC 怎么知道该读哪一项？建 RC QP 时，软件把队列基地址和深度等参数交给硬件，同时配置远端 QPN、包序号（PSN）、路径 MTU、重试参数及保护域（PD）。它们属于每条连接自己的状态。PG332 描述的 QP Manager 会在发送队列间仲裁，缓存已经取回的发送 WQE，再交给 WQE Processor 按 PMTU 组包、驱动 DMA。这样，主存里有发送队列，卡上也能暂存其中一项的副本。<sup class="cite"><a href="#rd-ref-6">[6]</a></sup><sup class="cite"><a href="#rd-ref-7">[7]</a></sup>
+选 RecoNIC 示例的 `host_mem` 配置，SQ、RQ 和 CQ 的存储在主机里。那 ERNIC 怎么知道该读哪一项？建 RC QP 时，软件把队列基地址和深度等参数交给硬件，同时配置远端 QPN、PSN、PMTU、重试参数及 PD。它们属于每条连接自己的状态。PG332 描述的 QP Manager 会在不同 SQ 之间仲裁，缓存已经取回的发送 WQE，再交给 WQE Processor 按 PMTU 组包、驱动 DMA。这样，主存里的 SQ 保存着 WQE，卡上也能暂存其中一项的副本。<sup class="cite"><a href="#rd-ref-6">[6]</a></sup><sup class="cite"><a href="#rd-ref-7">[7]</a></sup>
 
-进来的 WRITE 还要查另一组信息。比方说 B 注册了 16 KiB，并分成四个连续的 4 KiB 槽，`slot3` 占用最后 4096 B。目的 QPN 让 ERNIC 找到连接。远端地址、rkey 和长度用来检查相应内存窗口与写权限。若把同一个写请求的起点再后移 64 B，尾部就越过窗口，网卡不能把它作为合法的 4 KiB 写入执行。QPN 指出包属于哪条连接，网卡还要核对 QP 与 MR 是否属于同一保护域，以及 MR 是否允许这次写入。<sup class="cite"><a href="#rd-ref-2">[2]</a></sup><sup class="cite"><a href="#rd-ref-6">[6]</a></sup>
+进来的 WRITE 还要查另一组信息。比方说 B 注册了 16 KiB，并分成四个连续的 4 KiB 槽，`slot3` 占用最后 4096 B。目的 QPN 让 ERNIC 找到连接。远端地址、rkey 和长度用来检查相应内存窗口与写权限。若把同一个写请求的起点再后移 64 B，尾部就越过窗口，ERNIC 不能把它作为合法的 4 KiB 写入执行。QPN 指出包属于哪条连接，ERNIC 还要核对 QP 与 MR 是否属于同一 PD，以及 MR 是否允许这次写入。<sup class="cite"><a href="#rd-ref-2">[2]</a></sup><sup class="cite"><a href="#rd-ref-6">[6]</a></sup>
 
-RecoNIC 随库提供了 SEND/RECV、WRITE 和 READ 的双端示例。它自己的接收程序轮询 RQ 生产者索引，从预分配的槽取消息，用完再更新消费位置。在源码里，收到新消息的信号就是这个索引向前移动。前面动画里的接收完成项对应通用 libibverbs 接口。这版 ERNIC 的手册也明确列出不支持 Atomic，图 6 的取号例子要用具备该能力的 RNIC。<sup class="cite"><a href="#rd-ref-6">[6]</a></sup><sup class="cite"><a href="#rd-ref-8">[8]</a></sup>
+RecoNIC 随库提供了 SEND/RECV、WRITE 和 READ 的双端示例。它自己的接收程序轮询 RQ 生产者索引，从预分配的槽取消息，用完再更新消费位置。在源码里，收到新消息的信号就是这个索引向前移动。前面动画中的应用通过 libibverbs 轮询 CQ，拿到接收 WC。这版 ERNIC 的手册也明确列出不支持 Atomic，图 6 的取号例子要用具备该能力的 RNIC。<sup class="cite"><a href="#rd-ref-6">[6]</a></sup><sup class="cite"><a href="#rd-ref-8">[8]</a></sup>
 
 ## 四、NCCL 的一次发送为什么会用 WRITE
 
-跨机 AllGather 完成后，B 的结果缓冲区里应当有一段来自 A 的张量。只看这块张量怎样从 A 传到 B。至于每次传输怎样安排，NCCL 可以交给网络后端。即使上层用的是成对的 `ncclSend` 和 `ncclRecv`，网卡也可以用 RDMA WRITE 把这块数据送到位。下面跟的是内置 IB 后端的一个具体分支。<sup class="cite"><a href="#rd-ref-11">[11]</a></sup><sup class="cite"><a href="#rd-ref-12">[12]</a></sup>
+跨机 AllGather 完成后，B 的结果缓冲区里应当有一段来自 A 的张量。只看这块张量怎样从 A 传到 B。至于每次传输怎样安排，NCCL 可以交给网络后端。即使上层用的是成对的 `ncclSend` 和 `ncclRecv`，RNIC 也可以用 RDMA WRITE 把这块数据送到位。下面跟的是内置 IB 后端的一个具体分支。<sup class="cite"><a href="#rd-ref-11">[11]</a></sup><sup class="cite"><a href="#rd-ref-12">[12]</a></sup>
 
-先动手的是 B。在这个版本的 `ncclIbIrecv()` 里，有一条很容易忽略的接收请求。它有 `wr_id`，但 `sg_list = NULL`、`num_sge = 0`。B 先把这个接收项投给相应 QP，留给写入通知使用。它没有指定任何用来放张量的缓冲区。真正的落点由接下来的 `ncclIbPostFifo()` 公布。B 把地址、容量和 rkey 写进 A 那边的 FIFO 槽，A 读到它们以后，才知道往哪里写。<sup class="cite"><a href="#rd-ref-12">[12]</a></sup><sup class="cite"><a href="#rd-ref-17">[17]</a></sup>
+B 先调用 `ncclIbIrecv()`，向 RQ 提交一条接收 WR。它有 `wr_id`，但 `sg_list = NULL`、`num_sge = 0`。这条 WR 留给写入通知使用，因此没有指定用来放张量的缓冲区。真正的落点由接下来的 `ncclIbPostFifo()` 公布。B 把地址、容量和 rkey 写进 A 那边的 FIFO 槽，A 读到它们以后，才知道往哪里写。<sup class="cite"><a href="#rd-ref-12">[12]</a></sup><sup class="cite"><a href="#rd-ref-17">[17]</a></sup>
 
 {% visual_svg rdma-four-operations/05-nccl-write-imm %}
 图 8｜NCCL v2.26.5-1 内置 IB 后端。固定一条消息、一个 QP，开启自适应路由并保留默认阈值 8192 B。两种大小共用 B 发布缓冲区的步骤，区别从 A 提交数据 WR 时开始。图中省略传输层 ACK。<sup class="cite"><a href="#rd-ref-12">[12]</a></sup><sup class="cite"><a href="#rd-ref-17">[17]</a></sup>
@@ -314,16 +416,16 @@ RecoNIC 随库提供了 SEND/RECV、WRITE 和 READ 的双端示例。它自己�
 
 在这个分支里，`ncclIbMultiSend()` 判断消息大小是否严格大于 `NCCL_IB_AR_THRESHOLD`。把开头的 4 KiB 和一条 16 KiB 消息代进去，数一数 A 要提交几条 WR。
 
-| A 要发的数据 | A 在这一条 QP 上提交的工作 | B 从接收完成读回的大小 |
+| A 要发的数据 | A 在这一条 QP 上提交的工作 | B 从接收 WC 读回的大小 |
 | --- | --- | --- |
 | 4 KiB | 一条 WRITE_WITH_IMM，同时带 4096 B 张量数据和立即数 | 4096 B |
 | 16 KiB | 一条普通 WRITE 搬 16384 B，再接一条零载荷 WRITE_WITH_IMM，串成链一次提交 | 16384 B |
 
-恰好 8 KiB 也走第一行的路径。第二行末尾的写没有第二份张量数据，却照样能触发 B 的接收完成。B 的代码从 `wc->imm_data` 取回原消息的长度，所以即便最后那条写的载荷长度为零，B 仍能读出 16384。图 5 里两端约定把这个字段用作槽号，NCCL 在这里用它传长度。表里数的是 A 传张量的工作请求，前面 B 发布地址的那条控制 WRITE 两种情形都有。<sup class="cite"><a href="#rd-ref-12">[12]</a></sup><sup class="cite"><a href="#rd-ref-17">[17]</a></sup>
+恰好 8 KiB 也走第一行的路径。第二行末尾的写没有第二份张量数据，却照样使 B 的 RNIC 写入 CQE。B 的代码从 `wc->imm_data` 取回原消息的长度，所以即便最后那条写的载荷长度为零，B 仍能读出 16384。图 5 里两端约定把这个字段用作槽号，NCCL 在这里用它传长度。表里数的是 A 传张量的 WR，前面 B 发布地址的那条控制 WRITE 两种情形都有。<sup class="cite"><a href="#rd-ref-12">[12]</a></sup><sup class="cite"><a href="#rd-ref-17">[17]</a></sup>
 
 如果张量在 GPU 显存里，而且平台支持 GPUDirect RDMA，图 1 里指向主机 DRAM 的载荷箭头还可以改指向 GPU 显存。RNIC 可以直接走 PCIe 点对点访问这块内存。依赖这批数据的 GPU 内核何时可以启动，还要遵守 CUDA 和通信库的同步要求。<sup class="cite"><a href="#rd-ref-14">[14]</a></sup>
 
-回到开头的 4 KiB。用 SEND，B 把可写地址留在自己的接收队列里。图 8 的方案则先把可写地址送到 A，所以 A 用一次带立即数的写就能把张量送到位。B 的网络后端收到了这一块的通知，接下来可以推进这笔传输。整个 AllGather 还要等其余分块满足依赖，而原来的槽什么时候能再次使用，取决于消费它的那一步是否已经结束。
+回到开头的 4 KiB。用 SEND，B 把可写地址留在自己的 RQ 里。图 8 的方案则先把可写地址送到 A，所以 A 用一次带立即数的写就能把张量送到位。B 的网络后端收到了这一块的通知，接下来可以推进这笔传输。整个 AllGather 还要等其余分块满足依赖，而原来的槽什么时候能再次使用，取决于消费它的那一步是否已经结束。
 
 ## 资料与源码
 
