@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 516" role="img" aria-label="NCCL v2.26.5-1 sends 4 KiB as the payload of the write carrying immediate data, versus 16 KiB in a separate RDMA write" font-family="system-ui, sans-serif">
+<title>One receive setup, two send paths in the NCCL IB backend</title>
+<desc>Single message, one data QP, adaptive routing enabled, default threshold 8192 bytes. At B, a receive request with zero scatter/gather entries and a local work request identifier is posted first. B then writes its advertised address, rkey and capacity into a FIFO at A. For a 4096-byte message, A posts a write with immediate that carries all 4096 payload bytes. For a 16384-byte message, A chains a normal payload write and a zero-payload write with immediate, submitting the chain once. In either case, B receives one receive completion and the immediate value is the message size in bytes. Arrows show work request direction, not individual transport packets.</desc>
+<text x="20" y="28" text-anchor="start" font-size="22" font-weight="670" class="v-ink" fill="var(--text-primary, #1d2b39)">NCCL IB transport</text>
+<text x="20" y="54" text-anchor="start" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">Single message · one data QP · adaptive routing on · default threshold = 8192 B</text>
+<rect x="12" y="72" width="736" height="126" rx="9" fill="var(--surface-soft, #f3f6f8)" stroke="var(--figure-line, #a6b4c1)" stroke-width="1"/>
+<text x="32" y="100" text-anchor="start" font-size="18" font-weight="650" class="v-ink" fill="var(--text-primary, #1d2b39)">A · Sender</text>
+<text x="727" y="100" text-anchor="end" font-size="18" font-weight="650" class="v-ink" fill="var(--text-primary, #1d2b39)">B · Receiver</text>
+<text x="32" y="124" text-anchor="start" font-size="15" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">FIFO slot for B’s buffer descriptor</text>
+<text x="727" y="124" text-anchor="end" font-size="15" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">Post receive · 0 SGEs · local wr_id</text>
+<text x="380" y="153" text-anchor="middle" font-size="16" font-weight="590" class="v-ink" fill="var(--text-primary, #1d2b39)">RDMA WRITE · B’s address, rkey and capacity</text>
+<path d="M709 169H58" fill="none" stroke="var(--chart-teal, #276f68)" stroke-width="2.4" stroke-dasharray="7 5"/>
+<circle cx="709" cy="169" r="3.5" fill="var(--chart-teal, #276f68)"/><path d="M48 169 l11 -5 v10 z" fill="var(--chart-teal, #276f68)"/>
+<text x="380" y="189" text-anchor="middle" font-size="14.5" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">B publishes the descriptor before A can send data.</text>
+<rect x="12" y="213" width="360" height="292" rx="9" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #a6b4c1)" stroke-width="1"/>
+<rect x="388" y="213" width="360" height="292" rx="9" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #a6b4c1)" stroke-width="1"/>
+<text x="30" y="245" text-anchor="start" font-size="22" font-weight="660" class="v-ink" fill="var(--text-primary, #1d2b39)">4 KiB</text>
+<text x="355" y="244" text-anchor="end" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">4096 ≤ 8192</text>
+<text x="30" y="270" text-anchor="start" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">1 data-path WR</text>
+<text x="32" y="305" text-anchor="start" font-size="16" font-weight="650" class="v-ink" fill="var(--text-primary, #1d2b39)">A</text>
+<text x="352" y="305" text-anchor="end" font-size="16" font-weight="650" class="v-ink" fill="var(--text-primary, #1d2b39)">B</text>
+<text x="406" y="245" text-anchor="start" font-size="22" font-weight="660" class="v-ink" fill="var(--text-primary, #1d2b39)">16 KiB</text>
+<text x="731" y="244" text-anchor="end" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">16384 &gt; 8192</text>
+<text x="406" y="270" text-anchor="start" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">2 chained data-path WRs · 1 post</text>
+<text x="408" y="305" text-anchor="start" font-size="16" font-weight="650" class="v-ink" fill="var(--text-primary, #1d2b39)">A</text>
+<text x="728" y="305" text-anchor="end" font-size="16" font-weight="650" class="v-ink" fill="var(--text-primary, #1d2b39)">B</text>
+<text x="192" y="332" text-anchor="middle" font-size="17" font-weight="625" class="v-ink" fill="var(--text-primary, #1d2b39)">WRITE_WITH_IMM</text>
+<path d="M37 345H336" fill="none" stroke="var(--chart-blue, #396d98)" stroke-width="2.4"/>
+<circle cx="37" cy="345" r="3.5" fill="var(--chart-blue, #396d98)"/><path d="M346 345 l-11 -5 v10 z" fill="var(--chart-blue, #396d98)"/>
+<text x="192" y="369" text-anchor="middle" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">4096 B payload · imm = 4096</text>
+<text x="568" y="332" text-anchor="middle" font-size="17" font-weight="625" class="v-ink" fill="var(--text-primary, #1d2b39)">RDMA_WRITE</text>
+<path d="M413 345H712" fill="none" stroke="var(--chart-blue, #396d98)" stroke-width="2.4"/>
+<circle cx="413" cy="345" r="3.5" fill="var(--chart-blue, #396d98)"/><path d="M722 345 l-11 -5 v10 z" fill="var(--chart-blue, #396d98)"/>
+<text x="568" y="369" text-anchor="middle" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">16384 B payload</text>
+<text x="568" y="400" text-anchor="middle" font-size="17" font-weight="625" class="v-ink" fill="var(--text-primary, #1d2b39)">WRITE_WITH_IMM</text>
+<path d="M413 413H712" fill="none" stroke="var(--chart-teal, #276f68)" stroke-width="2.4" stroke-dasharray="7 5"/>
+<circle cx="413" cy="413" r="3.5" fill="var(--chart-teal, #276f68)"/><path d="M722 413 l-11 -5 v10 z" fill="var(--chart-teal, #276f68)"/>
+<text x="568" y="436" text-anchor="middle" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">0 B payload · imm = 16384</text>
+<path d="M30 450H354" fill="none" stroke="var(--figure-line, #a6b4c1)" stroke-width="1"/>
+<text x="32" y="474" text-anchor="start" font-size="16" font-weight="600" class="v-ink" fill="var(--text-primary, #1d2b39)">B · 1 receive CQE</text>
+<text x="32" y="498" text-anchor="start" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">imm_data = 4096 B</text>
+<path d="M406 450H730" fill="none" stroke="var(--figure-line, #a6b4c1)" stroke-width="1"/>
+<text x="408" y="474" text-anchor="start" font-size="16" font-weight="600" class="v-ink" fill="var(--text-primary, #1d2b39)">B · 1 receive CQE</text>
+<text x="408" y="498" text-anchor="start" font-size="16" font-weight="450" class="v-sub" fill="var(--text-secondary, #49596a)">imm_data = 16384 B</text>
+</svg>

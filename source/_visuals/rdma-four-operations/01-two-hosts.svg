@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 434" role="img" aria-label="Two hosts, two PCIe links, one network connection" font-family="system-ui, sans-serif">
+  <title>Two hosts, two PCIe links, one network connection</title>
+  <desc>Each machine has a CPU, host DRAM and an RNIC attached to the host over its own PCIe link. Software posts work and polls completions in memory. A dotted arrow to the RNIC represents a doorbell register write. The two-ended solid arrow between the RNIC and DRAM represents device-initiated DMA reads and writes for host-backed queues and registered buffers. The RNICs exchange requests and responses over the network. Both endpoints can submit work.</desc>
+  <defs>
+    <marker id="rd4-host-blue" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-blue, #3c689a)" />
+    </marker>
+    <marker id="rd4-host-teal" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-teal, #226b63)" />
+    </marker>
+    <marker id="rd4-host-amber" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-amber, #8c5b23)" />
+    </marker>
+    <marker id="rd4-host-sub" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--text-secondary, #435669)" />
+    </marker>
+  </defs>
+  <rect x="12" y="12" width="296" height="282" rx="10" fill="var(--surface-soft, #f0f4f7)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.15" />
+  <text x="29" y="43" fill="var(--text-primary, #233442)" text-anchor="start" font-size="22" font-weight="680" class="v-ink">Host A</text>
+  <rect x="24" y="70" width="84" height="76" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.25" />
+  <text x="66" y="101" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="650" class="v-ink">CPU</text>
+  <text x="66" y="124" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="13.5" font-weight="450" class="v-sub">Provider</text>
+  <rect x="134" y="62" width="162" height="91" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.25" />
+  <text x="215" y="87" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17.5" font-weight="650" class="v-ink">Host DRAM</text>
+  <text x="215" y="111" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="15" font-weight="450" class="v-sub">SQ / RQ  ·  CQ</text>
+  <text x="215" y="134" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">Registered buffer</text>
+  <path d="M 110 107 H 131" fill="none" stroke="var(--text-secondary, #435669)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-host-sub)" />
+  <polygon points="110.0,107.0 116.96,110.6 116.96,103.4" fill="var(--text-secondary, #435669)" />
+  <path d="M 66 148 V 219" fill="none" stroke="var(--chart-amber, #8c5b23)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 4" marker-end="url(#rd4-host-amber)" />
+  <path d="M 215 155 V 219" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-host-teal)" />
+  <polygon points="215.0,155.0 210.05,164.57 219.95,164.57" fill="var(--chart-teal, #226b63)" />
+  <text x="138" y="193" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="16" font-weight="580" class="v-sub">PCIe</text>
+  <rect x="25" y="223" width="270" height="57" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--chart-blue, #3c689a)" stroke-width="1.8" />
+  <text x="160" y="247" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="21" font-weight="680" class="v-ink">RNIC</text>
+  <text x="160" y="269" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">Queue processing  ·  RC transport</text>
+  <rect x="452" y="12" width="296" height="282" rx="10" fill="var(--surface-soft, #f0f4f7)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.15" />
+  <text x="469" y="43" fill="var(--text-primary, #233442)" text-anchor="start" font-size="22" font-weight="680" class="v-ink">Host B</text>
+  <rect x="464" y="70" width="84" height="76" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.25" />
+  <text x="506" y="101" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="650" class="v-ink">CPU</text>
+  <text x="506" y="124" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="13.5" font-weight="450" class="v-sub">Provider</text>
+  <rect x="574" y="62" width="162" height="91" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.25" />
+  <text x="655" y="87" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17.5" font-weight="650" class="v-ink">Host DRAM</text>
+  <text x="655" y="111" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="15" font-weight="450" class="v-sub">SQ / RQ  ·  CQ</text>
+  <text x="655" y="134" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">Registered buffer</text>
+  <path d="M 550 107 H 571" fill="none" stroke="var(--text-secondary, #435669)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-host-sub)" />
+  <polygon points="550.0,107.0 556.96,110.6 556.96,103.4" fill="var(--text-secondary, #435669)" />
+  <path d="M 506 148 V 219" fill="none" stroke="var(--chart-amber, #8c5b23)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 4" marker-end="url(#rd4-host-amber)" />
+  <path d="M 655 155 V 219" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-host-teal)" />
+  <polygon points="655.0,155.0 650.05,164.57 659.95,164.57" fill="var(--chart-teal, #226b63)" />
+  <text x="578" y="193" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="16" font-weight="580" class="v-sub">PCIe</text>
+  <rect x="465" y="223" width="270" height="57" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--chart-blue, #3c689a)" stroke-width="1.8" />
+  <text x="600" y="247" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="21" font-weight="680" class="v-ink">RNIC</text>
+  <text x="600" y="269" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">Queue processing  ·  RC transport</text>
+  <text x="380" y="223" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="16" font-weight="620" class="v-ink">Ethernet</text>
+  <path d="M 298 249 H 462" fill="none" stroke="var(--chart-blue, #3c689a)" stroke-width="2.7" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-host-blue)" />
+  <polygon points="298.0,249.0 309.745,255.075 309.745,242.925" fill="var(--chart-blue, #3c689a)" />
+  <text x="380" y="274" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="15" font-weight="450" class="v-sub">RoCEv2</text>
+  <text x="14" y="336" fill="var(--text-primary, #233442)" text-anchor="start" font-size="18" font-weight="660" class="v-ink">What crosses PCIe?</text>
+  <path d="M 18 365 H 69" fill="none" stroke="var(--chart-amber, #8c5b23)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 4" marker-end="url(#rd4-host-amber)" />
+  <text x="85" y="370" fill="var(--text-primary, #233442)" text-anchor="start" font-size="16" font-weight="650" class="v-ink">MMIO</text>
+  <text x="168" y="370" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="16" font-weight="450" class="v-sub">CPU writes a doorbell to notify its local RNIC.</text>
+  <path d="M 18 402 H 69" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-host-teal)" />
+  <polygon points="18.0,402.0 27.57,406.95 27.57,397.05" fill="var(--chart-teal, #226b63)" />
+  <text x="85" y="407" fill="var(--text-primary, #233442)" text-anchor="start" font-size="16" font-weight="650" class="v-ink">DMA</text>
+  <text x="168" y="407" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="16" font-weight="450" class="v-sub">RNIC fetches work, moves data and writes completions.</text>
+</svg>

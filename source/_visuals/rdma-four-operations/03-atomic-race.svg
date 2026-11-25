@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 377" role="img" aria-label="A lost increment versus two atomic fetch-and-add operations" font-family="system-ui, sans-serif">
+  <title>A lost increment versus two atomic fetch-and-add operations</title>
+  <desc>Both clients update the same aligned 64-bit counter initialized to 41 through a single responding RNIC. On the left an admissible interleaving has A and C read 41, then both write 42, losing one increment. On the right the responder executes A and then C as indivisible fetch-and-add operations. Their returned old values are 41 and 42, and the final counter value is 43. The reverse serialization order exchanges the two return values.</desc>
+  <defs>
+    <marker id="rd4-rmw-blue" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-blue, #3c689a)" />
+    </marker>
+    <marker id="rd4-rmw-teal" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-teal, #226b63)" />
+    </marker>
+    <marker id="rd4-rmw-amber" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-amber, #8c5b23)" />
+    </marker>
+    <marker id="rd4-rmw-sub" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--text-secondary, #435669)" />
+    </marker>
+  </defs>
+  <text x="12" y="31" fill="var(--text-primary, #233442)" text-anchor="start" font-size="22" font-weight="670" class="v-ink">One counter at B, two requesters</text>
+  <rect x="8" y="55" width="366" height="305" rx="10" fill="var(--surface-soft, #f0f4f7)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.15" />
+  <text x="23" y="87" fill="var(--text-primary, #233442)" text-anchor="start" font-size="19" font-weight="650" class="v-ink">Separate READ and WRITE</text>
+  <text x="23" y="113" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="15" font-weight="500" class="v-sub">Initial value  41</text>
+  <path d="M 23 126 H 359" fill="none" stroke="var(--divider, #cbd5df)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" />
+  <text x="34" y="151" fill="var(--text-muted, #516477)" text-anchor="start" font-size="14" font-weight="550" class="v-muted">From</text>
+  <text x="113" y="151" fill="var(--text-muted, #516477)" text-anchor="start" font-size="14" font-weight="550" class="v-muted">Access at B</text>
+  <text x="349" y="151" fill="var(--text-muted, #516477)" text-anchor="end" font-size="14" font-weight="550" class="v-muted">B after</text>
+  <text x="48" y="181" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">A</text>
+  <text x="113" y="181" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="16" font-weight="500" class="v-sub">READ → 41</text>
+  <text x="332" y="181" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">41</text>
+  <text x="48" y="211" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">C</text>
+  <text x="113" y="211" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="16" font-weight="500" class="v-sub">READ → 41</text>
+  <text x="332" y="211" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">41</text>
+  <text x="48" y="241" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">A</text>
+  <text x="113" y="241" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="16" font-weight="500" class="v-sub">WRITE 42</text>
+  <text x="332" y="241" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">42</text>
+  <text x="48" y="271" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">C</text>
+  <text x="113" y="271" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="16" font-weight="500" class="v-sub">WRITE 42</text>
+  <text x="332" y="271" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">42</text>
+  <rect x="23" y="299" width="336" height="44" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--chart-amber, #8c5b23)" stroke-width="1.6" />
+  <text x="191" y="327" fill="var(--chart-amber, #8c5b23)" text-anchor="middle" font-size="18" font-weight="650">Final value  42</text>
+  <rect x="386" y="55" width="366" height="305" rx="10" fill="var(--surface-soft, #f0f4f7)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.15" />
+  <text x="401" y="87" fill="var(--text-primary, #233442)" text-anchor="start" font-size="19" font-weight="650" class="v-ink">Atomic FETCH_ADD(+1)</text>
+  <text x="401" y="113" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="15" font-weight="500" class="v-sub">Initial value  41</text>
+  <path d="M 401 126 H 737" fill="none" stroke="var(--divider, #cbd5df)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" />
+  <text x="412" y="151" fill="var(--text-muted, #516477)" text-anchor="start" font-size="14" font-weight="550" class="v-muted">From</text>
+  <text x="491" y="151" fill="var(--text-muted, #516477)" text-anchor="start" font-size="14" font-weight="550" class="v-muted">Access at B</text>
+  <text x="727" y="151" fill="var(--text-muted, #516477)" text-anchor="end" font-size="14" font-weight="550" class="v-muted">B after</text>
+  <text x="426" y="181" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">A</text>
+  <text x="491" y="181" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="16" font-weight="500" class="v-sub">old value 41</text>
+  <text x="710" y="181" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">42</text>
+  <text x="426" y="211" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">C</text>
+  <text x="491" y="211" fill="var(--text-secondary, #435669)" text-anchor="start" font-size="16" font-weight="500" class="v-sub">old value 42</text>
+  <text x="710" y="211" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17" font-weight="620" class="v-ink">43</text>
+  <rect x="401" y="299" width="336" height="44" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--chart-teal, #226b63)" stroke-width="1.6" />
+  <text x="569" y="327" fill="var(--chart-teal, #226b63)" text-anchor="middle" font-size="18" font-weight="650">Final value  43</text>
+</svg>

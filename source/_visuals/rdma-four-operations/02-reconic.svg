@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" role="img" aria-label="RecoNIC on an Alveo U250: packet classification and the RDMA memory paths" font-family="system-ui, sans-serif">
+  <title>RecoNIC on an Alveo U250: packet classification and the RDMA memory paths</title>
+  <desc>The left panel follows incoming Ethernet frames through CMAC RX and the packet classifier. RoCEv2 packets go to the licensed ERNIC v3.1 engine. Ordinary frames take the QDMA receive stream. The right panel expands the memory interfaces of that same ERNIC. Its AXI memory-mapped ports connect to a system crossbar. The host path uses the QDMA AXI bridge and PCIe to host DRAM. The device path uses the device crossbar and DDR controller to on-card DDR; it does not need the host PCIe link for payload placement.</desc>
+  <defs>
+    <marker id="rd4-rn-blue" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-blue, #3c689a)" />
+    </marker>
+    <marker id="rd4-rn-teal" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-teal, #226b63)" />
+    </marker>
+    <marker id="rd4-rn-amber" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--chart-amber, #8c5b23)" />
+    </marker>
+    <marker id="rd4-rn-sub" viewBox="0 0 8 8" refX="7.1" refY="4" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--text-secondary, #435669)" />
+    </marker>
+  </defs>
+  <rect x="8" y="10" width="331" height="491" rx="10" fill="var(--surface-soft, #f0f4f7)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.15" />
+  <rect x="349" y="10" width="403" height="491" rx="10" fill="var(--surface-soft, #f0f4f7)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.15" />
+  <text x="23" y="41" fill="var(--text-primary, #233442)" text-anchor="start" font-size="21" font-weight="680" class="v-ink">Ethernet ingress</text>
+  <text x="365" y="41" fill="var(--text-primary, #233442)" text-anchor="start" font-size="21" font-weight="680" class="v-ink">RDMA memory access</text>
+  <rect x="59" y="64" width="228" height="55" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="173.0" y="89.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="17.5" font-weight="620" class="v-ink">100 GbE CMAC</text>
+  <text x="173.0" y="109.5" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">RX stream</text>
+  <path d="M 173 120 V 154" fill="none" stroke="var(--text-secondary, #435669)" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-rn-sub)" />
+  <rect x="50" y="158" width="246" height="56" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="173.0" y="184.0" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="620" class="v-ink">Packet classifier</text>
+  <text x="173.0" y="204.0" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">RoCEv2 / ordinary Ethernet</text>
+  <path d="M 173 216 V 238 H 92 V 247" fill="none" stroke="var(--chart-blue, #3c689a)" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M 92 270 V 282" fill="none" stroke="var(--chart-blue, #3c689a)" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-rn-blue)" />
+  <path d="M 173 238 H 251 V 247" fill="none" stroke="var(--text-secondary, #435669)" stroke-width="2.05" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 4" />
+  <path d="M 251 270 V 282" fill="none" stroke="var(--text-secondary, #435669)" stroke-width="2.05" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 4" marker-end="url(#rd4-rn-sub)" />
+  <text x="92" y="265" fill="var(--chart-blue, #3c689a)" text-anchor="middle" font-size="15" font-weight="610">RoCEv2</text>
+  <text x="255" y="265" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14.5" font-weight="570" class="v-sub">Other traffic</text>
+  <rect x="20" y="286" width="145" height="75" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--chart-blue, #3c689a)" stroke-width="1.6" />
+  <text x="92.5" y="321.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="620" class="v-ink">ERNIC 3.1</text>
+  <text x="92.5" y="341.5" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">RDMA engine</text>
+  <rect x="181" y="286" width="146" height="75" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="254.0" y="321.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="620" class="v-ink">QDMA RX</text>
+  <text x="254.0" y="341.5" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">Packet stream</text>
+  <path d="M 250 362 V 396" fill="none" stroke="var(--text-secondary, #435669)" stroke-width="2.05" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 4" marker-end="url(#rd4-rn-sub)" />
+  <rect x="181" y="400" width="146" height="51" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="254.0" y="431.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="15.5" font-weight="620" class="v-ink">Host RX buffers</text>
+  <text x="92" y="391" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">AMD licensed IP</text>
+  <rect x="422" y="64" width="255" height="55" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--chart-blue, #3c689a)" stroke-width="1.6" />
+  <text x="549.5" y="89.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="620" class="v-ink">ERNIC 3.1</text>
+  <text x="549.5" y="109.5" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">AXI memory-mapped ports</text>
+  <path d="M 550 122 V 154" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-rn-teal)" />
+  <polygon points="550.0,122.0 544.825,132.005 555.175,132.005" fill="var(--chart-teal, #226b63)" />
+  <rect x="416" y="158" width="267" height="56" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="549.5" y="184.0" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="620" class="v-ink">System AXI crossbar</text>
+  <text x="549.5" y="204.0" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">Address selects the target</text>
+  <path d="M 550 217 V 235" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" />
+  <polygon points="550.0,217.0 545.05,226.57 554.95,226.57" fill="var(--chart-teal, #226b63)" />
+  <path d="M 449 246 V 235 H 652 V 246" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M 449 268 V 279" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-rn-teal)" />
+  <path d="M 652 268 V 279" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-rn-teal)" />
+  <text x="449" y="262" fill="var(--chart-teal, #226b63)" text-anchor="middle" font-size="15" font-weight="570">Host address</text>
+  <text x="651" y="262" fill="var(--chart-teal, #226b63)" text-anchor="middle" font-size="15" font-weight="570">Card address</text>
+  <rect x="363" y="282" width="172" height="69" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="449.0" y="314.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="16.3" font-weight="620" class="v-ink">QDMA AXI bridge</text>
+  <text x="449.0" y="334.5" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">PCIe-facing AXI port</text>
+  <rect x="562" y="282" width="176" height="69" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="650.0" y="314.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="16" font-weight="620" class="v-ink">Device AXI crossbar</text>
+  <text x="650.0" y="334.5" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14" font-weight="450" class="v-sub">DDR controller path</text>
+  <path d="M 449 354 V 413" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-rn-teal)" />
+  <polygon points="449.0,354.0 444.05,363.57 453.95,363.57" fill="var(--chart-teal, #226b63)" />
+  <path d="M 651 354 V 413" fill="none" stroke="var(--chart-teal, #226b63)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rd4-rn-teal)" />
+  <polygon points="651.0,354.0 646.05,363.57 655.95,363.57" fill="var(--chart-teal, #226b63)" />
+  <text x="484" y="391" fill="var(--text-secondary, #435669)" text-anchor="middle" font-size="14.5" font-weight="580" class="v-sub">PCIe</text>
+  <rect x="363" y="417" width="172" height="57" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="449.0" y="451.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="620" class="v-ink">Host DRAM</text>
+  <rect x="562" y="417" width="176" height="57" rx="7" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #abb8c4)" stroke-width="1.6" />
+  <text x="650.0" y="451.5" fill="var(--text-primary, #233442)" text-anchor="middle" font-size="18" font-weight="620" class="v-ink">On-card DDR</text>
+</svg>

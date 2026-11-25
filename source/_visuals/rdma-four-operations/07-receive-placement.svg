@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 692 548" role="img" aria-label="How SEND, WRITE and WRITE WITH IMMEDIATE place four kibibytes at receiver B" font-family="system-ui, sans-serif">
+<title>Payload placement and receive completion on B</title>
+<desc>Each case is a fresh successful RC transfer into host memory. Read across each panel. For SEND a receive WQE on the destination QP supplies an SGE into RX7 and B’s completion reports its locally assigned wr_id of 7. For ordinary WRITE, the address from A and its remote write key select slot3, no receive WQE is consumed and no receive completion is generated. For WRITE WITH IMMEDIATE the same address selects slot3. One locally posted receive is consumed for the notification. A receive completion returns B’s local wr_id of 7 and A’s 32-bit immediate value of 3. Solid arrows show the payload path into memory and dashed arrows denote the completion visible to software. The diagram does not specify how the provider recovers the local wr_id.</desc>
+<text x="26" y="28" fill="var(--text-primary,#233342)" font-size="20" font-weight="680" text-anchor="start">B RNIC</text>
+<text x="347" y="27" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="600" text-anchor="middle">PCIe</text>
+<text x="433" y="28" fill="var(--text-primary,#233342)" font-size="20" font-weight="680" text-anchor="start">B host memory</text>
+<rect x="9" y="42" width="674" height="151" rx="9" fill="var(--surface-card,#ffffff)" stroke="var(--figure-line,#b7c1cb)"/>
+<rect x="10" y="43" width="672" height="36" rx="8" fill="var(--surface-soft,#f1f5f7)" stroke="none"/>
+<path d="M10 79H682" fill="none" stroke="var(--figure-line,#b7c1cb)" stroke-width="1"/>
+<text x="25" y="67" fill="var(--text-primary,#233342)" font-size="19.5" font-weight="700" text-anchor="start">SEND</text>
+<text x="668" y="66" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="540" text-anchor="end">1 receive WQE consumed</text>
+<text x="26" y="107" fill="var(--text-primary,#233342)" font-size="17.5" font-weight="650" text-anchor="start">Next receive WQE on QP</text>
+<text x="26" y="127" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="450" text-anchor="start">B’s SGE points to RX7</text>
+<path d="M286 111H401" fill="none" stroke="var(--chart-blue,#356b96)" stroke-width="2.3"/>
+<path d="m400 106 10 5 -10 5 z" fill="var(--chart-blue,#356b96)"/>
+<text x="347" y="102" fill="var(--text-secondary,#495968)" font-size="14.8" font-weight="600" text-anchor="middle">4 KiB</text>
+<text x="433" y="107" fill="var(--text-primary,#233342)" font-size="17.5" font-weight="670" text-anchor="start">RX7</text>
+<text x="433" y="127" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="450" text-anchor="start">B’s posted receive buffer</text>
+<text x="26" y="160" fill="var(--text-primary,#233342)" font-size="16.7" font-weight="620" text-anchor="start">ID of that receive WR</text>
+<text x="26" y="180" fill="var(--text-secondary,#495968)" font-size="15.3" font-weight="450" text-anchor="start">wr_id = 7, chosen by B</text>
+<path d="M286 165H401" fill="none" stroke="var(--chart-teal,#25756e)" stroke-width="2.3" stroke-dasharray="6 4"/>
+<path d="m400 160 10 5 -10 5 z" fill="var(--chart-teal,#25756e)"/>
+<text x="347" y="157" fill="var(--text-secondary,#495968)" font-size="14.8" font-weight="600" text-anchor="middle">CQ update</text>
+<text x="433" y="161" fill="var(--text-primary,#233342)" font-size="17" font-weight="640" text-anchor="start">Receive CQ entry</text>
+<text x="433" y="182" fill="var(--text-secondary,#495968)" font-size="15.3" font-weight="450" text-anchor="start">Poll: wr_id = 7</text>
+<rect x="9" y="205" width="674" height="151" rx="9" fill="var(--surface-card,#ffffff)" stroke="var(--figure-line,#b7c1cb)"/>
+<rect x="10" y="206" width="672" height="36" rx="8" fill="var(--surface-soft,#f1f5f7)" stroke="none"/>
+<path d="M10 242H682" fill="none" stroke="var(--figure-line,#b7c1cb)" stroke-width="1"/>
+<text x="25" y="230" fill="var(--text-primary,#233342)" font-size="19.5" font-weight="700" text-anchor="start">WRITE</text>
+<text x="668" y="229" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="540" text-anchor="end">0 receive WQEs consumed</text>
+<text x="26" y="270" fill="var(--text-primary,#233342)" font-size="17.5" font-weight="650" text-anchor="start">Address + rkey from A</text>
+<text x="26" y="290" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="450" text-anchor="start">Check MR bounds and write access</text>
+<path d="M286 274H401" fill="none" stroke="var(--chart-blue,#356b96)" stroke-width="2.3"/>
+<path d="m400 269 10 5 -10 5 z" fill="var(--chart-blue,#356b96)"/>
+<text x="347" y="265" fill="var(--text-secondary,#495968)" font-size="14.8" font-weight="600" text-anchor="middle">4 KiB</text>
+<text x="433" y="270" fill="var(--text-primary,#233342)" font-size="17.5" font-weight="670" text-anchor="start">slot3</text>
+<text x="433" y="290" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="450" text-anchor="start">Address specified by A</text>
+<text x="26" y="323" fill="var(--text-primary,#233342)" font-size="16.7" font-weight="620" text-anchor="start">No receive WQE consumed</text>
+<text x="26" y="343" fill="var(--text-secondary,#495968)" font-size="15.3" font-weight="450" text-anchor="start">No receive WR needed</text>
+<path d="M286 327H410" fill="none" stroke="var(--figure-line,#b7c1cb)" stroke-width="1"/>
+<path d="M343 323l8 8m-8 0 8-8" fill="none" stroke="var(--text-muted,#657482)" stroke-width="1.8"/>
+<text x="433" y="334" fill="var(--text-secondary,#495968)" font-size="16" font-weight="560" text-anchor="start">No receive completion</text>
+<rect x="9" y="368" width="674" height="151" rx="9" fill="var(--surface-card,#ffffff)" stroke="var(--figure-line,#b7c1cb)"/>
+<rect x="10" y="369" width="672" height="36" rx="8" fill="var(--surface-soft,#f1f5f7)" stroke="none"/>
+<path d="M10 405H682" fill="none" stroke="var(--figure-line,#b7c1cb)" stroke-width="1"/>
+<text x="25" y="393" fill="var(--text-primary,#233342)" font-size="19.5" font-weight="700" text-anchor="start">WRITE_WITH_IMM</text>
+<text x="668" y="392" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="540" text-anchor="end">1 receive WQE consumed</text>
+<text x="26" y="433" fill="var(--text-primary,#233342)" font-size="17.5" font-weight="650" text-anchor="start">Address + rkey from A</text>
+<text x="26" y="453" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="450" text-anchor="start">Check MR bounds and write access</text>
+<path d="M286 437H401" fill="none" stroke="var(--chart-blue,#356b96)" stroke-width="2.3"/>
+<path d="m400 432 10 5 -10 5 z" fill="var(--chart-blue,#356b96)"/>
+<text x="347" y="428" fill="var(--text-secondary,#495968)" font-size="14.8" font-weight="600" text-anchor="middle">4 KiB</text>
+<text x="433" y="433" fill="var(--text-primary,#233342)" font-size="17.5" font-weight="670" text-anchor="start">slot3</text>
+<text x="433" y="453" fill="var(--text-secondary,#495968)" font-size="15.5" font-weight="450" text-anchor="start">Address specified by A</text>
+<text x="26" y="486" fill="var(--text-primary,#233342)" font-size="16.7" font-weight="620" text-anchor="start">One receive WR from B</text>
+<text x="26" y="506" fill="var(--text-secondary,#495968)" font-size="15.3" font-weight="450" text-anchor="start">Plus 32-bit immediate from A</text>
+<path d="M286 491H401" fill="none" stroke="var(--chart-teal,#25756e)" stroke-width="2.3" stroke-dasharray="6 4"/>
+<path d="m400 486 10 5 -10 5 z" fill="var(--chart-teal,#25756e)"/>
+<text x="347" y="483" fill="var(--text-secondary,#495968)" font-size="14.8" font-weight="600" text-anchor="middle">CQ update</text>
+<text x="433" y="487" fill="var(--text-primary,#233342)" font-size="17" font-weight="640" text-anchor="start">Receive CQ entry</text>
+<text x="433" y="508" fill="var(--text-secondary,#495968)" font-size="15.3" font-weight="450" text-anchor="start">Poll: wr_id = 7 · imm = 3</text>
+<text x="11" y="540" fill="var(--text-secondary,#495968)" font-size="14.8" font-weight="500" text-anchor="start">Solid: payload to memory</text>
+<text x="322" y="540" fill="var(--text-secondary,#495968)" font-size="14.8" font-weight="500" text-anchor="start">Dashed: notification visible to B</text>
+</svg>

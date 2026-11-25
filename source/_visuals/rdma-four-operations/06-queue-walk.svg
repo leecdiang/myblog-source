@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 630" role="img" aria-label="How one 4 KiB SEND uses a host-backed send queue, two local scatter-gather elements, PCIe DMA and a completion queue" font-family="system-ui, sans-serif">
+<title>One SEND, two local buffers, one completion</title>
+<desc>Host A posts one signaled, non-inline RC SEND. SGE zero describes one KiB at P; SGE one describes three KiB at P plus 8192. Both lie inside one registered twelve-KiB range and use local key K. On a host-backed queue fetch path, software publishes the work entry and rings a doorbell. The NIC uses QP state, fetches the WQE, checks the local key and ranges, gathers the two payload slices in order and sends one message to the peer. PCIe read requests point from NIC to host while returned bytes point from host to NIC. After the signaled send completes, the NIC writes a local completion entry. Logical accesses only. Descriptor encodings, caches, batching and physical transactions are implementation specific.</desc>
+<rect x="10" y="10" width="347" height="160" rx="8" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #aebcc9)" stroke-width="1"/>
+<rect x="365" y="10" width="345" height="160" rx="8" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #aebcc9)" stroke-width="1"/>
+<text x="24" y="41" font-size="20" font-weight="650" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">SQ slot n</text>
+<text x="344" y="40" font-size="16" font-weight="600" text-anchor="end" class="v-sub" fill="var(--text-secondary, #495669)">SEND · signaled</text>
+<path d="M23 54 L344 54" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="25" y="78" font-size="15" font-weight="600" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">SGE</text>
+<text x="92" y="78" font-size="15" font-weight="600" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Local address</text>
+<text x="270" y="78" font-size="15" font-weight="600" text-anchor="end" class="v-sub" fill="var(--text-secondary, #495669)">Length</text>
+<text x="324" y="78" font-size="15" font-weight="600" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">lkey</text>
+<text x="32" y="109" font-size="16" font-weight="620" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">0</text>
+<text x="92" y="109" font-size="16" font-weight="450" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">P</text>
+<text x="270" y="109" font-size="16" font-weight="470" text-anchor="end" class="v-ink" fill="var(--text-primary, #253442)">1 KiB</text>
+<text x="324" y="109" font-size="16" font-weight="470" text-anchor="middle" class="v-ink" fill="var(--text-primary, #253442)">K</text>
+<text x="32" y="140" font-size="16" font-weight="620" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">1</text>
+<text x="92" y="140" font-size="16" font-weight="450" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">P + 8192 B</text>
+<text x="270" y="140" font-size="16" font-weight="470" text-anchor="end" class="v-ink" fill="var(--text-primary, #253442)">3 KiB</text>
+<text x="324" y="140" font-size="16" font-weight="470" text-anchor="middle" class="v-ink" fill="var(--text-primary, #253442)">K</text>
+<text x="380" y="41" font-size="20" font-weight="650" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">Registered MR</text>
+<text x="695" y="40" font-size="15" font-weight="600" text-anchor="end" class="v-sub" fill="var(--text-secondary, #495669)">Base P · key K</text>
+<path d="M379 54 L696 54" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="388" y="82" font-size="15" font-weight="620" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">SGE 0</text>
+<text x="608" y="82" font-size="15" font-weight="620" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">SGE 1</text>
+<path d="M400.5 88 L400.5 103" stroke="var(--text-secondary, #495669)" stroke-width="1" fill="none"/>
+<path d="M625.5 88 L625.5 103" stroke="var(--text-secondary, #495669)" stroke-width="1" fill="none"/>
+<rect x="388" y="103" width="300" height="18" rx="0" fill="var(--surface-soft, #eff3f6)" stroke="var(--figure-line, #aebcc9)" stroke-width="1"/>
+<rect x="388" y="103" width="25" height="18" rx="0" fill="var(--chart-blue, #3c689a)" stroke="var(--chart-blue, #3c689a)" stroke-width="1"/>
+<rect x="588" y="103" width="75" height="18" rx="0" fill="var(--chart-teal, #226b63)" stroke="var(--chart-teal, #226b63)" stroke-width="1"/>
+<path d="M388 122 L388 130" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="388" y="151" font-size="15" font-weight="450" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">0</text>
+<path d="M588 122 L588 130" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="588" y="151" font-size="15" font-weight="450" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">8</text>
+<path d="M688 122 L688 130" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="688" y="151" font-size="15" font-weight="450" text-anchor="end" class="v-sub" fill="var(--text-secondary, #495669)">12 KiB</text>
+<rect x="10" y="182" width="700" height="436" rx="8" fill="var(--surface-card, #ffffff)" stroke="var(--figure-line, #aebcc9)" stroke-width="1"/>
+<text x="24" y="213" font-size="20" font-weight="670" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">Host A</text>
+<text x="363" y="213" font-size="17" font-weight="620" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">Across PCIe</text>
+<text x="507" y="213" font-size="20" font-weight="670" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">A RNIC</text>
+<path d="M24 226 L696 226" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="25" y="252" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">CPU / provider</text>
+<text x="25" y="274" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Publish SQ[n]</text>
+<text x="362" y="262" font-size="15" font-weight="570" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">MMIO doorbell</text>
+<path d="M243 269 L477 269" stroke="var(--chart-amber, #8c5b23)" stroke-width="2.1" stroke-dasharray="5 3" fill="none"/>
+<path d="M481 269 l-8 -4.5 v9 z" fill="var(--chart-amber, #8c5b23)"/>
+<text x="506" y="252" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">Select QP</text>
+<text x="506" y="274" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Locate its SQ</text>
+<path d="M24 289 L696 289" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="25" y="328" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">SQ slot n</text>
+<text x="25" y="350" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Encoded WQE</text>
+<text x="362" y="312" font-size="15" font-weight="570" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">Read request · MRd</text>
+<path d="M481 319 L247 319" stroke="var(--chart-amber, #8c5b23)" stroke-width="2.1" stroke-dasharray="5 3" fill="none"/>
+<path d="M243 319 l8 -4.5 v9 z" fill="var(--chart-amber, #8c5b23)"/>
+<text x="362" y="352" font-size="15" font-weight="570" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">WQE data · CplD</text>
+<path d="M243 359 L477 359" stroke="var(--chart-blue, #3c689a)" stroke-width="2.1" fill="none"/>
+<path d="M481 359 l-8 -4.5 v9 z" fill="var(--chart-blue, #3c689a)"/>
+<text x="506" y="328" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">Fetch WQE</text>
+<text x="506" y="350" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Decode the two SGEs</text>
+<path d="M24 375 L696 375" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="25" y="413" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">Registered MR</text>
+<text x="25" y="435" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Two local source slices</text>
+<text x="362" y="397" font-size="15" font-weight="570" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">Read requests · MRd</text>
+<path d="M481 404 L247 404" stroke="var(--chart-amber, #8c5b23)" stroke-width="2.1" stroke-dasharray="5 3" fill="none"/>
+<path d="M243 404 l8 -4.5 v9 z" fill="var(--chart-amber, #8c5b23)"/>
+<text x="362" y="438" font-size="15" font-weight="570" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">Payload data · CplD</text>
+<path d="M243 445 L477 445" stroke="var(--chart-teal, #226b63)" stroke-width="2.1" fill="none"/>
+<path d="M481 445 l-8 -4.5 v9 z" fill="var(--chart-teal, #226b63)"/>
+<text x="506" y="412" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">Check lkey + ranges</text>
+<text x="506" y="435" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Gather SGE 0, then 1</text>
+<path d="M24 460 L696 460" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="25" y="489" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">Message to peer QP</text>
+<text x="25" y="512" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Logical payload order</text>
+<rect x="248" y="477" width="109.0" height="12" rx="0" fill="var(--chart-blue, #3c689a)" stroke="var(--chart-blue, #3c689a)" stroke-width="1"/>
+<rect x="357.0" y="477" width="327.0" height="12" rx="0" fill="var(--chart-teal, #226b63)" stroke="var(--chart-teal, #226b63)" stroke-width="1"/>
+<text x="302.5" y="513" font-size="15" font-weight="560" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">SGE 0 · 1 KiB</text>
+<text x="520.5" y="513" font-size="15" font-weight="560" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">SGE 1 · 3 KiB</text>
+<path d="M24 533 L696 533" stroke="var(--figure-line, #aebcc9)" stroke-width="1" fill="none"/>
+<text x="25" y="565" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">CQ slot m</text>
+<text x="25" y="589" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">CPU polls for the result</text>
+<text x="362" y="570" font-size="15" font-weight="570" text-anchor="middle" class="v-sub" fill="var(--text-secondary, #495669)">CQE write · MWr</text>
+<path d="M481 577 L247 577" stroke="var(--chart-blue, #3c689a)" stroke-width="2.1" fill="none"/>
+<path d="M243 577 l8 -4.5 v9 z" fill="var(--chart-blue, #3c689a)"/>
+<text x="506" y="565" font-size="17" font-weight="630" text-anchor="start" class="v-ink" fill="var(--text-primary, #253442)">Complete SEND</text>
+<text x="506" y="589" font-size="15" font-weight="430" text-anchor="start" class="v-sub" fill="var(--text-secondary, #495669)">Report local success</text>
+</svg>

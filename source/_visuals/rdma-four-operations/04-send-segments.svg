@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 322" role="img" aria-label="One four-kibibyte SEND with two different path MTUs" font-family="system-ui, sans-serif">
+  <title>One SEND, two packet layouts</title>
+  <desc>A posts one signaled, non-inline 4096-byte SEND. With a path MTU of 4096 bytes, one SEND ONLY packet carries the message. With a path MTU of 1024 bytes, four packets cover four consecutive 1024-byte slices: FIRST, MIDDLE, MIDDLE, LAST. Under both configurations, B consumes one sufficiently large receive WQE. A gets one successful send completion and B gets one successful receive completion.</desc>
+  <text x="16" y="29" class="v-ink" fill="var(--text-primary,#18212b)" font-weight="670" font-size="23">One 4 KiB SEND</text>
+  <text x="16" y="55" class="v-sub" fill="var(--text-secondary,#4d6072)" font-size="17">Reliable connection · signaled, non-inline send</text>
+  <g class="v-sub" fill="var(--text-secondary,#4d6072)" font-size="15.5">
+    <text x="16" y="98">QP path MTU</text>
+    <text x="404" y="92" text-anchor="middle">Payload offset (KiB)</text>
+  </g>
+  <g stroke="var(--text-muted,#54697a)" stroke-width="1" fill="none">
+    <path d="M160 121H648 M160 117v8 M282 117v8 M404 117v8 M526 117v8 M648 117v8"/>
+  </g>
+  <g class="v-sub" fill="var(--text-secondary,#4d6072)" font-size="15" text-anchor="middle">
+    <text x="160" y="113">0</text><text x="282" y="113">1</text><text x="404" y="113">2</text><text x="526" y="113">3</text><text x="648" y="113">4</text>
+  </g>
+  <g fill="var(--chart-blue,#356a8f)" fill-opacity=".11" stroke="var(--chart-blue,#356a8f)" stroke-width="1.6">
+    <rect x="160" y="135" width="488" height="40" rx="4"/>
+    <rect x="160" y="190" width="488" height="40" rx="4"/>
+    <path d="M282 191v38 M404 191v38 M526 191v38" fill="none"/>
+  </g>
+  <g class="v-ink" fill="var(--text-primary,#18212b)" font-size="18" font-weight="620">
+    <text x="16" y="161">4096 B</text><text x="16" y="216">1024 B</text>
+  </g>
+  <g class="v-ink" fill="var(--text-primary,#18212b)" text-anchor="middle" font-family="ui-monospace, monospace" font-size="17" font-weight="600">
+    <text x="404" y="161">ONLY</text>
+    <text x="221" y="216">FIRST</text><text x="343" y="216">MIDDLE</text><text x="465" y="216">MIDDLE</text><text x="587" y="216">LAST</text>
+  </g>
+  <path d="M16 249H648" stroke="var(--text-muted,#54697a)" stroke-opacity=".35"/>
+  <g class="v-sub" fill="var(--text-secondary,#4d6072)" font-size="15.5">
+    <text x="16" y="276">Sender A</text><text x="339" y="276">Receiver B</text>
+  </g>
+  <g class="v-ink" fill="var(--text-primary,#18212b)" font-size="16.5" font-weight="590">
+    <text x="16" y="302">1 SEND WR · 1 send CQE</text>
+    <text x="339" y="302">1 receive WQE · 1 receive CQE</text>
+  </g>
+</svg>
