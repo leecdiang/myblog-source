@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 792 331" role="img" aria-label="Tensor-parallel AllReduce sizes in prefill and decode" font-family="system-ui, sans-serif" font-size="17">
+<desc>With 32 layers, both forwards call 64 layer collectives. One prefill collective takes 16 MiB per rank for 2048 rows. One decode collective takes 128 KiB for 16 rows.</desc>
+<text x="22.00" y="31.00" class="v-ink" font-size="23" text-anchor="start" font-weight="650">TP collective size per forward call</text>
+<text x="22.00" y="56.00" class="v-sub" font-size="16" text-anchor="start" font-weight="400">32 layers  /  hidden size 4,096  /  BF16 activations</text>
+<line x1="233.00" y1="98.00" x2="233.00" y2="252.00" stroke="var(--line)" stroke-width="1"/>
+<text x="233.00" y="276.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">32 KiB</text>
+<line x1="333.00" y1="98.00" x2="333.00" y2="252.00" stroke="var(--line)" stroke-width="1"/>
+<text x="333.00" y="276.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">128 KiB</text>
+<line x1="433.00" y1="98.00" x2="433.00" y2="252.00" stroke="var(--line)" stroke-width="1"/>
+<text x="433.00" y="276.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">512 KiB</text>
+<line x1="533.00" y1="98.00" x2="533.00" y2="252.00" stroke="var(--line)" stroke-width="1"/>
+<text x="533.00" y="276.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">2 MiB</text>
+<line x1="633.00" y1="98.00" x2="633.00" y2="252.00" stroke="var(--line)" stroke-width="1"/>
+<text x="633.00" y="276.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">8 MiB</text>
+<line x1="733.00" y1="98.00" x2="733.00" y2="252.00" stroke="var(--line)" stroke-width="1"/>
+<text x="733.00" y="276.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">32 MiB</text>
+<text x="23.00" y="128.00" class="v-ink" font-size="20" text-anchor="start" font-weight="650">Prefill</text>
+<text x="23.00" y="151.00" class="v-sub" font-size="16" text-anchor="start" font-weight="400">2,048 token rows</text>
+<line x1="233.00" y1="139.00" x2="683.00" y2="139.00" stroke="var(--chart-blue)" stroke-width="3"/>
+<circle cx="683.00" cy="139.00" r="7" fill="var(--chart-blue)"/>
+<text x="695.00" y="127.00" class="v-ink" font-size="17" text-anchor="start" font-weight="650">16 MiB</text>
+<text x="671.00" y="158.00" class="v-sub" font-size="15" text-anchor="end" font-weight="400">64 AllReduce calls</text>
+<text x="23.00" y="198.00" class="v-ink" font-size="20" text-anchor="start" font-weight="650">Decode</text>
+<text x="23.00" y="221.00" class="v-sub" font-size="16" text-anchor="start" font-weight="400">16 token rows</text>
+<line x1="233.00" y1="209.00" x2="333.00" y2="209.00" stroke="var(--chart-teal)" stroke-width="3"/>
+<circle cx="333.00" cy="209.00" r="7" fill="var(--chart-teal)"/>
+<text x="345.00" y="197.00" class="v-ink" font-size="17" text-anchor="start" font-weight="650">128 KiB</text>
+<text x="321.00" y="228.00" class="v-sub" font-size="15" text-anchor="end" font-weight="400">64 AllReduce calls</text>
+<line x1="233.00" y1="252.00" x2="733.00" y2="252.00" stroke="var(--muted)" stroke-width="1"/>
+<text x="483.00" y="309.00" class="v-sub" font-size="16" text-anchor="middle" font-weight="400">One AllReduce input per rank (log scale)</text>
+</svg>

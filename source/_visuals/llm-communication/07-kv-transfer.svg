@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 422" role="img" aria-label="KV transfer serialization floor" aria-labelledby="llm-kv-title" aria-describedby="llm-kv-desc" style="min-width:620px" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <title id="llm-kv-title">KV transfer serialization floor</title>
+  <desc id="llm-kv-desc">Theoretical time to serialize 128 KiB per prompt token over one equivalent payload link. At 32 Ki tokens, the 100, 200, and 400 gigabit-per-second links take 343.6, 171.8, and 85.9 milliseconds respectively.</desc>
+
+  <text x="72" y="30" fill="var(--text-primary, var(--ink))" font-size="23" font-weight="650">KV transfer serialization floor</text>
+  <text x="72" y="54" fill="var(--text-secondary, var(--muted))" font-size="15">128 KiB per prompt token · One equivalent payload link</text>
+
+  <path d="M72 115H584 M72 190H584 M72 265H584 M200 70V340 M328 70V340 M456 70V340 M584 70V340" fill="none" stroke="var(--divider, var(--line))" stroke-width="1"/>
+  <path d="M72 70V340H584" fill="none" stroke="var(--text-secondary, var(--muted))" stroke-width="1.5"/>
+
+  <g fill="var(--text-secondary, var(--muted))" font-size="16" text-anchor="end">
+    <text x="61" y="345">0</text>
+    <text x="61" y="270">100</text>
+    <text x="61" y="195">200</text>
+    <text x="61" y="120">300</text>
+  </g>
+  <g fill="var(--text-secondary, var(--muted))" font-size="16" text-anchor="middle">
+    <text x="72" y="366">0</text>
+    <text x="200" y="366">8</text>
+    <text x="328" y="366">16</text>
+    <text x="456" y="366">24</text>
+    <text x="584" y="366">32</text>
+    <text x="328" y="400" font-size="17">Prompt length (Ki tokens)</text>
+    <text transform="translate(19 206) rotate(-90)" font-size="17">Serialization time (ms)</text>
+  </g>
+
+  <g fill="none" stroke-width="3.5" stroke-linecap="round">
+    <path d="M72 340L584 82.302" stroke="var(--chart-amber)" stroke-dasharray="3 6"/>
+    <path d="M72 340L584 211.151" stroke="var(--chart-teal)" stroke-dasharray="11 6"/>
+    <path d="M72 340L584 275.575" stroke="var(--chart-blue)"/>
+  </g>
+  <circle cx="584" cy="82.302" r="4.5" fill="var(--chart-amber)"/>
+  <circle cx="584" cy="211.151" r="4.5" fill="var(--chart-teal)"/>
+  <circle cx="584" cy="275.575" r="4.5" fill="var(--chart-blue)"/>
+
+  <g font-size="17" font-weight="650">
+    <text x="601" y="79" fill="var(--chart-amber)">100 Gb/s</text>
+    <text x="601" y="208" fill="var(--chart-teal)">200 Gb/s</text>
+    <text x="601" y="273" fill="var(--chart-blue)">400 Gb/s</text>
+  </g>
+  <g fill="var(--text-secondary, var(--muted))" font-size="15">
+    <text x="601" y="99">343.6 ms</text>
+    <text x="601" y="228">171.8 ms</text>
+    <text x="601" y="293">85.9 ms</text>
+  </g>
+</svg>

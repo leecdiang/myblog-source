@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 411" role="img" aria-label="Training schedules for DDP gradient buckets and one FSDP sharding group" font-family="system-ui, sans-serif">
+  <title>DDP and FSDP training schedules</title>
+  <desc>DDP starts each gradient bucket AllReduce when its gradients are ready, overlapping the earlier reductions with backward compute. The optimizer waits for both the backward pass and all reductions. In one FSDP group with reshard after forward, weights are gathered before forward, the unsharded copy is freed, weights are gathered again before backward, and gradients are reduced and scattered before the shard-local update. Horizontal spans are illustrative.</desc>
+  <defs>
+    <marker id="llm-03-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 L8 4 L0 8 Z" fill="var(--text-secondary)"/>
+    </marker>
+  </defs>
+  <g fill="var(--text-primary)" font-weight="650" font-size="20">
+    <text x="25" y="34">DDP · gradient buckets in backward</text>
+    <text x="25" y="238">FSDP · one group, reshard after forward</text>
+  </g>
+  <g fill="var(--text-secondary)" font-size="15">
+    <text x="25" y="86">GPU compute</text>
+    <text x="25" y="140">Collectives</text>
+    <text x="25" y="301">Weight shard</text>
+    <text x="741" y="194" text-anchor="end">Time · schematic</text>
+  </g>
+  <path d="M144 61H741 M144 115H741 M25 213H741 M144 317H741" fill="none" stroke="var(--divider)" stroke-width="2"/>
+  <path d="M144 187H608" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#llm-03-arrow)"/>
+  <g fill="var(--chart-blue)" fill-opacity=".12" stroke="var(--chart-blue)" stroke-width="1.2">
+    <rect x="144" y="61" width="107" height="38" rx="5"/>
+    <rect x="253" y="61" width="124" height="38" rx="5"/>
+    <rect x="379" y="61" width="126" height="38" rx="5"/>
+    <rect x="633" y="61" width="108" height="38" rx="5"/>
+    <rect x="247" y="274" width="76" height="45" rx="5"/>
+    <rect x="453" y="274" width="87" height="45" rx="5"/>
+    <rect x="664" y="274" width="77" height="45" rx="5"/>
+  </g>
+  <g fill="var(--chart-teal)" fill-opacity=".12" stroke="var(--chart-teal)" stroke-width="1.2">
+    <rect x="251" y="115" width="111" height="38" rx="5"/>
+    <rect x="377" y="115" width="111" height="38" rx="5"/>
+    <rect x="505" y="115" width="111" height="38" rx="5"/>
+    <rect x="144" y="274" width="96" height="45" rx="5"/>
+    <rect x="350" y="274" width="96" height="45" rx="5"/>
+    <rect x="547" y="274" width="110" height="45" rx="5"/>
+  </g>
+  <g fill="none" stroke="var(--text-secondary)" stroke-width="1.3">
+    <path d="M251 99V115 M377 99V115 M505 99V115" stroke-dasharray="3 3"/>
+    <path d="M616 133H624V80H632" marker-end="url(#llm-03-arrow)"/>
+    <path d="M240 296H247 M323 296H350 M446 296H453 M540 296H547 M657 296H664"/>
+    <path d="M334 300V346H349" stroke-dasharray="3 3"/>
+  </g>
+  <circle cx="334" cy="296" r="4" fill="var(--chart-amber)"/>
+  <g fill="var(--text-primary)" text-anchor="middle" font-size="15" font-weight="550">
+    <text x="197" y="85">Compute G₁</text>
+    <text x="315" y="85">Compute G₂</text>
+    <text x="442" y="85">Compute G₃</text>
+    <text x="687" y="85">Optimizer</text>
+    <text x="306" y="139">AllReduce G₁</text>
+    <text x="432" y="139">AllReduce G₂</text>
+    <text x="560" y="139">AllReduce G₃</text>
+    <text x="192" y="292">AllGather</text>
+    <text x="285" y="302">Forward</text>
+    <text x="398" y="292">AllGather</text>
+    <text x="496" y="302">Backward</text>
+    <text x="602" y="292">ReduceScatter</text>
+    <text x="702" y="292">Optimizer</text>
+  </g>
+  <g fill="var(--text-secondary)" font-size="14">
+    <text x="624" y="167" text-anchor="middle">Final bucket completes</text>
+    <text x="192" y="310" text-anchor="middle">weights</text>
+    <text x="398" y="310" text-anchor="middle">weights</text>
+    <text x="602" y="310" text-anchor="middle">gradients</text>
+    <text x="702" y="310" text-anchor="middle">local shard</text>
+  </g>
+  <text x="357" y="351" fill="var(--chart-amber)" font-size="16">Free gathered weights</text>
+  <g font-size="15" fill="var(--text-secondary)">
+    <rect x="144" y="378" width="15" height="15" rx="3" fill="var(--chart-blue)" fill-opacity=".12" stroke="var(--chart-blue)"/>
+    <text x="168" y="391">Local compute</text>
+    <rect x="306" y="378" width="15" height="15" rx="3" fill="var(--chart-teal)" fill-opacity=".12" stroke="var(--chart-teal)"/>
+    <text x="330" y="391">Communication</text>
+  </g>
+</svg>

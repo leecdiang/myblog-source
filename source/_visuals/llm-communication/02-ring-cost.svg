@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 792 450" role="img" aria-label="Modeled latency of ring AllReduce with eight ranks" font-family="system-ui, sans-serif" font-size="17">
+<desc>Two logarithmic axes. The constant startup cost and the rising transfer cost cross at 800 kilobytes, where each contributes 28 microseconds. The total is their sum.</desc>
+<text x="22.00" y="29.00" class="v-ink" font-size="23" text-anchor="start" font-weight="650">Ring AllReduce latency</text>
+<text x="22.00" y="54.00" class="v-sub" font-size="16" text-anchor="start" font-weight="400">8 ranks  /  2 µs per round  /  50 GB/s one-way</text>
+<text x="98.00" y="91.00" class="v-sub" font-size="15" text-anchor="start" font-weight="400">Time (µs)</text>
+<line x1="98.00" y1="376.00" x2="736.00" y2="376.00" stroke="var(--line)" stroke-width="1"/>
+<text x="88.00" y="381.00" class="v-sub" font-size="15" text-anchor="end" font-weight="400">0.1</text>
+<line x1="98.00" y1="321.20" x2="736.00" y2="321.20" stroke="var(--line)" stroke-width="1"/>
+<text x="88.00" y="326.20" class="v-sub" font-size="15" text-anchor="end" font-weight="400">1</text>
+<line x1="98.00" y1="266.40" x2="736.00" y2="266.40" stroke="var(--line)" stroke-width="1"/>
+<text x="88.00" y="271.40" class="v-sub" font-size="15" text-anchor="end" font-weight="400">10</text>
+<line x1="98.00" y1="211.60" x2="736.00" y2="211.60" stroke="var(--line)" stroke-width="1"/>
+<text x="88.00" y="216.60" class="v-sub" font-size="15" text-anchor="end" font-weight="400">100</text>
+<line x1="98.00" y1="156.80" x2="736.00" y2="156.80" stroke="var(--line)" stroke-width="1"/>
+<text x="88.00" y="161.80" class="v-sub" font-size="15" text-anchor="end" font-weight="400">1,000</text>
+<line x1="98.00" y1="102.00" x2="736.00" y2="102.00" stroke="var(--line)" stroke-width="1"/>
+<text x="88.00" y="107.00" class="v-sub" font-size="15" text-anchor="end" font-weight="400">10,000</text>
+<line x1="98.00" y1="102.00" x2="98.00" y2="376.00" stroke="var(--line)" stroke-width="1"/>
+<text x="98.00" y="399.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">8 KiB</text>
+<line x1="225.60" y1="102.00" x2="225.60" y2="376.00" stroke="var(--line)" stroke-width="1"/>
+<text x="225.60" y="399.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">64 KiB</text>
+<line x1="353.20" y1="102.00" x2="353.20" y2="376.00" stroke="var(--line)" stroke-width="1"/>
+<text x="353.20" y="399.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">512 KiB</text>
+<line x1="480.80" y1="102.00" x2="480.80" y2="376.00" stroke="var(--line)" stroke-width="1"/>
+<text x="480.80" y="399.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">4 MiB</text>
+<line x1="608.40" y1="102.00" x2="608.40" y2="376.00" stroke="var(--line)" stroke-width="1"/>
+<text x="608.40" y="399.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">32 MiB</text>
+<line x1="736.00" y1="102.00" x2="736.00" y2="376.00" stroke="var(--line)" stroke-width="1"/>
+<text x="736.00" y="399.00" class="v-sub" font-size="15" text-anchor="middle" font-weight="400">256 MiB</text>
+<line x1="98.00" y1="376.00" x2="736.00" y2="376.00" stroke="var(--muted)" stroke-width="1"/>
+<line x1="98.00" y1="102.00" x2="98.00" y2="376.00" stroke="var(--muted)" stroke-width="1"/>
+<text x="417.00" y="428.00" class="v-sub" font-size="16" text-anchor="middle" font-weight="400">Input per rank (log scale)</text>
+<polyline points="98.00,241.90 108.63,241.90 119.27,241.90 129.90,241.90 140.53,241.90 151.17,241.90 161.80,241.90 172.43,241.90 183.07,241.90 193.70,241.90 204.33,241.90 214.97,241.90 225.60,241.90 236.23,241.90 246.87,241.90 257.50,241.90 268.13,241.90 278.77,241.90 289.40,241.90 300.03,241.90 310.67,241.90 321.30,241.90 331.93,241.90 342.57,241.90 353.20,241.90 363.83,241.90 374.47,241.90 385.10,241.90 395.73,241.90 406.37,241.90 417.00,241.90 427.63,241.90 438.27,241.90 448.90,241.90 459.53,241.90 470.17,241.90 480.80,241.90 491.43,241.90 502.07,241.90 512.70,241.90 523.33,241.90 533.97,241.90 544.60,241.90 555.23,241.90 565.87,241.90 576.50,241.90 587.13,241.90 597.77,241.90 608.40,241.90 619.03,241.90 629.67,241.90 640.30,241.90 650.93,241.90 661.57,241.90 672.20,241.90 682.83,241.90 693.47,241.90 704.10,241.90 714.73,241.90 725.37,241.90 736.00,241.90" fill="none" stroke="var(--chart-teal)" stroke-width="3" stroke-linecap="round" stroke-dasharray="7 5"/>
+<line x1="350.00" y1="72.00" x2="382.00" y2="72.00" stroke="var(--chart-teal)" stroke-width="3" stroke-dasharray="7 5"/>
+<text x="390.00" y="77.00" class="v-ink" font-size="15" text-anchor="start" font-weight="400">Startup</text>
+<polyline points="98.00,350.93 108.63,346.81 119.27,342.68 129.90,338.56 140.53,334.43 151.17,330.31 161.80,326.19 172.43,322.06 183.07,317.94 193.70,313.81 204.33,309.69 214.97,305.57 225.60,301.44 236.23,297.32 246.87,293.19 257.50,289.07 268.13,284.95 278.77,280.82 289.40,276.70 300.03,272.57 310.67,268.45 321.30,264.32 331.93,260.20 342.57,256.08 353.20,251.95 363.83,247.83 374.47,243.70 385.10,239.58 395.73,235.46 406.37,231.33 417.00,227.21 427.63,223.08 438.27,218.96 448.90,214.84 459.53,210.71 470.17,206.59 480.80,202.46 491.43,198.34 502.07,194.22 512.70,190.09 523.33,185.97 533.97,181.84 544.60,177.72 555.23,173.59 565.87,169.47 576.50,165.35 587.13,161.22 597.77,157.10 608.40,152.97 619.03,148.85 629.67,144.73 640.30,140.60 650.93,136.48 661.57,132.35 672.20,128.23 682.83,124.11 693.47,119.98 704.10,115.86 714.73,111.73 725.37,107.61 736.00,103.48" fill="none" stroke="var(--chart-amber)" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 5"/>
+<line x1="476.00" y1="72.00" x2="508.00" y2="72.00" stroke="var(--chart-amber)" stroke-width="3" stroke-dasharray="2 5"/>
+<text x="516.00" y="77.00" class="v-ink" font-size="15" text-anchor="start" font-weight="400">Transfer</text>
+<polyline points="98.00,241.65 108.63,241.61 119.27,241.55 129.90,241.49 140.53,241.41 151.17,241.32 161.80,241.22 172.43,241.09 183.07,240.94 193.70,240.76 204.33,240.56 214.97,240.31 225.60,240.02 236.23,239.68 246.87,239.29 257.50,238.82 268.13,238.28 278.77,237.66 289.40,236.94 300.03,236.10 310.67,235.15 321.30,234.06 331.93,232.83 342.57,231.45 353.20,229.90 363.83,228.18 374.47,226.29 385.10,224.21 395.73,221.96 406.37,219.54 417.00,216.94 427.63,214.18 438.27,211.27 448.90,208.21 459.53,205.03 470.17,201.72 480.80,198.31 491.43,194.80 502.07,191.20 512.70,187.53 523.33,183.80 533.97,180.01 544.60,176.17 555.23,172.28 565.87,168.36 576.50,164.41 587.13,160.43 597.77,156.43 608.40,152.41 619.03,148.38 629.67,144.33 640.30,140.27 650.93,136.20 661.57,132.12 672.20,128.03 682.83,123.94 693.47,119.84 704.10,115.74 714.73,111.63 725.37,107.52 736.00,103.41" fill="none" stroke="var(--chart-blue)" stroke-width="3" stroke-linecap="round"/>
+<line x1="610.00" y1="72.00" x2="642.00" y2="72.00" stroke="var(--chart-blue)" stroke-width="3"/>
+<text x="650.00" y="77.00" class="v-ink" font-size="15" text-anchor="start" font-weight="400">Total</text>
+<line x1="379.13" y1="249.90" x2="379.13" y2="280.00" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 4"/>
+<circle cx="379.13" cy="241.90" r="4" fill="var(--ink)"/>
+<text x="389.13" y="280.00" class="v-sub" font-size="15" text-anchor="start" font-weight="400">800 kB · both 28 µs</text>
+</svg>

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 381" role="img" aria-label="Mixture-of-experts routing with balanced and hotspot traffic matrices" font-family="system-ui, sans-serif">
+  <title>Token routing by source and destination rank</title>
+  <desc>Each source sends four top-1 assignments including one local assignment. Both cases have sixteen assignments and twelve cross-rank transfers. Every cell in the balanced matrix is one. The hotspot has rows 1 1 1 1, 3 1 0 0, 3 0 1 0, and 3 0 0 1. Remote receives by destination are 3 3 3 3 when balanced and 9 1 1 1 in the hotspot case.</desc>
+  <defs>
+    <rect id="llm-05-cell" width="50" height="41" rx="3"/>
+  </defs>
+  <g fill="var(--text-primary)" font-size="21" font-weight="650">
+    <text x="25" y="37">Balanced routing</text>
+    <text x="400" y="37">Hotspot at rank 0</text>
+  </g>
+  <path d="M380 23V328" fill="none" stroke="var(--divider)" stroke-width="2"/>
+  <g fill="var(--text-secondary)" font-size="16">
+    <text x="205" y="70" text-anchor="middle">Destination rank</text>
+    <text x="580" y="70" text-anchor="middle">Destination rank</text>
+    <text x="342" y="98" text-anchor="middle">Total</text>
+    <text x="717" y="98" text-anchor="middle">Total</text>
+    <text x="38" y="194" text-anchor="middle" transform="rotate(-90 38 194)">Source rank</text>
+    <text x="413" y="194" text-anchor="middle" transform="rotate(-90 413 194)">Source rank</text>
+  </g>
+  <g fill="var(--text-secondary)" font-size="16" text-anchor="middle">
+    <text x="124" y="98">0</text><text x="178" y="98">1</text><text x="232" y="98">2</text><text x="286" y="98">3</text>
+    <text x="499" y="98">0</text><text x="553" y="98">1</text><text x="607" y="98">2</text><text x="661" y="98">3</text>
+    <text x="74" y="135">0</text><text x="74" y="180">1</text><text x="74" y="225">2</text><text x="74" y="270">3</text>
+    <text x="449" y="135">0</text><text x="449" y="180">1</text><text x="449" y="225">2</text><text x="449" y="270">3</text>
+  </g>
+  <g fill="var(--chart-blue)" fill-opacity=".14" stroke="var(--border-subtle)">
+    <use href="#llm-05-cell" x="153" y="109"/><use href="#llm-05-cell" x="207" y="109"/><use href="#llm-05-cell" x="261" y="109"/>
+    <use href="#llm-05-cell" x="99" y="154"/><use href="#llm-05-cell" x="207" y="154"/><use href="#llm-05-cell" x="261" y="154"/>
+    <use href="#llm-05-cell" x="99" y="199"/><use href="#llm-05-cell" x="153" y="199"/><use href="#llm-05-cell" x="261" y="199"/>
+    <use href="#llm-05-cell" x="99" y="244"/><use href="#llm-05-cell" x="153" y="244"/><use href="#llm-05-cell" x="207" y="244"/>
+    <use href="#llm-05-cell" x="528" y="109"/><use href="#llm-05-cell" x="582" y="109"/><use href="#llm-05-cell" x="636" y="109"/>
+  </g>
+  <g fill="var(--chart-blue)" fill-opacity=".37" stroke="var(--chart-blue)">
+    <use href="#llm-05-cell" x="474" y="154"/><use href="#llm-05-cell" x="474" y="199"/><use href="#llm-05-cell" x="474" y="244"/>
+  </g>
+  <g fill="var(--surface-card)" stroke="var(--border-subtle)">
+    <use href="#llm-05-cell" x="582" y="154"/><use href="#llm-05-cell" x="636" y="154"/>
+    <use href="#llm-05-cell" x="528" y="199"/><use href="#llm-05-cell" x="636" y="199"/>
+    <use href="#llm-05-cell" x="528" y="244"/><use href="#llm-05-cell" x="582" y="244"/>
+  </g>
+  <g fill="var(--chart-teal)" fill-opacity=".12" stroke="var(--chart-teal)" stroke-dasharray="4 3" stroke-width="1.3">
+    <use href="#llm-05-cell" x="99" y="109"/><use href="#llm-05-cell" x="153" y="154"/><use href="#llm-05-cell" x="207" y="199"/><use href="#llm-05-cell" x="261" y="244"/>
+    <use href="#llm-05-cell" x="474" y="109"/><use href="#llm-05-cell" x="528" y="154"/><use href="#llm-05-cell" x="582" y="199"/><use href="#llm-05-cell" x="636" y="244"/>
+  </g>
+  <g fill="var(--text-primary)" text-anchor="middle" font-size="18" font-weight="550">
+    <text x="124" y="136">1</text><text x="178" y="136">1</text><text x="232" y="136">1</text><text x="286" y="136">1</text>
+    <text x="124" y="181">1</text><text x="178" y="181">1</text><text x="232" y="181">1</text><text x="286" y="181">1</text>
+    <text x="124" y="226">1</text><text x="178" y="226">1</text><text x="232" y="226">1</text><text x="286" y="226">1</text>
+    <text x="124" y="271">1</text><text x="178" y="271">1</text><text x="232" y="271">1</text><text x="286" y="271">1</text>
+    <text x="499" y="136">1</text><text x="553" y="136">1</text><text x="607" y="136">1</text><text x="661" y="136">1</text>
+    <text x="499" y="181">3</text><text x="553" y="181">1</text><text x="607" y="181">0</text><text x="661" y="181">0</text>
+    <text x="499" y="226">3</text><text x="553" y="226">0</text><text x="607" y="226">1</text><text x="661" y="226">0</text>
+    <text x="499" y="271">3</text><text x="553" y="271">0</text><text x="607" y="271">0</text><text x="661" y="271">1</text>
+  </g>
+  <path d="M99 295H362 M474 295H737" stroke="var(--divider)" stroke-width="2"/>
+  <g fill="var(--text-secondary)" text-anchor="middle" font-size="16">
+    <text x="342" y="135">4</text><text x="342" y="180">4</text><text x="342" y="225">4</text><text x="342" y="270">4</text>
+    <text x="717" y="135">4</text><text x="717" y="180">4</text><text x="717" y="225">4</text><text x="717" y="270">4</text>
+    <text x="124" y="318">3</text><text x="178" y="318">3</text><text x="232" y="318">3</text><text x="286" y="318">3</text>
+    <text x="553" y="318">1</text><text x="607" y="318">1</text><text x="661" y="318">1</text>
+    <text x="51" y="318">Remote in</text><text x="426" y="318">Remote in</text>
+  </g>
+  <text x="499" y="318" fill="var(--chart-amber)" text-anchor="middle" font-size="19" font-weight="700">9</text>
+  <rect x="25" y="345" width="17" height="16" rx="3" fill="var(--chart-teal)" fill-opacity=".12" stroke="var(--chart-teal)" stroke-dasharray="4 3"/>
+  <text x="51" y="359" fill="var(--text-secondary)" font-size="16">Local assignment</text>
+  <text x="737" y="359" fill="var(--text-secondary)" text-anchor="end" font-size="16">Each panel · 16 assignments · 12 cross-rank</text>
+</svg>
