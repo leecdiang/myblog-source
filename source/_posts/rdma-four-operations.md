@@ -1,7 +1,7 @@
 ---
 title: "通信原语背后的 RDMA ——理解四种 RDMA 操作"
 date: 2026-11-25 18:00:00
-updated: 2026-11-25 20:14:00
+updated: 2026-11-25 20:25:00
 lang: zh-CN
 published: true
 categories: Silicon & Circuits
@@ -38,13 +38,13 @@ A 要给 B 发 4 KiB 数据。用 SEND，A 可以一直不知道这 4 KiB 最后
 #rdma-glossary code { font-size: 1em; white-space: normal; overflow-wrap: anywhere; }
 #rdma-glossary [hidden] { display: none !important; }
 #rdma-glossary .rdma-term-action { font-size: var(--rdma-table-font); text-align: start; margin: .3em 0; }
-#rdma-term-toggle { font: inherit; padding: .18em .6em; background: transparent; border: 1px solid currentColor; border-radius: .25em; color: inherit; cursor: pointer; }
-#rdma-term-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+#rdma-glossary button { font: inherit; font-size: var(--rdma-table-font); scroll-margin-block: 5rem 1rem; padding: .18em .6em; background: transparent; border: 1px solid currentColor; border-radius: .25em; color: inherit; cursor: pointer; }
+#rdma-glossary button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 #rdma-glossary tbody .rdma-term-group th { padding-top: .75em; }
 </style>
 <div id="rdma-glossary">
-<p class="rdma-term-action"><a href="#rdma-host-path">跳到图 1 和正文</a>　<button type="button" id="rdma-term-toggle" aria-controls="rdma-term-extra" aria-expanded="true" hidden>收起其余术语</button></p>
-<table aria-label="RDMA 缩写、英文全称与中文含义">
+<p class="rdma-term-action"><a href="#rdma-host-path">跳到图 1 和正文</a>　<button type="button" id="rdma-term-toggle" aria-controls="rdma-term-extra" aria-expanded="false" hidden>展开其余术语</button></p>
+<table id="rdma-term-table" tabindex="-1" aria-label="RDMA 缩写、英文全称与中文含义">
 <colgroup><col><col><col></colgroup>
 <thead><tr><th scope="col">缩写或代码名</th><th scope="col">英文全称或名称</th><th scope="col">中文含义</th></tr></thead>
 <tbody>
@@ -126,6 +126,7 @@ A 要给 B 发 4 KiB 数据。用 SEND，A 可以一直不知道这 4 KiB 最后
 <tr><th scope="row"><code>CUDA</code></th><td lang="en">Compute Unified Device Architecture</td><td>NVIDIA 的 GPU 并行计算平台</td></tr>
 </tbody>
 </table>
+<button type="button" id="rdma-term-collapse" aria-controls="rdma-term-extra" aria-expanded="true" hidden>收起其余术语</button>
 </div>
 {% endraw %}
 
@@ -317,7 +318,7 @@ B 的 RNIC 收到 SEND，先按包里的目的 QPN 找到 QP，再从 RQ 取出 
   <div data-rdma-static><p>SEND 把数据送进 B 的接收 WR 指定的 RX7。WRITE 写入 A 指定的 B 端 slot3。WRITE_WITH_IMM 还消耗 B 的一条接收 WQE。B 应用轮询 CQ，从 WC 中读到立即数 3。READ 把 slot3 的数据拉回 A。对 B 的计数器执行 Fetch &amp; Add (+1)，B 的值从 41 变为 42，A 收到旧值 41。</p></div>
   <figcaption class="v-caption">图 3｜虚线箭头表示控制信息，实线箭头表示数据。每步跟踪一次逻辑动作，可以包含多个包。RC 的确认与重传从略。</figcaption>
 </figure>
-<script src="/js/rdma-four-operations.js?v=cd5420df52" defer></script>
+<script src="/js/rdma-four-operations.js?v=55664a98b7" defer></script>
 {% endraw %}
 
 ### SEND 由 B 决定消息落在哪儿
