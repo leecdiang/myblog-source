@@ -303,8 +303,6 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .about-editorial .research-copy .about-meta{font-size:11px;margin:0;color:var(--muted)}
 .about-editorial .research-copy .about-role{margin:0 0 12px}
 .about-editorial .research-copy .about-entry-links{gap:20px;margin-top:14px}
-.about-editorial .research-feature--wide .research-figure{margin-top:18px}
-.about-editorial .research-feature--wide .research-copy h3{max-width:40ch;font-size:22px}
 .about-editorial #projects .about-entry{padding:20px 0;border:0;border-bottom:1px solid var(--line);margin:0}
 .about-editorial #projects .about-entry:first-of-type{padding-top:0}
 .about-editorial #projects .about-entry:last-child{border:0;padding-bottom:0}
@@ -338,10 +336,9 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
  .about-editorial .organization-description p{font-size:13px;line-height:1.8}
  .about-editorial .about-experience+.about-experience{margin-top:25px}
  .about-editorial .research-feature--split{display:flex;flex-direction:column-reverse;gap:20px;align-items:stretch}
- .about-editorial .research-copy h3,.about-editorial .research-feature--wide .research-copy h3{font-size:21px}
+ .about-editorial .research-copy h3{font-size:21px}
  .about-editorial .research-figure>a{padding:10px}
  .about-editorial .research-feature+.research-feature{margin-top:28px;padding-top:27px}
- .about-editorial .research-feature--wide .research-figure>a{padding:7px}
  .about-editorial .research-copy .about-entry-links{margin-top:8px}
 }
 
