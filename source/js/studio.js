@@ -46,6 +46,30 @@
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')restoreVisit()});
   window.addEventListener('studio:language',applyTheme);
   refreshOrreryStyles();
+  const widthToggle = document.querySelector('.reading-width-toggle');
+  if (widthToggle) {
+    const root = document.documentElement;
+    const storageKey = 'studio-reading-width';
+    function setReadingWidth(wide) {
+      root.toggleAttribute('data-reading-wide', wide);
+      widthToggle.setAttribute('aria-pressed', String(wide));
+    }
+    setReadingWidth(root.hasAttribute('data-reading-wide'));
+    widthToggle.addEventListener('click', () => {
+      const wide = !root.hasAttribute('data-reading-wide');
+      setReadingWidth(wide);
+      try { localStorage.setItem(storageKey, wide ? 'wide' : 'default'); } catch {}
+    });
+    window.addEventListener('storage', event => {
+      if (event.key === storageKey || event.key === null) setReadingWidth(event.newValue === 'wide');
+    });
+    window.addEventListener('pageshow', event => {
+      if (event.persisted) {
+        try { setReadingWidth(localStorage.getItem(storageKey) === 'wide'); } catch {}
+      }
+    });
+    widthToggle.hidden = false;
+  }
   // A local-only visual comparison. The source photograph is never modified.
   if (['127.0.0.1','localhost'].includes(location.hostname) && new URLSearchParams(location.search).get('portrait')==='mono') document.documentElement.classList.add('portrait-mono');
   document.addEventListener('DOMContentLoaded',()=>{
