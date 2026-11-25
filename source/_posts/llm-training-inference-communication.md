@@ -1,6 +1,7 @@
 ---
 title: "大模型训练和推理中的通信"
 date: 2026-11-25 13:00:00
+updated: 2026-11-25 17:01:00
 lang: zh-CN
 published: true
 categories: Silicon & Circuits
@@ -15,7 +16,7 @@ etoc: true
 toc:
   max_depth: 2
 mathjax: true
-description: "用张量在 GPU 之间的分布解释 AllReduce、AllGather、ReduceScatter 和 All-to-All，再对照 DDP、FSDP、张量并行、MoE 专家并行与分离式推理的消息大小和同步位置。"
+description: "两张 GPU 各算一批样本，怎么用梯度更新同一个模型？用同一组梯度对照 DDP 和 FSDP，再看张量并行和 MoE 分别要传什么，以及生成一个 token 要等哪些通信。"
 ---
 
 {% note primary %}
@@ -25,6 +26,8 @@ description: "用张量在 GPU 之间的分布解释 AllReduce、AllGather、Red
 <!-- more -->
 
 ## 一、四张卡怎么交换数据
+
+如果这四个数是一层权重的四块，每张卡都得拿齐，才能算这一层。如果它们是同一个参数在四批样本上算出的梯度，就要把它们加起来。图中每行是一张卡，r0 到 r3 对应四个通信进程的组内编号（rank）。
 
 {% raw %}
 <style>
@@ -135,7 +138,7 @@ description: "用张量在 GPU 之间的分布解释 AllReduce、AllGather、Red
       </tbody>
     </table>
   </div>
-  <figcaption class="v-caption">高亮格子表示当前步骤的输入和输出。演示按位置展开数据关系，通信库的传输轮次由算法决定。</figcaption>
+  <figcaption class="v-caption">高亮格子表示当前步骤的输入和输出。每一步显示一组数的去向。实际传几轮取决于通信库所用的算法。</figcaption>
 </figure>
 <script src="/js/llm-collectives.js" defer></script>
 {% endraw %}
@@ -146,111 +149,153 @@ description: "用张量在 GPU 之间的分布解释 AllReduce、AllGather、Red
 {% endraw %}
 
 {% visual_svg llm-communication/01-collective-layouts %}
-图 1｜四种操作的输入和最终结果。每行对应一个 rank。
+图 1｜四种操作的输入和结果。每行对应一张卡，两种归约均按列求和。
 {% endvisual_svg %}
 
 {% raw %}
 </details>
 {% endraw %}
 
-| 操作 | 一个 rank 提供什么 | 操作结束后拿到什么 |
-| --- | --- | --- |
-| AllReduce | 同形状张量的一份局部结果 | 各 rank 逐元素归约后的完整张量 |
-| ReduceScatter | 同形状张量的一份局部结果 | 完整归约结果中分给自己的那一片 |
-| AllGather | 属于自己的分片 | 按 rank 顺序拼起来的完整张量 |
-| All-to-All | 为每个目的 rank 准备的数据 | 各来源 rank 专门发给自己的数据 |
-| Broadcast | 根 rank 提供完整数据 | 根 rank 的一份副本 |
-| Send/Recv | 发送方提供一条消息 | 指定接收方拿到这条消息 |
+切到 AllReduce，点一次「下一步」。第一列的四个数相加得到 28，四张卡都拿到 28。把各卡同一位置的数合成一个结果叫作**归约**，这个例子用的是加法。<sup class="cite"><a href="#ref-1">[1]</a></sup>
 
-ReduceScatter 做完后，每张卡只保留一段求和结果。接着做 AllGather，每张卡便能恢复完整结果，布局和 AllReduce 一样。浮点数若换了加法顺序，末位可能不同。<sup class="cite"><a href="#ref-1">[1]</a></sup>
+ReduceScatter 也按列求和，区别在于谁拿结果。第一列的和 28 归 0 号卡，第二列的和 32 归 1 号卡，余下两张卡各得 36 和 40。如果此时再做一次 AllGather，四张卡就都有了完整的 `[28, 32, 36, 40]`。这和一次 AllReduce 求的是同一组和。实际使用浮点数时，加法顺序可能影响结果的末位。<sup class="cite"><a href="#ref-1">[1]</a></sup>
 
-### 每张卡搬多少字节
+All-to-All 里的列有另一层意思。第一列是各卡准备发给 0 号卡的数，第二列都发给 1 号卡。0 号卡最后收到一整列，四个数原样保留。后面 MoE 要把 token 送往各自的专家，就用到了这种交换。
 
-拿一组 16 GB 的权重做 AllGather。均分给四张卡，每张已有 4 GB，还要收 12 GB。改用八张卡，每张要收 14 GB。把每张卡的接收量加起来，四卡共 48 GB，八卡共 112 GB。
+<div id="二、训练中的通信" aria-hidden="true"></div>
 
-推广到 $p$ 张卡，若拼好的张量共 $S$ 字节，均匀切成 $p$ 片，每张卡手里先有 $S/p$，还要收 $(p-1)S/p$。把整组收到的字节加起来，就是 $(p-1)S$。若改成每张卡固定带入 1 GB，四卡时每张收 3 GB，八卡时每张收 7 GB，因为拼好的张量也跟着变大。<sup class="cite"><a href="#ref-2">[2]</a></sup>
+## 二、各读一批样本，怎么更新同一个模型
 
-### Ring AllReduce 的耗时
+<div id="DDP-与-FSDP-交换的是梯度还是参数" aria-hidden="true"></div>
 
-设 $p$ 张卡在均匀链路上做 ring AllReduce，归约前每张卡各有 $S$ 字节。ReduceScatter 走 $p-1$ 轮，AllGather 再走 $p-1$ 轮。每轮每张卡向下游发 $S/p$ 字节，也从上游收同样多，单卡发送量合计 $2(p-1)S/p$。设一轮的启动时间为 $\alpha$，单向传输速率为 $B$，暂且省去归约计算、链路争用和协议开销。
+### DDP 和 FSDP 各自更新哪些参数
+
+假设模型只有两个待更新的参数。两张卡起初拿着相同的参数，各读一批样本。反向传播结束后，0 号卡算出的平均梯度是 `[2, 4]`，1 号卡是 `[6, 8]`。要是各自拿这个梯度更新，两份模型走一步就不同了。
+
+分布式数据并行（DDP）在初始化时可以用 Broadcast，让 0 号卡把同一份参数发给大家。训练时，两张卡用 AllReduce 把梯度逐项相加。如果两批样本含有同样多的有效 token，求和再除以二，两边就能用同一个平均梯度 `[4, 6]` 更新模型。若损失按 token 求平均，而两批的有效 token 数却不同，就要按各批的有效 token 数加权。<sup class="cite"><a href="#ref-3">[3]</a></sup>
+
+换一种存法。0 号卡平时只保管第一个参数，1 号卡只保管第二个，两份样本照旧各算各的。算到需要这两个参数的层时，每张卡都缺对方手里那一份，于是先用 AllGather 拼齐权重。更新时用 ReduceScatter。0 号卡领到第一项的和 $2+6=8$，1 号卡领到第二项的和 $4+8=12$。各自除以二，0 号卡用 4 更新第一个参数，1 号卡用 6 更新第二个。
+
+这就是完全分片数据并行（FSDP）的做法。PyTorch FSDP2 可以把一层或几层的参数编成一组，算到哪组，就收集哪组的权重。梯度和优化器状态也按参数分片。前向算完释放这组完整权重，可以腾出显存，代价是反向算到它时还要再收集一次。<sup class="cite"><a href="#ref-4">[4]</a></sup>
+
+图 2 把两种训练方式放在了一起。DDP 会把多个参数的梯度凑成一桶，按各卡约定的桶顺序发起 AllReduce。靠近输出端的梯度先算出来，所以传第一桶时，GPU 还可以继续计算靠近输入端的梯度。等反向计算结束，最后一桶如果还没传完，优化器就得等它。<sup class="cite"><a href="#ref-3">[3]</a></sup>
+
+{% visual_svg llm-communication/03-training-schedule %}
+图 2｜上半部画 DDP 的三个梯度桶，下半部跟踪 FSDP2 的一个参数组。两次 AllGather 分别发生在前向和反向之前，中间一段可以释放完整权重。条带长度为示意。
+{% endvisual_svg %}
+
+<div id="每张卡搬多少字节" aria-hidden="true"></div>
+
+### 八张卡，每步要发多少数据
+
+取一个 80 亿参数的模型，通信时每个参数和每个梯度元素都占 2 字节，权重和梯度各有 16 GB。把权重均分到四张卡，做一次完整的参数收集时，每张已有 4 GB，还要收 12 GB。换成八张卡，每张已有 2 GB，要收 14 GB。
+
+把各卡收到的字节加起来，四卡共收 48 GB，八卡共收 112 GB。若模型大小固定为 $S$，均分到 $p$ 张卡，每张接收 $(p-1)S/p$，全组共接收 $(p-1)S$。若固定的是每张卡带来的分片大小，比如一律 1 GB，那么四卡时每张收 3 GB，八卡时每张就要收 7 GB。<sup class="cite"><a href="#ref-2">[2]</a></sup>
+
+在均匀的八卡环上，每张卡把分片传给下一张，同时从上一张接收，发送量和接收量相等。一遍参数 AllGather 每张卡发 14 GB。等大的梯度做一遍 ReduceScatter，每张也发 14 GB。下表按一步做一次前向、一次反向来算，各参数组采用相同的策略。<sup class="cite"><a href="#ref-2">[2]</a></sup><sup class="cite"><a href="#ref-4">[4]</a></sup>
+
+| 训练方式 | 一步里要传什么 | 单卡每步发送量 |
+| --- | --- | ---: |
+| DDP | 每桶梯度各做一次 AllReduce | 28 GB |
+| FSDP2，前向后保留完整权重 | 收集一次权重，归约并分发一次梯度 | 28 GB |
+| FSDP2，前向后释放完整权重 | 前向、反向各收集一次权重，再归约并分发梯度 | 42 GB |
+
+表中只计发送，单位用十进制 GB。FSDP2 多发这 14 GB，就可以在前向结束后释放完整权重。至于每步要多等多久，还要看其中多少通信能和别的层的计算同时进行。
+
+## 三、模型还能怎么分
+
+<div id="张量并行在一层里面交换部分和" aria-hidden="true"></div>
+
+### 张量并行为什么要把输出相加
+
+FSDP 临时凑齐一层的权重，每张卡算自己的样本。张量并行（TP）可以让两张卡同时算**同一层里的同一个 token**。以 Transformer 里的前馈网络（MLP）为例，输入先经过一次矩阵乘法扩展到较宽的中间层，经过激活函数，再由第二次矩阵乘法投回原来的宽度。
+
+假设中间层只有四个特征。0 号卡算前两个，1 号卡算后两个。要算最终输出的第一个数，第二次矩阵乘法需要把四个特征各乘一个权重，再把四项加起来。0 号卡能算前两项之和，1 号卡能算后两项之和。把两个部分和相加，才得到第一个输出。其余位置也一样。后续算子在两张卡上都要读完整输出，于是用 AllReduce 把两边的结果逐项加起来。<sup class="cite"><a href="#ref-5">[5]</a></sup>
+
+{% visual_svg llm-communication/04-tp-mlp %}
+图 3｜沿任意一张卡的分支读。第一块权重按列切，中间特征减半。第二块权重沿相同的特征按行切，所得部分和已经具有完整输出的形状。两条分支的结果在右侧相加。
+{% endvisual_svg %}
+
+写成矩阵，输入 $X$ 有 $T$ 行 token、$H$ 列特征。图中 $W_1$ 是第一块权重，$W_2$ 是第二块，$\phi$ 是逐元素激活函数。下标 $r$ 表示第几张卡，省去偏置后有
+
+{% raw %}<div>$$
+U_r=\phi(XW_{1,r})W_{2,r},\qquad
+U_r\in\mathbb{R}^{T\times H},\qquad Y=U_0+U_1.
+$$</div>{% endraw %}
+
+经典 Megatron 的 attention 输出投影也会产生这样的部分和。一个 Transformer 层里，attention 和 MLP 在前向各做一次 AllReduce。训练反向时，attention 和 MLP 还各有一次输入梯度归约。如果同时启用序列并行，可以把归约后的 token 行分给各卡，用 ReduceScatter 收尾。下一处需要完整序列的列并行算子再做 AllGather。<sup class="cite"><a href="#ref-5">[5]</a></sup><sup class="cite"><a href="#ref-6">[6]</a></sup>
+
+<div id="流水线并行在阶段边界传激活" aria-hidden="true"></div>
+
+### 流水线并行只把中间结果交给下一段
+
+流水线并行（PP）把连续的几层交给同一个阶段。假设前 16 层在第一张卡，第 17 层起在第二张。先把一批样本拆成几小份（微批）。第一张卡算完一份，就把第 16 层的输出发给第二张卡，后者接着算第 17 层。边界上的两张卡用一对 Send/Recv 交接这份激活，反向时沿原路送回它的梯度。一个阶段内部仍可以用多张卡做 TP。<sup class="cite"><a href="#ref-7">[7]</a></sup>
+
+<div id="MoE-专家并行按-token-的去向发消息" aria-hidden="true"></div>
+
+### MoE 怎么把一个 token 送到它的专家
+
+混合专家模型（MoE）的一层里有多个专家网络。假设 0 号卡上的一个 token 选中了 2 号卡上的专家。0 号卡要把这个 token 的隐藏向量（这一层的输入）送过去，2 号卡算完后再把专家的输出送回。若选中了两个专家，来源卡就按路由器给的权重合并两份输出。
+
+把一批 token 放在一起，各卡先按目的地打包向量，一起发出，这一程叫 dispatch。专家计算完成后，各卡把结果送回来源卡，恢复 token 顺序并合并输出，这一程叫 combine。这就是专家并行（EP）里常见的两次 All-to-All 交换。演示里每张卡给每个目的地各送一格，MoE 的路由器选出来的数量可以不等。通信实现可以为每个目的地指定不同的发送长度。训练反向时，梯度也沿对应的路由交换。<sup class="cite"><a href="#ref-8">[8]</a></sup><sup class="cite"><a href="#ref-15">[15]</a></sup>
+
+{% visual_svg llm-communication/05-moe-traffic %}
+图 4｜每个 token 只选一个专家。每行是一张来源卡，每列是一张专家卡，格子里的数是分给它的 token 个数。对角线上的 token 就地计算。
+{% endvisual_svg %}
+
+图 4 两边都只有 12 个 token 跨卡，差别藏在第一列。左图每张卡收 3 个远端 token。右图的 0 号卡独自收了 9 个，加上本地 1 个，一共要处理 10 个，其他三张卡各处理 2 个。即使总流量相同，等待这批输出的时间也会受最忙那张卡影响。推广到每个 token 选 $k$ 个专家，$T$ 个 token 共有 $kT$ 次分配。同一个 token 选中的几个专家若在同一目的节点，还可以共用一次跨节点传输。在一些 MoE 推理部署里，各副本独立计算 attention，却共用一组专家。到了专家层，这些副本之间也要传 token。<sup class="cite"><a href="#ref-8">[8]</a></sup><sup class="cite"><a href="#ref-9">[9]</a></sup><sup class="cite"><a href="#ref-11">[11]</a></sup>
+
+<div id="三、推理要传什么" aria-hidden="true"></div>
+
+## 四、跟一条推理请求走一遍
+
+<div id="完整副本分请求，TP-副本在层内归约" aria-hidden="true"></div>
+
+### 读提示词和逐个生成 token，哪一笔通信变小了
+
+一条请求先由调度器交给一个模型副本。如果几张 GPU 各自运行一份完整的稠密模型，它们可以各接各的请求，生成一个 token 用到的层间结果和历史缓存都留在本卡。如果一个副本用了多张卡做 TP，同一条请求每经过一层，就会遇到图 3 的部分和。<sup class="cite"><a href="#ref-5">[5]</a></sup><sup class="cite"><a href="#ref-9">[9]</a></sup>
+
+假设这个 TP 副本有 32 层，隐藏宽度 4096，激活使用 BF16。每个 token 的一行数据占 $4096\times2$ 字节，也就是 8 KiB。先读一条 2048 个 token 的提示，整段一次算完，叫作预填充（prefill）。每个 rank 交给一次 AllReduce 的输入就是 $2048\times8$ KiB，合 16 MiB。
+
+生成阶段（decode）里，一条序列每步只算一个新位置。假设这一轮同时推进 16 条序列，一次归约便只有 16 行，合 128 KiB。Attention 仍要读各序列的历史 KV 缓存，但输出投影只为本步新算的 16 个位置产生部分和。两次前向都要经过相同的 32 层，各做 $32\times2=64$ 次归约。<sup class="cite"><a href="#ref-5">[5]</a></sup>
+
+{% visual_svg llm-communication/06-tp-inference %}
+图 5｜每次 AllReduce 的单卡输入相差 128 倍，两次前向的层内归约次数都为 64。横轴是输入张量的大小。要换算链路上发送的字节数，还需指定通信算法。
+{% endvisual_svg %}
+
+<div id="Ring-AllReduce-的耗时" aria-hidden="true"></div>
+
+### 128 KiB 的归约要等多久
+
+用八卡 ring AllReduce 估一次。先用 ReduceScatter 让各卡拿到各自负责的和，再用 AllGather 让每张卡拿到全部结果。每个阶段都绕环传 7 轮。每轮都有启动开销，即使消息很短，这 14 轮也要走完。
+
+{% visual_svg llm-communication/02-ring-cost %}
+图 6｜八卡环，每轮启动 2 µs、单向带宽 50 GB/s。单卡输入达到 800 kB（十进制）时，启动和传输各占 28 µs。两轴均为对数刻度，曲线由上式计算。
+{% endvisual_svg %}
+
+代入图 5 的两个数。128 KiB 的输入花在传输上的时间约为 4.6 µs，14 轮启动却要 28 µs。输入增到 16 MiB，启动仍是 28 µs，传输耗时增至约 587 µs。DDP 可以把多个梯度攒成一桶，少付几次启动开销。TP 做 decode 时，下一层要读上一层的结果，每生成一步又要依次走过这些层。实际通信库会按消息大小和拓扑选算法，图 6 算的是选用环形算法时的情形。
+
+{% raw %}
+<details><summary>展开环形 AllReduce 的耗时公式</summary>
+{% endraw %}
+
+设有 $p$ 张卡，每张的输入是 $S$ 字节，每轮各发 $S/p$ 字节给下一张卡，同时从上一张收同样多。设每轮启动耗时 $\alpha$，单向带宽为 $B$。忽略链路争用、协议开销和归约计算，两段通信的总耗时近似如下。<sup class="cite"><a href="#ref-2">[2]</a></sup>
 
 {% raw %}<div>$$
 t_{\mathrm{ring}}(S)\approx 2(p-1)\alpha + \frac{2(p-1)}{p}\frac{S}{B}.
 $$</div>{% endraw %}
 
-{% visual_svg llm-communication/02-ring-cost %}
-图 2｜八 rank ring AllReduce 的时延模型。取每轮启动 2 µs、单向 50 GB/s，两项在 800 kB 处相等。横纵轴均为对数，曲线按公式计算。
-{% endvisual_svg %}
+{% raw %}
+</details>
+{% endraw %}
 
-把 8 KiB 切成八片，每轮只发 1 KiB。按图 2 的参数，14 轮的传输加起来约 0.29 µs，启动项是 28 µs。几条小消息若能等到一起发，可以合成一条。数据并行可以攒够一桶梯度再交给通信库。张量并行的后一层还得读前一层的结果，跨层的归约很难攒在一起发。实际通信库也会随消息大小和拓扑换算法。
+<div id="Prefill-与-Decode-分离时，转移的是-KV" aria-hidden="true"></div>
 
-## 二、训练中的通信
+### 如果换一组卡接着生成，历史 KV 怎么办
 
-### DDP 与 FSDP 交换的是梯度还是参数
+如果读提示和生成 token 用的是两组设备，接手生成的 GPU 从哪里读历史 KV？提示词的 key 和 value 是前一组 GPU 算的，此时还在它们的显存里。DistServe 这样的系统会在两组设备之间传递各层的 KV 缓存。两边的分片方式如果不同，一张源卡保存的那一片还得拆给几张目的卡。<sup class="cite"><a href="#ref-10">[10]</a></sup>
 
-两张卡各存一份模型，分别拿不同样本做前向和反向，这就是分布式数据并行（Distributed Data Parallel，DDP）。如果两边算出的本地平均梯度分别是 `[2, 4]` 和 `[6, 8]`，归约后各自除以二，两张卡就能用同一份 `[4, 6]` 更新模型。这个平均给每张卡相同的权重。若各卡的有效 token 数不等，想求所有 token 的平均梯度，就要把各卡的 token 数算进损失归一化。<sup class="cite"><a href="#ref-3">[3]</a></sup>
-
-沿着 Transformer 从输出端往回算，末几层的梯度会早一些出来。PyTorch DDP 把梯度分桶，一桶的梯度凑齐了就开始归约，其余层接着做反向。反向计算都结束后，若最后一桶还在归约，优化器就得等它收尾。这一段通信落在反向和参数更新之间，没法用反向计算的时间盖过去。
-
-完全分片数据并行（Fully Sharded Data Parallel，FSDP）也让各 rank 处理不同样本。PyTorch FSDP2 把参数、梯度和优化器状态按 rank 分片存放。算到一个模块时，先用 AllGather 拼齐它的参数组。前向用完，若把完整参数释放掉，到了反向还得再拼一次。梯度算完后做 ReduceScatter，每张卡收到自己负责更新的那段归约结果。<sup class="cite"><a href="#ref-4">[4]</a></sup>
-
-{% visual_svg llm-communication/03-training-schedule %}
-图 3｜DDP 的梯度桶与 FSDP2 的单个参数组。下图在前向后释放完整参数，反向前需要重新收集。条带只表示操作的依赖关系。
-{% endvisual_svg %}
-
-以 80 亿参数的模型为例，参数收集和梯度归约都用每元素 2 B，总量各为 16 GB（十进制）。在八卡 ring 上，把各参数组的传输加起来，做完一遍参数 AllGather 或一遍梯度 ReduceScatter，每张卡都要发 $7/8\times16=14$ GB。这里按每步一次前向、一次反向算，各参数组采用相同的策略，略去初始化与辅助消息。
-
-DDP 把各桶的 AllReduce 加起来是 28 GB/卡。FSDP2 若在两段计算之间保留完整参数，一次 AllGather 加一次 ReduceScatter，也是 28 GB/卡。前向后若重新分片，反向前得再做一轮 AllGather，发送量就到了 42 GB/卡。多花的 14 GB 对应那一轮参数收集，省下的是两次计算之间存放完整参数所用的显存。要比单步耗时，还得看各次参数收集或梯度归约能和多少计算重叠。
-
-### 张量并行在一层里面交换部分和
-
-把一个多层感知机（Multilayer Perceptron，MLP）分给两张卡，先切中间特征。设输入 $X$ 有 $T$ 行 token、$H$ 列隐藏特征，上投影把宽度扩到 $F$，下投影再收回 $H$。把上投影 $W_1$ 沿输出列分成两半，下投影 $W_2$ 沿对应的输入行分成两半。每张卡读同一份 $X$，各自算自己那半边中间特征。到了下投影，两张卡算出来的都是 $T\times H$ 的矩阵，其中每个位置各贡献一部分。把这两份部分和相加，就拿到了输出 $Y$。下式省略偏置，$\phi$ 是逐元素激活函数。<sup class="cite"><a href="#ref-5">[5]</a></sup>
-
-{% raw %}<div>$$
-Y=\sum_{r=0}^{1}U_r,\qquad
-U_r=\phi(XW_{1,r})W_{2,r},\qquad
-U_r\in\mathbb{R}^{T\times H}.
-$$</div>{% endraw %}
-
-{% visual_svg llm-communication/04-tp-mlp %}
-图 4｜两路张量并行的 MLP。<em>W</em><sub>1</sub> 按列切，<em>W</em><sub>2</sub> 沿同一组特征按行切，两路输出在下投影之后做 AllReduce。
-{% endvisual_svg %}
-
-经典 Megatron 张量并行（Tensor Parallelism，TP）里，attention 的输出投影也这么算。加上 MLP，每个 Transformer block 前向归约两次。训练时还要给两个列并行入口分别归约输入梯度，反向也是两次。若用了序列并行（Sequence Parallelism），行并行的出口可以用 ReduceScatter，把归约后的 token 行分给各卡。等下一处列并行要用完整序列了，再做 AllGather。<sup class="cite"><a href="#ref-5">[5]</a></sup> <sup class="cite"><a href="#ref-6">[6]</a></sup>
-
-### 流水线并行在阶段边界传激活
-
-把第 1 到第 16 层放在一个阶段，第 17 层起交给下一个阶段，两段之间就有了一条流水线边界。前向做完一个微批，第 16 层的激活用 Send/Recv 交给后一个阶段。训练反向沿原路送回对应的激活梯度。这个切法叫流水线并行（Pipeline Parallelism，PP）。阶段内部若用了 TP，归约仍由阶段内的 TP 组完成。<sup class="cite"><a href="#ref-7">[7]</a></sup>
-
-### MoE 专家并行按 token 的去向发消息
-
-给一批 token 选完专家，路由器就有了一张去向表。混合专家模型（Mixture of Experts，MoE）采用专家并行（Expert Parallelism，EP）时，专家分布在不同 rank 上。采用 All-to-All 的实现先在来源 rank 按目的地打包向量，再发给各专家。这一程叫 dispatch。专家算完，结果循原路送回，来源 rank 恢复 token 的顺序。如果一个 token 选了多个专家，就按路由权重把对应的几份输出加起来。返回并合并的过程叫 combine，训练反向的梯度也沿相应的路径交换。<sup class="cite"><a href="#ref-8">[8]</a></sup>
-
-{% visual_svg llm-communication/05-moe-traffic %}
-图 5｜四个 rank 的 top-1 路由。行是来源，列是专家所在的 rank，每格计路由条数。落在对角线上的 token 留在本卡。
-{% endvisual_svg %}
-
-两批都跨卡发了 12 份，右图有 9 份发往 rank 0。这张卡加上本地那一份，要替专家处理 10 条路由。每列加起来就是该 rank 的专家要处理的条数，跨卡流量只算对角线以外的格子。Top-$k$ 路由会为 $T$ 个 token 产生 $kT$ 个 token–expert 分配。若同一个 token 选中的几个专家落在同一目的地，传输实现可以复用同一份输入向量，跨节点流量还取决于专家的位置和打包方式。<sup class="cite"><a href="#ref-8">[8]</a></sup>
-
-## 三、推理要传什么
-
-### 完整副本分请求，TP 副本在层内归约
-
-部署了几份独立的稠密模型时，请求分给哪个副本，它的前向和 KV Cache 就归哪个副本。副本里若有几张卡做 TP，层内归约在这几张卡之间进行。有些 MoE 服务把 attention 留在各自的副本里，却共用一组专家。各 rank 到了专家层仍要交换路由到其他 rank 的 token。<sup class="cite"><a href="#ref-9">[9]</a></sup>
-
-拿一个 32 层模型算，隐藏宽度 $H=4096$，激活用 BF16（每元素 2 B），沿用前面每层两次 AllReduce 的切法。提示有 2048 个 token，prefill 一次做完时，每次归约的输入有 2048 行，共 16 MiB。decode 若在同一步里推进 16 条序列，每条只添一个位置，归约的输入就缩到 16 行，也就是 128 KiB。两次前向都走过 32 层，算下来各有 64 次层内归约。这里按每 rank 交给归约的张量大小计，算链路字节还要指定通信算法和拓扑。<sup class="cite"><a href="#ref-5">[5]</a></sup>
-
-{% visual_svg llm-communication/06-tp-inference %}
-图 6｜横轴是单次层内 AllReduce 在一个 rank 上的输入大小，采用对数刻度。归约计数只含 attention 和 MLP。
-{% endvisual_svg %}
-
-Attention 会读历史 KV，但给输出投影的只有这一轮新算的 16 行。这 16 行才是接下来归约的数据。把两个点放回图 2 的模型，128 KiB 那笔开销主要来自启动，16 MiB 那笔主要来自传输。每轮 decode 都要重新走这 64 次归约，当前 token 选出来，下一轮的输入才确定。<sup class="cite"><a href="#ref-5">[5]</a></sup> <sup class="cite"><a href="#ref-10">[10]</a></sup>
-
-### Prefill 与 Decode 分离时，转移的是 KV
-
-若 prefill 和 decode 各用一组设备，读完提示词之后还有一次交接。Prefill worker 得把已经算好的 K、V 交给接手这条请求的 decode worker。DistServe 按对应层传送缓存，遇到带宽受限的部署，还可以让负责同一批层的两个 worker 留在一台机器上。若两边的并行布局不同，也可能要把一个源分片拆给几个目的 rank。<sup class="cite"><a href="#ref-10">[10]</a></sup>
-
-以 32 层、8 个 KV 头、头维度 128 的分组查询注意力（Grouped-Query Attention，GQA）模型为例，KV 用 BF16 存储。令 $L$ 是层数、$h_{\mathrm{KV}}$ 是 KV 头数、$d_h$ 是头维度、$b$ 是每个元素的字节数。每个提示 token 对应的总逻辑缓存量如下。
+取一个 32 层的分组查询注意力（GQA）模型，每层有 8 个 KV 头，每个头有 128 个分量。一个提示 token 在每一层都要留下 K 和 V 两份数据。设元素大小为 $b$，层数为 $L$，KV 头数为 $h_{\mathrm{KV}}$，头维度为 $d_h$。用 BF16 存储时，有
 
 {% raw %}<div>$$
 S_{\mathrm{KV/token}}=2Lh_{\mathrm{KV}}d_hb
@@ -258,31 +303,45 @@ S_{\mathrm{KV/token}}=2Lh_{\mathrm{KV}}d_hb
 =128\ \mathrm{KiB}.
 $$</div>{% endraw %}
 
+这里恰好也是 128 KiB。图 5 的 128 KiB 来自 16 条序列，是一个 rank 在一层里交给一次归约的激活。这里的 128 KiB 属于**一个提示 token**，把它在 32 层留下的 KV 全部加了起来。提示长到 8192 个 token，整条请求就有 1 GiB 的逻辑缓存。
+
 {% visual_svg llm-communication/07-kv-transfer %}
-图 7｜KV 交接的理论序列化下限。每个提示 token 对应 128 KiB，总量经过一条等效链路。横轴以 1024 个 token 为一单位，链路速率使用十进制 Gb/s。每条曲线只计算有效载荷上链所需的时间。
+图 7｜一条请求的提示 KV 全部通过一条等效链路时，发完有效载荷至少需要多久。横轴每单位为 1024 个提示 token，曲线按标出的十进制 Gb/s 计算。
 {% endvisual_svg %}
 
-8192 个提示 token 累积起来就是 1 GiB。这 1 GiB 若全过一条 400 Gb/s 的链路，光把字节送上链就要至少 21.47 ms。用两条链路时，要由最后传完的那份来算时间。只有两条链路能并行满速跑、数据又按速率分得开，才够得上按合计带宽算的下限。这里还要留出数据准备和接收端等待的时间。
+如果这 1 GiB 全要经过一条 400 Gb/s 链路，跑满线速也要 21.47 ms。实际还要算上准备、排队和接收。若分到两条独立链路并行传，完成时间取决于最后传完的那一份。DistServe 因此也考虑设备放置，在跨机带宽紧张时，可以把负责相同层的两段计算放在同一台机器上。<sup class="cite"><a href="#ref-10">[10]</a></sup>
 
-交接的等待算在哪段，要看首 token 由谁发给客户端。若 prefill 端先把它发出去，交接中尚未完成的部分就落在首、次 token 之间。若由 decode 端开始返回结果，这部分等待会落在首 token 延迟里。后续 KV 直接由 decode 端追加。<sup class="cite"><a href="#ref-10">[10]</a></sup> <sup class="cite"><a href="#ref-14">[14]</a></sup>
+如果 prefill 端先返回首个 token，而 decode 端需要的 KV 还在路上，用户会多等一会儿才看到第二个 token。如果首个 token 由 decode 端返回，这段等待就算在首 token 延迟里。后续的新 KV 由 decode 端就地追加。<sup class="cite"><a href="#ref-10">[10]</a></sup><sup class="cite"><a href="#ref-14">[14]</a></sup>
 
-## 四、从 collective 到网卡
+{% raw %}
+<details><summary>对照各场景传的数据和等待它的计算</summary>
+{% endraw %}
 
-DeepSeek-V3 的技术报告里，同一套 MoE dispatch 和 combine，在 prefill 和 decode 用了不同的走法。Prefill 先走 InfiniBand 跨节点，再用 NVLink 在节点内转发。Decode 为了降低延迟，跨节点时用 InfiniBand 点对点直传，通过 IBGDA（InfiniBand GPUDirect Async）提交操作。<sup class="cite"><a href="#ref-11">[11]</a></sup>
+| 场景 | 跨卡交换的数据 | 哪一步需要它 |
+| --- | --- | --- |
+| DDP 训练 | 各卡的梯度，按桶 AllReduce | 每张卡用相同的平均梯度更新完整模型 |
+| FSDP2 训练 | AllGather 收集参数，ReduceScatter 分发归约后的梯度 | 计算时需要完整参数组，更新时只要本卡的梯度分片 |
+| 经典 TP | AllReduce 合并输出部分和，训练时还要归约输入梯度 | 同层后续计算读取完整结果 |
+| PP | Send/Recv 传微批的边界激活，反向传激活梯度 | 相邻阶段接着算这一个微批 |
+| MoE 专家并行 | 按目的地交换 token 向量，再把专家输出送回 | 专家先等输入，来源卡再等专家结果 |
+| 独立稠密推理副本 | 调度器分发请求，副本间无需交换本次前向的激活 | 选中的副本独立生成 |
+| Prefill/Decode 分离 | 点对点传递或重新分片的提示 KV | 接手生成的设备读取历史缓存 |
 
-框架里的 `Send` 指把一条消息交给目标 rank。RDMA verbs 里的 `SEND` 则是网卡执行的一种操作。以可靠连接为例，发 `SEND` 之前，收方得在接收队列上备好缓冲区。用普通 `RDMA_WRITE` 时，发方按远端虚拟地址和 rkey 写进获准访问的内存。框架调用 Send/Recv 后，具体选哪种操作，由传输后端决定。有 GPUDirect RDMA 时，支持它的网卡可以直接读写 GPU 显存。由 CPU 还是 GPU 提交工作请求，则由后端的控制路径决定。<sup class="cite"><a href="#ref-12">[12]</a></sup> <sup class="cite"><a href="#ref-13">[13]</a></sup>
+{% raw %}
+</details>
+{% endraw %}
 
-| 场景 | 交换的数据 | 典型操作 | 等到什么时候才能继续 |
-| --- | --- | --- | --- |
-| DDP 训练 | 本地样本产生的梯度 | AllReduce | 归约结果到齐后更新参数 |
-| FSDP2 训练 | 参数组分片、各自计算的梯度 | 参数 AllGather，梯度 ReduceScatter | 参数齐了才算该组，梯度分片齐了才更新 |
-| 经典 TP 训练或推理 | 激活的部分和、训练时的输入梯度部分和 | AllReduce | 同层的后继算子等待对应结果 |
-| PP | 微批的边界激活或激活梯度 | Send/Recv | 相邻阶段等到该微批的输入 |
-| MoE 专家并行 | 路由后的 token 向量与专家输出 | 两次按目的地交换 | 专家等输入，来源 rank 等自己的输出 |
-| 独立稠密推理副本 | 请求交给某个副本 | 请求分发 | 请求等待选中的副本排程 |
-| Prefill/Decode 分离 | 一条请求的提示 KV | 点对点或分片重分布 | Decode worker 等它需要的缓存 |
+<div id="四、从-collective-到网卡" aria-hidden="true"></div>
 
-相关博文包括[智算互联（上）：训练吞吐与通信瓶颈](/2026/06/28/ai-compute-interconnect-part1-communication-wall/)、[大模型推理的执行机制与性能约束](/2026/11/08/llm-inference-from-token-to-cluster/)和[智算互联（下）：高性能网卡的芯片架构](/2026/06/28/ai-compute-interconnect-part3-smart-nic-chip/)。
+## 五、到了网卡上，All-to-All 怎么传
+
+回到图 4，从 0 号卡发往 2 号卡的 token，到底走哪条链路？DeepSeek-V3 的技术报告给了一个具体例子。预填充时，发往其他节点的 token 先走 InfiniBand（IB），到了目标节点，再经 NVLink 转交给专家所在的 GPU。专家返回结果时方向相反，先在节点内汇集，再跨 IB 返回。逐 token 生成时，请求对延迟更敏感，这套部署在 dispatch 和 combine 两程都采用 IB 点对点直传，并用 IBGDA 让 GPU 提交通信操作。<sup class="cite"><a href="#ref-11">[11]</a></sup>
+
+流水线里调用 Send/Recv，框架知道要把哪条消息交给哪个 rank。至于网卡怎么交付这条消息，要看传输后端。在可靠连接上使用 RDMA 的 `SEND` 时，接收方须事先在接收队列挂好缓冲区。若选用普通 `RDMA_WRITE`，发送方凭远端地址和访问密钥（rkey），直接把数据写入对方授权的内存。启用 GPUDirect RDMA 后，这块内存可以是 GPU 显存。工作请求可以由 CPU 提交，也可以像前面的 IBGDA 配置那样由 GPU 提交。<sup class="cite"><a href="#ref-12">[12]</a></sup><sup class="cite"><a href="#ref-13">[13]</a></sup>
+
+回头看图 5 里的 128 KiB。如果参与这次归约的 GPU 全在同一台机器上，GPU 之间走的又是 NVLink，这次归约产生的跨机网卡流量就是零。要和网卡计数器对账，除了每张卡交给 AllReduce 的字节数，还得知道哪些卡参加了归约、它们之间走哪条链路。
+
+延伸阅读　[智算互联（上）：训练吞吐与通信瓶颈](/2026/06/28/ai-compute-interconnect-part1-communication-wall/) · [大模型推理的执行机制与性能约束](/2026/11/08/llm-inference-from-token-to-cluster/) · [智算互联（下）：高性能网卡的芯片架构](/2026/06/28/ai-compute-interconnect-part3-smart-nic-chip/)
 
 ## 参考资料
 
@@ -296,7 +355,8 @@ DeepSeek-V3 的技术报告里，同一套 MoE dispatch 和 combine，在 prefil
 8. <span id="ref-8" class="ref-anchor"></span> NVIDIA. [Megatron Core MoE Token Dispatcher](https://docs.nvidia.com/megatron-core/developer-guide/0.15.0/apidocs/core/core.transformer.moe.token_dispatcher.html). 专家并行的 dispatch、combine 与局部重排。
 9. <span id="ref-9" class="ref-anchor"></span> vLLM. [Data Parallel Deployment](https://docs.vllm.ai/en/stable/serving/data_parallel_deployment/). 独立推理副本与跨副本的专家层。
 10. <span id="ref-10" class="ref-anchor"></span> Zhong et al., OSDI 2024. [DistServe: Disaggregating Prefill and Decoding for Goodput-optimized Large Language Model Serving](https://www.usenix.org/conference/osdi24/presentation/zhong-yinmin). Prefill/Decode 解耦、KV 交接及放置策略。
-11. <span id="ref-11" class="ref-anchor"></span> DeepSeek-AI, 2024. [DeepSeek-V3 Technical Report](https://arxiv.org/html/2412.19437#S3.SS4). §3.4，推理两阶段的 MoE 通信路径。
+11. <span id="ref-11" class="ref-anchor"></span> DeepSeek-AI, 2024. [DeepSeek-V3 Technical Report](https://arxiv.org/html/2412.19437#S3.SS4). §3.2.2、§3.4，MoE 分发与合并在训练、预填充和解码中的通信路径。
 12. <span id="ref-12" class="ref-anchor"></span> NVIDIA. [GPUDirect RDMA](https://docs.nvidia.com/cuda/gpudirect-rdma/). 第三方 PCIe 设备访问 GPU 显存的数据路径。
 13. <span id="ref-13" class="ref-anchor"></span> NVIDIA. [RDMA Aware Networks Programming User Manual](https://docs.nvidia.com/rdma-aware-networks-programming-user-manual-1-7.pdf#page=20). §3.1，Send 和 RDMA Write 的接收缓冲区与地址约定。
 14. <span id="ref-14" class="ref-anchor"></span> vLLM. [Disaggregated Prefilling](https://docs.vllm.ai/en/latest/features/disagg_prefill/#generate-api-output-modes). 分离式推理的输出模式与 KV 交接。
+15. <span id="ref-15" class="ref-anchor"></span> PyTorch. [Distributed communication package，all_to_all_single](https://docs.pytorch.org/docs/stable/distributed.html#torch.distributed.all_to_all_single). 各目的地收发不等长分片的示例。
