@@ -3,9 +3,9 @@
   <desc>A byte-level recurrent model trained on Amazon reviews. A threshold on one unit achieved 92.30% IMDb sentiment accuracy. Fixing that unit at +1 or −1 steered generated reviews.</desc>
   <!-- Radford, Jozefowicz & Sutskever (2017), sections 4.2 and 4.5, Table 5. https://arxiv.org/abs/1704.01444 . Quotations are excerpts from generated samples in Table 5. -->
   <text x="8" y="25" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Amazon reviews</text>
-  <path d="M 179 19 L 200 19" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
-  <path d="M 195 22.3 L 202 19 L 195 15.7 Z" fill="var(--muted, #526071)" opacity="1"/>
-  <text x="213" y="25" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Predict the next byte</text>
+  <path d="M 207 19 L 233 19" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 228 22.3 L 235 19 L 228 15.7 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <text x="250" y="25" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Predict next byte</text>
   <text x="8" y="78" font-size="21" font-weight="650" text-anchor="start" fill="var(--chart-blue, #376b9f)">Read one unit</text>
   <rect x="9" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
   <rect x="28" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
