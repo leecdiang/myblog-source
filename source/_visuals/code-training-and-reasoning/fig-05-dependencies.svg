@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 356" role="img" aria-label="Four positions in a recurrent or a causal attention layer" style="min-width:0;max-width:560px;margin-inline:auto;font-variant-numeric:tabular-nums" font-family="system-ui, sans-serif">
+  <title>Four positions in a recurrent or a causal attention layer</title>
+  <desc>Each recurrent state depends on its predecessor and its input. Each attention output reads layer inputs at earlier positions and its own position. Within the same attention layer no horizontal edge joins output positions.</desc>
+  <!-- Original graph for teacher-forced training. See Vaswani et al., Table 1 and section 3.2.3, https://arxiv.org/abs/1706.03762 . Edges are logical dependencies. -->
+  <text x="8" y="28" font-size="21" font-weight="650" text-anchor="start" fill="var(--chart-blue, #376b9f)">Recurrent layer</text>
+  <path d="M 91 69 L 139 69" fill="none" stroke="var(--chart-blue, #376b9f)" stroke-width="2" opacity="1"/>
+  <path d="M 134 72.3 L 141 69 L 134 65.7 Z" fill="var(--chart-blue, #376b9f)" opacity="1"/>
+  <path d="M 56 105 L 56 90" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="1"/>
+  <path d="M 59.3 95 L 56 88 L 52.7 95 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <rect x="26" y="52" width="60" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="56" y="75" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">h₁</text>
+  <text x="56" y="128" font-size="19" font-weight="520" text-anchor="middle" fill="var(--muted, #526071)">x₁</text>
+  <path d="M 212 69 L 261 69" fill="none" stroke="var(--chart-blue, #376b9f)" stroke-width="2" opacity="1"/>
+  <path d="M 256 72.3 L 263 69 L 256 65.7 Z" fill="var(--chart-blue, #376b9f)" opacity="1"/>
+  <path d="M 177 105 L 177 90" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="1"/>
+  <path d="M 180.3 95 L 177 88 L 173.7 95 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <rect x="147" y="52" width="60" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="177" y="75" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">h₂</text>
+  <text x="177" y="128" font-size="19" font-weight="520" text-anchor="middle" fill="var(--muted, #526071)">x₂</text>
+  <path d="M 334 69 L 382 69" fill="none" stroke="var(--chart-blue, #376b9f)" stroke-width="2" opacity="1"/>
+  <path d="M 377 72.3 L 384 69 L 377 65.7 Z" fill="var(--chart-blue, #376b9f)" opacity="1"/>
+  <path d="M 299 105 L 299 90" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="1"/>
+  <path d="M 302.3 95 L 299 88 L 295.7 95 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <rect x="269" y="52" width="60" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="299" y="75" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">h₃</text>
+  <text x="299" y="128" font-size="19" font-weight="520" text-anchor="middle" fill="var(--muted, #526071)">x₃</text>
+  <path d="M 420 105 L 420 90" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="1"/>
+  <path d="M 423.3 95 L 420 88 L 416.7 95 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <rect x="390" y="52" width="60" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="420" y="75" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">h₄</text>
+  <text x="420" y="128" font-size="19" font-weight="520" text-anchor="middle" fill="var(--muted, #526071)">x₄</text>
+  <path d="M 8 153 L 472 153" fill="none" stroke="var(--line, #dce2e9)" stroke-width="1.5" opacity="1"/>
+  <text x="8" y="186" font-size="21" font-weight="650" text-anchor="start" fill="var(--chart-blue, #376b9f)">Causal self-attention</text>
+  <path d="M 56 291 L 56 242" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="0.67"/>
+  <path d="M 59.3 247 L 56 240 L 52.7 247 Z" fill="var(--muted, #526071)" opacity="0.67"/>
+  <path d="M 56 291 L 171.17 240.8" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="0.67"/>
+  <path d="M 167.9 245.82 L 173 240 L 165.26 239.77 Z" fill="var(--muted, #526071)" opacity="0.67"/>
+  <path d="M 177 291 L 180.84 241.99" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="0.67"/>
+  <path d="M 183.74 247.24 L 181 240 L 177.16 246.72 Z" fill="var(--muted, #526071)" opacity="0.67"/>
+  <path d="M 56 291 L 289.05 240.42" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="0.67"/>
+  <path d="M 284.86 244.71 L 291 240 L 283.46 238.26 Z" fill="var(--muted, #526071)" opacity="0.67"/>
+  <path d="M 177 291 L 297.15 240.77" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="0.67"/>
+  <path d="M 293.81 245.74 L 299 240 L 291.27 239.66 Z" fill="var(--muted, #526071)" opacity="0.67"/>
+  <path d="M 299 291 L 306.69 241.98" fill="none" stroke="var(--muted, #526071)" stroke-width="1.6" opacity="0.67"/>
+  <path d="M 309.18 247.43 L 307 240 L 302.66 246.4 Z" fill="var(--muted, #526071)" opacity="0.67"/>
+  <path d="M 56 291 L 406.02 240.29" fill="none" stroke="var(--chart-teal, #2b7975)" stroke-width="1.6" opacity="1"/>
+  <path d="M 401.55 244.27 L 408 240 L 400.6 237.74 Z" fill="var(--chart-teal, #2b7975)" opacity="1"/>
+  <path d="M 177 291 L 414.04 240.42" fill="none" stroke="var(--chart-teal, #2b7975)" stroke-width="1.6" opacity="1"/>
+  <path d="M 409.84 244.69 L 416 240 L 408.47 238.23 Z" fill="var(--chart-teal, #2b7975)" opacity="1"/>
+  <path d="M 299 291 L 422.15 240.76" fill="none" stroke="var(--chart-teal, #2b7975)" stroke-width="1.6" opacity="1"/>
+  <path d="M 418.77 245.7 L 424 240 L 416.27 239.59 Z" fill="var(--chart-teal, #2b7975)" opacity="1"/>
+  <path d="M 420 291 L 431.54 241.95" fill="none" stroke="var(--chart-teal, #2b7975)" stroke-width="1.6" opacity="1"/>
+  <path d="M 433.61 247.57 L 432 240 L 427.18 246.06 Z" fill="var(--chart-teal, #2b7975)" opacity="1"/>
+  <rect x="26" y="204" width="60" height="34" rx="5" fill="var(--chart-teal, #2b7975)" fill-opacity="0.1" stroke="var(--chart-teal, #2b7975)" stroke-width="1.2"/>
+  <text x="56" y="227" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">y₁</text>
+  <rect x="26" y="293" width="60" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="56" y="316" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">x₁</text>
+  <rect x="147" y="204" width="60" height="34" rx="5" fill="var(--chart-teal, #2b7975)" fill-opacity="0.1" stroke="var(--chart-teal, #2b7975)" stroke-width="1.2"/>
+  <text x="177" y="227" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">y₂</text>
+  <rect x="147" y="293" width="60" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="177" y="316" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">x₂</text>
+  <rect x="269" y="204" width="60" height="34" rx="5" fill="var(--chart-teal, #2b7975)" fill-opacity="0.1" stroke="var(--chart-teal, #2b7975)" stroke-width="1.2"/>
+  <text x="299" y="227" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">y₃</text>
+  <rect x="269" y="293" width="60" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="299" y="316" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">x₃</text>
+  <rect x="390" y="204" width="60" height="34" rx="5" fill="var(--chart-teal, #2b7975)" fill-opacity="0.1" stroke="var(--chart-teal, #2b7975)" stroke-width="1.2"/>
+  <text x="420" y="227" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">y₄</text>
+  <rect x="390" y="293" width="60" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="420" y="316" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">x₄</text>
+  <text x="8" y="350" font-size="18" font-weight="450" text-anchor="start" fill="var(--muted, #526071)">x = layer input</text>
+  <text x="472" y="350" font-size="18" font-weight="450" text-anchor="end" fill="var(--muted, #526071)">y = layer output</text>
+</svg>
