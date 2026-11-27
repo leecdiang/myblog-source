@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 308" role="img" aria-label="Inventory update in code, algebra and a ledger" style="min-width:0;max-width:560px;margin-inline:auto;font-variant-numeric:tabular-nums" font-family="system-ui, sans-serif">
+  <title>Inventory update in code, algebra and a ledger</title>
+  <desc>Start with 6 items. Accept a request only when the entire quantity fits. Requests 4, 5 and 2 leave 2, 2 and 0. This analogy was constructed by the author.</desc>
+  <!-- Original worked example of a stateful update. The drawing does not report model activations. -->
+  <text x="8" y="29" font-size="19" font-weight="600" text-anchor="start" fill="var(--muted, #526071)">Code</text>
+  <text x="112" y="29" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)" font-family="ui-monospace, Menlo, monospace">if q &lt;= b: b -= q</text>
+  <text x="8" y="68" font-size="19" font-weight="600" text-anchor="start" fill="var(--muted, #526071)">Math</text>
+  <text x="112" y="68" font-size="22" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">b′ = b − q · 1[q ≤ b]</text>
+  <path d="M 8 92 L 472 92" fill="none" stroke="var(--line, #dce2e9)" stroke-width="1.5" opacity="1"/>
+  <text x="8" y="130" font-size="19" font-weight="600" text-anchor="start" fill="var(--heading, #102b56)">Request</text>
+  <text x="123" y="130" font-size="19" font-weight="600" text-anchor="start" fill="var(--heading, #102b56)">Action</text>
+  <text x="263" y="130" font-size="19" font-weight="600" text-anchor="start" fill="var(--heading, #102b56)">Stock remaining</text>
+  <text x="19" y="162" font-size="21" font-weight="570" text-anchor="start" fill="var(--ink, #293441)">—</text>
+  <text x="123" y="162" font-size="20" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Start</text>
+  <rect x="263" y="146" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="287" y="146" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="311" y="146" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="335" y="146" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="359" y="146" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="383" y="146" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <text x="465" y="162" font-size="21" font-weight="620" text-anchor="end" fill="var(--ink, #293441)">6</text>
+  <text x="19" y="205" font-size="21" font-weight="570" text-anchor="start" fill="var(--ink, #293441)">4</text>
+  <text x="123" y="205" font-size="20" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Fill</text>
+  <rect x="263" y="189" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="287" y="189" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="311" y="189" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="335" y="189" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="359" y="189" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="383" y="189" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <text x="465" y="205" font-size="21" font-weight="620" text-anchor="end" fill="var(--ink, #293441)">2</text>
+  <text x="19" y="248" font-size="21" font-weight="570" text-anchor="start" fill="var(--ink, #293441)">5</text>
+  <text x="123" y="248" font-size="20" font-weight="550" text-anchor="start" fill="var(--chart-amber, #946022)">Skip</text>
+  <rect x="263" y="232" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="287" y="232" width="18" height="18" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="311" y="232" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="335" y="232" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="359" y="232" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="383" y="232" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <text x="465" y="248" font-size="21" font-weight="620" text-anchor="end" fill="var(--ink, #293441)">2</text>
+  <text x="19" y="291" font-size="21" font-weight="570" text-anchor="start" fill="var(--ink, #293441)">2</text>
+  <text x="123" y="291" font-size="20" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Fill</text>
+  <rect x="263" y="275" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="287" y="275" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="311" y="275" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="335" y="275" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="359" y="275" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="383" y="275" width="18" height="18" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <text x="465" y="291" font-size="21" font-weight="620" text-anchor="end" fill="var(--ink, #293441)">0</text>
+</svg>

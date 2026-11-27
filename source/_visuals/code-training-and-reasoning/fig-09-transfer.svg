@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 351" role="img" aria-label="Changes at 50 percent code, compared with text only" style="min-width:0;max-width:560px;margin-inline:auto;font-variant-numeric:tabular-nums" font-family="system-ui, sans-serif">
+  <title>Changes at 50% code, compared with text only</title>
+  <desc>At 470M parameters and 400B total training tokens, replacing half the text with code changed NL reasoning by +2.8 percentage points, world knowledge by −1.4 and code by +8.6.</desc>
+  <!-- Appendix B, Table 2, PRETRAINING section; Cooldown (T) = N/A. Source: https://proceedings.iclr.cc/paper_files/paper/2025/file/c513d1786f85531fac7050947736265f-Paper-Conference.pdf#page=25 -->
+  <text x="8" y="26" font-size="20" font-weight="650" text-anchor="start" fill="var(--ink, #293441)">Change in percentage points</text>
+  <text x="8" y="53" font-size="18" font-weight="450" text-anchor="start" fill="var(--muted, #526071)">Text only → 50% code</text>
+  <text x="8" y="94" font-size="20" font-weight="620" text-anchor="start" fill="var(--ink, #293441)">NL reasoning</text>
+  <text x="472" y="94" font-size="20" font-weight="450" text-anchor="end" fill="var(--ink, #293441)">49.0 → 51.8</text>
+  <text x="8" y="117" font-size="18" font-weight="450" text-anchor="start" fill="var(--muted, #526071)">Avg. accuracy</text>
+  <path d="M 61 137 H 449" stroke="var(--line, #dce2e9)" fill="none" stroke-width="1.5"/>
+  <path d="M 139 127 v 20" stroke="var(--muted, #526071)" fill="none" stroke-width="1.2"/>
+  <path d="M 139 137 H 223" stroke="var(--chart-teal, #2b7975)" fill="none" stroke-width="7"/>
+  <text x="232" y="143" font-size="18" font-weight="650" text-anchor="start" fill="var(--chart-teal, #2b7975)">+2.8</text>
+  <text x="8" y="185" font-size="20" font-weight="620" text-anchor="start" fill="var(--ink, #293441)">World knowledge</text>
+  <text x="472" y="185" font-size="20" font-weight="450" text-anchor="end" fill="var(--ink, #293441)">9.5 → 8.1</text>
+  <text x="8" y="208" font-size="18" font-weight="450" text-anchor="start" fill="var(--muted, #526071)">Avg. exact match</text>
+  <path d="M 61 228 H 449" stroke="var(--line, #dce2e9)" fill="none" stroke-width="1.5"/>
+  <path d="M 139 218 v 20" stroke="var(--muted, #526071)" fill="none" stroke-width="1.2"/>
+  <path d="M 139 228 H 97" stroke="var(--chart-red, #ac4d5b)" fill="none" stroke-width="7"/>
+  <text x="88" y="234" font-size="18" font-weight="650" text-anchor="end" fill="var(--chart-red, #ac4d5b)">−1.4</text>
+  <text x="8" y="276" font-size="20" font-weight="620" text-anchor="start" fill="var(--ink, #293441)">Code</text>
+  <text x="472" y="276" font-size="20" font-weight="450" text-anchor="end" fill="var(--ink, #293441)">0.4 → 9.0</text>
+  <text x="8" y="299" font-size="18" font-weight="450" text-anchor="start" fill="var(--muted, #526071)">Avg. pass@1</text>
+  <path d="M 61 319 H 449" stroke="var(--line, #dce2e9)" fill="none" stroke-width="1.5"/>
+  <path d="M 139 309 v 20" stroke="var(--muted, #526071)" fill="none" stroke-width="1.2"/>
+  <path d="M 139 319 H 397" stroke="var(--chart-teal, #2b7975)" fill="none" stroke-width="7"/>
+  <text x="406" y="325" font-size="18" font-weight="650" text-anchor="start" fill="var(--chart-teal, #2b7975)">+8.6</text>
+  <text x="139" y="348" font-size="18" font-weight="450" text-anchor="middle" fill="var(--muted, #526071)">0</text>
+</svg>
