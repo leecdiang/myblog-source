@@ -21,11 +21,11 @@
         "brokenMath": 0,
         "badAnchors": [],
         "clipped": [],
-        "citations": 25,
+        "citations": 27,
         "toc": 7,
-        "staticFigures": 8
+        "staticFigures": 9
       },
-      "figures": 11
+      "figures": 12
     },
     {
       "width": 1440,
@@ -47,11 +47,11 @@
         "brokenMath": 0,
         "badAnchors": [],
         "clipped": [],
-        "citations": 25,
+        "citations": 27,
         "toc": 7,
-        "staticFigures": 8
+        "staticFigures": 9
       },
-      "figures": 11
+      "figures": 12
     },
     {
       "width": 390,
@@ -73,11 +73,11 @@
         "brokenMath": 0,
         "badAnchors": [],
         "clipped": [],
-        "citations": 25,
+        "citations": 27,
         "toc": 7,
-        "staticFigures": 8
+        "staticFigures": 9
       },
-      "figures": 11
+      "figures": 12
     },
     {
       "width": 390,
@@ -99,11 +99,11 @@
         "brokenMath": 0,
         "badAnchors": [],
         "clipped": [],
-        "citations": 25,
+        "citations": 27,
         "toc": 7,
-        "staticFigures": 8
+        "staticFigures": 9
       },
-      "figures": 11
+      "figures": 12
     }
   ],
   "errors": []
