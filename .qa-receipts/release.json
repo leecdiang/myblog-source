@@ -1,266 +1,166 @@
 [
  {
   "path": "2026/11/27/code-training-and-reasoning/index.html",
-  "blob": "65cb83a35f20e9f59f557a24ab1fb023c4badd5a",
-  "bytes": 111427,
+  "blob": "414dab8e9af57b4261ea620ec694be5cbff78a0c",
+  "bytes": 113571,
   "reason": "article, feed or taxonomy index",
   "parts": [
-   "65cb83a35f20e9f59f557a24ab1fb023c4badd5a-0.b64",
-   "65cb83a35f20e9f59f557a24ab1fb023c4badd5a-1.b64",
-   "65cb83a35f20e9f59f557a24ab1fb023c4badd5a-2.b64",
-   "65cb83a35f20e9f59f557a24ab1fb023c4badd5a-3.b64"
-  ]
- },
- {
-  "path": "2026/11/27/code-training-and-reasoning/interactive/controls.css",
-  "blob": "53655bac7d753eebe2dde6404a2eddc17cee229b",
-  "bytes": 5798,
-  "reason": "article, feed or taxonomy index",
-  "parts": [
-   "53655bac7d753eebe2dde6404a2eddc17cee229b-0.b64"
-  ]
- },
- {
-  "path": "2026/11/27/code-training-and-reasoning/interactive/controls.js",
-  "blob": "cab599665adfc8f5fc2d408162304112fc16ab76",
-  "bytes": 12961,
-  "reason": "article, feed or taxonomy index",
-  "parts": [
-   "cab599665adfc8f5fc2d408162304112fc16ab76-0.b64"
-  ]
- },
- {
-  "path": "2026/11/27/code-training-and-reasoning/reproduce/aryabumi-table2.json",
-  "blob": "0f44ab49e616f3bce3f365477d3a92d7e9db6912",
-  "bytes": 920,
-  "reason": "article, feed or taxonomy index",
-  "parts": [
-   "0f44ab49e616f3bce3f365477d3a92d7e9db6912-0.b64"
-  ]
- },
- {
-  "path": "2026/11/27/code-training-and-reasoning/reproduce/render-transfer.mjs",
-  "blob": "7f03aba5c10aff5a8773504701e2092073cfef0e",
-  "bytes": 2936,
-  "reason": "article, feed or taxonomy index",
-  "parts": [
-   "7f03aba5c10aff5a8773504701e2092073cfef0e-0.b64"
+   "414dab8e9af57b4261ea620ec694be5cbff78a0c-0.b64",
+   "414dab8e9af57b4261ea620ec694be5cbff78a0c-1.b64",
+   "414dab8e9af57b4261ea620ec694be5cbff78a0c-2.b64",
+   "414dab8e9af57b4261ea620ec694be5cbff78a0c-3.b64"
   ]
  },
  {
   "path": "archives/2026/index.html",
-  "blob": "086092dab6f3b924799a49157af166b1808d6e18",
-  "bytes": 27175,
+  "blob": "9768938dac81399f705c6e88869ebf210c6e216b",
+  "bytes": 27188,
   "reason": "page directly references the new article",
   "parts": [
-   "086092dab6f3b924799a49157af166b1808d6e18-0.b64"
+   "9768938dac81399f705c6e88869ebf210c6e216b-0.b64"
   ]
  },
  {
   "path": "archives/index.html",
-  "blob": "85c94c2ca693d7473ac127e23a54bce233daecfd",
-  "bytes": 28744,
+  "blob": "83a60d104ab27da39bf368f9a5e09b38ab7b0239",
+  "bytes": 28757,
   "reason": "page directly references the new article",
   "parts": [
-   "85c94c2ca693d7473ac127e23a54bce233daecfd-0.b64"
-  ]
- },
- {
-  "path": "assets/studio/math.4d032b484e1b.css",
-  "blob": "b6ff8d983c8f1ca7147bf40c547c5e115baf7920",
-  "bytes": 22035,
-  "reason": "asset used by a release page",
-  "parts": [
-   "b6ff8d983c8f1ca7147bf40c547c5e115baf7920-0.b64"
+   "83a60d104ab27da39bf368f9a5e09b38ab7b0239-0.b64"
   ]
  },
  {
   "path": "atom.xml",
-  "blob": "5758e23028fd1aada78e9ac0a3457e84d593642e",
-  "bytes": 1935650,
+  "blob": "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322",
+  "bytes": 1939922,
   "reason": "article, feed or taxonomy index",
   "parts": [
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-0.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-1.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-2.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-3.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-4.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-5.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-6.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-7.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-8.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-9.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-10.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-11.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-12.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-13.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-14.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-15.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-16.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-17.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-18.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-19.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-20.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-21.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-22.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-23.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-24.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-25.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-26.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-27.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-28.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-29.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-30.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-31.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-32.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-33.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-34.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-35.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-36.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-37.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-38.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-39.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-40.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-41.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-42.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-43.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-44.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-45.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-46.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-47.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-48.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-49.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-50.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-51.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-52.b64",
-   "5758e23028fd1aada78e9ac0a3457e84d593642e-53.b64"
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-0.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-1.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-2.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-3.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-4.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-5.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-6.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-7.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-8.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-9.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-10.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-11.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-12.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-13.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-14.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-15.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-16.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-17.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-18.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-19.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-20.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-21.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-22.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-23.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-24.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-25.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-26.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-27.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-28.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-29.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-30.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-31.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-32.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-33.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-34.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-35.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-36.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-37.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-38.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-39.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-40.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-41.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-42.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-43.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-44.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-45.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-46.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-47.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-48.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-49.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-50.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-51.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-52.b64",
+   "2a796d8d63ebb0f43d18fc0f3a30ab53b6a96322-53.b64"
   ]
  },
  {
   "path": "baidusitemap.xml",
-  "blob": "8a5d27615fe8d675539a319998bc766d568ad6ba",
+  "blob": "1b6b6ef1f8ebfc9a234878ca4a7827f52d11c284",
   "bytes": 3027,
   "reason": "article, feed or taxonomy index",
   "parts": [
-   "8a5d27615fe8d675539a319998bc766d568ad6ba-0.b64"
+   "1b6b6ef1f8ebfc9a234878ca4a7827f52d11c284-0.b64"
   ]
  },
  {
   "path": "categories/Silicon-Circuits/index.html",
-  "blob": "b46476cc5e9021e4d32243e57b044b86a46e44db",
-  "bytes": 12085,
+  "blob": "484c87538f24fcc70f4c6a8dd1060bf0fa129826",
+  "bytes": 12098,
   "reason": "page directly references the new article",
   "parts": [
-   "b46476cc5e9021e4d32243e57b044b86a46e44db-0.b64"
-  ]
- },
- {
-  "path": "categories/Silicon-Circuits/page/2/index.html",
-  "blob": "f4b8553599d70aba61e0671fe7c8a899b709723e",
-  "bytes": 8520,
-  "reason": "the list of article links changed",
-  "parts": [
-   "f4b8553599d70aba61e0671fe7c8a899b709723e-0.b64"
+   "484c87538f24fcc70f4c6a8dd1060bf0fa129826-0.b64"
   ]
  },
  {
   "path": "categories/index.html",
-  "blob": "22c7df37779b7ef1198004d83c1e46c33fc16944",
+  "blob": "506bf369d538bca738dd8ffc1b0502506945fa75",
   "bytes": 8296,
   "reason": "article, feed or taxonomy index",
   "parts": [
-   "22c7df37779b7ef1198004d83c1e46c33fc16944-0.b64"
+   "506bf369d538bca738dd8ffc1b0502506945fa75-0.b64"
   ]
  },
  {
   "path": "home/index.html",
-  "blob": "5ca33d33c0f613f39136af10350d269dfb1f3962",
+  "blob": "0b95fa0e3474c0c1a5483fb398eeeec4ac92e1fb",
   "bytes": 10066,
   "reason": "page directly references the new article",
   "parts": [
-   "5ca33d33c0f613f39136af10350d269dfb1f3962-0.b64"
-  ]
- },
- {
-  "path": "images/social/eddd16e00e10.png",
-  "blob": "cfc08393fb091d67bac33c8f4a728f9d5bfbb9f6",
-  "bytes": 45122,
-  "reason": "asset used by a release page",
-  "parts": [
-   "cfc08393fb091d67bac33c8f4a728f9d5bfbb9f6-0.b64",
-   "cfc08393fb091d67bac33c8f4a728f9d5bfbb9f6-1.b64"
+   "0b95fa0e3474c0c1a5483fb398eeeec4ac92e1fb-0.b64"
   ]
  },
  {
   "path": "index.html",
-  "blob": "de697b2480764dc808287ab86a6a4cbaed740238",
+  "blob": "e62d16c9354c5f9e42a3a088b80d8b43038b72f8",
   "bytes": 9780,
   "reason": "page directly references the new article",
   "parts": [
-   "de697b2480764dc808287ab86a6a4cbaed740238-0.b64"
+   "e62d16c9354c5f9e42a3a088b80d8b43038b72f8-0.b64"
   ]
  },
  {
   "path": "intro/index.html",
-  "blob": "e04a31f96a0177f4118904d8d33613c13b81ffc9",
-  "bytes": 27663,
+  "blob": "807575d3b0c874d018d436fbba06d83d0071bba3",
+  "bytes": 27676,
   "reason": "page directly references the new article",
   "parts": [
-   "e04a31f96a0177f4118904d8d33613c13b81ffc9-0.b64"
+   "807575d3b0c874d018d436fbba06d83d0071bba3-0.b64"
   ]
  },
  {
   "path": "sitemap.xml",
-  "blob": "8e100a01d9327abc5fbb5a6d77d298221b8549fe",
+  "blob": "68cb3d0ec4af31437c6f5e73953f1a4c71bc357f",
   "bytes": 6556,
   "reason": "article, feed or taxonomy index",
   "parts": [
-   "8e100a01d9327abc5fbb5a6d77d298221b8549fe-0.b64"
-  ]
- },
- {
-  "path": "tags/Transformer/index.html",
-  "blob": "be80ae2c16c88e3ca0a5975ada0bf57d074eb3b5",
-  "bytes": 7318,
-  "reason": "page directly references the new article",
-  "parts": [
-   "be80ae2c16c88e3ca0a5975ada0bf57d074eb3b5-0.b64"
+   "68cb3d0ec4af31437c6f5e73953f1a4c71bc357f-0.b64"
   ]
  },
  {
   "path": "tags/index.html",
-  "blob": "a8275881f9996ecce7f201dff6bbed36525cee93",
+  "blob": "ae9104e6503ff7dd7a40deab9a391b9cb5852983",
   "bytes": 17913,
   "reason": "article, feed or taxonomy index",
   "parts": [
-   "a8275881f9996ecce7f201dff6bbed36525cee93-0.b64"
-  ]
- },
- {
-  "path": "tags/大语言模型/index.html",
-  "blob": "01523e3f3fce80e2f934376667969c2689e86580",
-  "bytes": 7398,
-  "reason": "page directly references the new article",
-  "parts": [
-   "01523e3f3fce80e2f934376667969c2689e86580-0.b64"
-  ]
- },
- {
-  "path": "tags/计算机体系结构/index.html",
-  "blob": "d3c66d1012deeb79f815b318abd95113e3dc0ec7",
-  "bytes": 10325,
-  "reason": "page directly references the new article",
-  "parts": [
-   "d3c66d1012deeb79f815b318abd95113e3dc0ec7-0.b64"
-  ]
- },
- {
-  "path": "tags/预训练/index.html",
-  "blob": "d63590738d1e847dc9f39682b6f6f9a8b6102d6b",
-  "bytes": 7344,
-  "reason": "page directly references the new article",
-  "parts": [
-   "d63590738d1e847dc9f39682b6f6f9a8b6102d6b-0.b64"
+   "ae9104e6503ff7dd7a40deab9a391b9cb5852983-0.b64"
   ]
  }
 ]
