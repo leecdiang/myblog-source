@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 348" role="img" aria-label="Selected task scores for two dense one-billion-parameter training mixtures" style="min-width:0;max-width:560px;margin-inline:auto;font-variant-numeric:tabular-nums" font-family="system-ui, sans-serif" fill="var(--ink, #293441)">
+  <title>Task scores in the dense 1B ablation</title>
+  <desc>Open circle: without the independent code corpus. Filled diamond: full data. HumanEval rises from 2.44 to 24.39, MATH500 falls from 25.60 to 22.80, and OlympiadBench rises from 0.59 to 4.15. Read each comparison within its own benchmark.</desc>
+  <metadata>Source: Yuze Zhao et al., What Really Improves Mathematical Reasoning: Structured Reasoning Signals Beyond Pure Code, Appendix A.7, Table 4. https://arxiv.org/html/2605.19762v1#A1.SS7 . Dense 1B, selected individual tasks. Columns: benchmark, w/o code (1B), full data (1B). HumanEval,2.44,24.39; MATH500,25.60,22.80; OlympiadBench,0.59,4.15.</metadata>
+  <text x="8" y="26" font-size="20" font-weight="650">Benchmark score · dense 1B</text>
+  <circle cx="17" cy="54" r="6" fill="none" stroke="var(--ink, #293441)" stroke-width="2.5"/><text x="32" y="60" font-size="18">w/o independent code</text>
+  <path d="M269 47l7 7-7 7-7-7z" fill="var(--chart-teal, #2b7975)"/><text x="284" y="60" font-size="18">Full data</text>
+  <text x="8" y="99" font-size="20" font-weight="620">HumanEval</text><text x="472" y="99" text-anchor="end" font-size="20">2.44 → 24.39</text>
+  <path d="M30 122H57.16M71.16 122H450" stroke="var(--line, #dce2e9)" stroke-width="1.5" fill="none"/>
+  <path d="M71.16 122H371.46" stroke="var(--muted, #526071)" stroke-width="2.5"/><circle cx="64.16" cy="122" r="6" fill="none" stroke="var(--ink, #293441)" stroke-width="2.5"/><path d="M371.46 115l7 7-7 7-7-7z" fill="var(--chart-teal, #2b7975)"/>
+  <text x="8" y="172" font-size="20" font-weight="620">MATH500</text><text x="472" y="172" text-anchor="end" font-size="20">25.60 → 22.80</text>
+  <path d="M30 195H381.4M395.4 195H450" stroke="var(--line, #dce2e9)" stroke-width="1.5" fill="none"/>
+  <path d="M381.4 195H349.2" stroke="var(--muted, #526071)" stroke-width="2.5"/><circle cx="388.4" cy="195" r="6" fill="none" stroke="var(--ink, #293441)" stroke-width="2.5"/><path d="M349.2 188l7 7-7 7-7-7z" fill="var(--chart-teal, #2b7975)"/>
+  <text x="8" y="245" font-size="20" font-weight="620">OlympiadBench</text><text x="472" y="245" text-anchor="end" font-size="20">0.59 → 4.15</text>
+  <path d="M30 268H31.259999999999998M45.26 268H450" stroke="var(--line, #dce2e9)" stroke-width="1.5" fill="none"/>
+  <path d="M45.26 268H88.1" stroke="var(--muted, #526071)" stroke-width="2.5"/><circle cx="38.26" cy="268" r="6" fill="none" stroke="var(--ink, #293441)" stroke-width="2.5"/><path d="M88.1 261l7 7-7 7-7-7z" fill="var(--chart-teal, #2b7975)"/>
+  <path d="M30 293H450 M30 293v6 M170 293v6 M310 293v6 M450 293v6" fill="none" stroke="var(--muted, #526071)" stroke-width="1.2"/>
+  <g font-size="17" text-anchor="middle" fill="var(--muted, #526071)"><text x="30" y="320" >0</text><text x="170" y="320" >10</text><text x="310" y="320" >20</text><text x="450" y="320" >30</text></g>
+</svg>

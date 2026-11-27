@@ -3,8 +3,8 @@
   <desc>Two independent models train on labeled examples. A shared language model learns next-token prediction on mixed data. Prompts can use the same weights to translate sentences or classify reviews.</desc>
   <!-- Original schematic. The two arrangements can coexist. -->
   <text x="8" y="26" font-size="21" font-weight="650" text-anchor="start" fill="var(--chart-blue, #376b9f)">Separate task models</text>
-  <text x="8" y="74" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Paired sentences</text>
-  <path d="M 171 67 L 201 67" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <text x="8" y="74" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Sentence pairs</text>
+  <path d="M 181 67 L 201 67" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
   <path d="M 196 70.3 L 203 67 L 196 63.7 Z" fill="var(--muted, #526071)" opacity="1"/>
   <rect x="209" y="52" width="56" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
   <text x="237" y="75" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">θ₁</text>
@@ -12,7 +12,7 @@
   <path d="M 299 70.3 L 306 67 L 299 63.7 Z" fill="var(--muted, #526071)" opacity="1"/>
   <text x="316" y="74" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Translate</text>
   <text x="8" y="121" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Labeled reviews</text>
-  <path d="M 171 114 L 201 114" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 181 114 L 201 114" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
   <path d="M 196 117.3 L 203 114 L 196 110.7 Z" fill="var(--muted, #526071)" opacity="1"/>
   <rect x="209" y="99" width="56" height="34" rx="5" fill="var(--chart-teal, #2b7975)" fill-opacity="0.1" stroke="var(--chart-teal, #2b7975)" stroke-width="1.2"/>
   <text x="237" y="122" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">θ₂</text>
