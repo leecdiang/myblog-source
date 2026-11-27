@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   preview:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 28
     env:
       TZ: Asia/Shanghai
@@ -66,7 +66,7 @@ jobs:
         working-directory: blog
         run: |
           ./node_modules/.bin/hexo server --ip 127.0.0.1 -p 4000 -s > ../hexo-server.log 2>&1 &
-          for attempt in $(seq 1 40); do
+          for attempt in $(seq 1 95); do
             if curl --noproxy '*' -fsS 'http://127.0.0.1:4000/2026/11/27/code-training-and-reasoning/' -o /dev/null; then exit 0; fi
             sleep 1
           done
@@ -80,6 +80,10 @@ jobs:
           "$RUNNER_TEMP/article-browser/node_modules/.bin/playwright" install chromium
           mkdir -p ../receipts
           NODE_PATH="$RUNNER_TEMP/article-browser/node_modules" node .qa-code-transfer/read.cjs
+      - name: Open a portable copy of the preview from disk
+        if: steps.readiness.outputs.ready == 'yes'
+        working-directory: blog
+        run: NODE_PATH="$RUNNER_TEMP/article-browser/node_modules" node .qa-code-transfer/offline.cjs
       - name: Prepare a scoped release manifest
         if: steps.readiness.outputs.ready == 'yes'
         working-directory: blog
