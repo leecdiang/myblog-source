@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 310" role="img" aria-label="Task-specific supervision and a shared language model" style="min-width:0;max-width:560px;margin-inline:auto;font-variant-numeric:tabular-nums" font-family="system-ui, sans-serif">
+  <title>Task-specific supervision and a shared language model</title>
+  <desc>Two independent models train on labeled examples. A shared language model learns next-token prediction on mixed data. Prompts can use the same weights to translate sentences or classify reviews.</desc>
+  <!-- Original schematic. The two arrangements can coexist. -->
+  <text x="8" y="26" font-size="21" font-weight="650" text-anchor="start" fill="var(--chart-blue, #376b9f)">Separate task models</text>
+  <text x="8" y="74" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Sentence pairs</text>
+  <path d="M 181 67 L 201 67" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 196 70.3 L 203 67 L 196 63.7 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <rect x="209" y="52" width="56" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="237" y="75" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">θ₁</text>
+  <path d="M 274 67 L 304 67" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 299 70.3 L 306 67 L 299 63.7 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <text x="316" y="74" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Translate</text>
+  <text x="8" y="121" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Labeled reviews</text>
+  <path d="M 181 114 L 201 114" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 196 117.3 L 203 114 L 196 110.7 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <rect x="209" y="99" width="56" height="34" rx="5" fill="var(--chart-teal, #2b7975)" fill-opacity="0.1" stroke="var(--chart-teal, #2b7975)" stroke-width="1.2"/>
+  <text x="237" y="122" font-size="19" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">θ₂</text>
+  <path d="M 274 114 L 304 114" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 299 117.3 L 306 114 L 299 110.7 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <text x="316" y="121" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Classify</text>
+  <path d="M 8 155 L 472 155" fill="none" stroke="var(--line, #dce2e9)" stroke-width="1.5" opacity="1"/>
+  <text x="8" y="191" font-size="21" font-weight="650" text-anchor="start" fill="var(--chart-blue, #376b9f)">One pretrained language model</text>
+  <text x="8" y="230" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">Text + code</text>
+  <path d="M 128 223 L 162 223" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 157 226.3 L 164 223 L 157 219.7 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <rect x="171" y="206" width="94" height="34" rx="5" fill="var(--chart-blue, #376b9f)" fill-opacity="0.1" stroke="var(--chart-blue, #376b9f)" stroke-width="1.2"/>
+  <text x="218" y="229" font-size="18" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">shared θ</text>
+  <path d="M 273 223 L 302 223" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 297 226.3 L 304 223 L 297 219.7 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <text x="314" y="230" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Next token</text>
+  <path d="M 218 241 L 218 260" fill="none" stroke="var(--muted, #526071)" stroke-width="1.4" opacity="1"/>
+  <path d="M 147 260 L 335 260" fill="none" stroke="var(--muted, #526071)" stroke-width="1.4" opacity="1"/>
+  <path d="M 147 260 L 147 271" fill="none" stroke="var(--muted, #526071)" stroke-width="1.4" opacity="1"/>
+  <path d="M 143.7 266 L 147 273 L 150.3 266 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <path d="M 335 260 L 335 271" fill="none" stroke="var(--muted, #526071)" stroke-width="1.4" opacity="1"/>
+  <path d="M 331.7 266 L 335 273 L 338.3 266 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <text x="147" y="295" font-size="19" font-weight="550" text-anchor="middle" fill="var(--ink, #293441)">Translate</text>
+  <text x="335" y="295" font-size="19" font-weight="550" text-anchor="middle" fill="var(--ink, #293441)">Classify</text>
+  <text x="8" y="279" font-size="18" font-weight="450" text-anchor="start" fill="var(--muted, #526071)">At use</text>
+</svg>

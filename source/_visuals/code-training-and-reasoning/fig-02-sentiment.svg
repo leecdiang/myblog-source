@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 305" role="img" aria-label="Reading and intervening on one sentiment unit" style="min-width:0;max-width:560px;margin-inline:auto;font-variant-numeric:tabular-nums" font-family="system-ui, sans-serif">
+  <title>Reading and intervening on one sentiment unit</title>
+  <desc>A byte-level recurrent model trained on Amazon reviews. A threshold on one unit achieved 92.30% IMDb sentiment accuracy. Fixing that unit at +1 or −1 steered generated reviews.</desc>
+  <!-- Radford, Jozefowicz & Sutskever (2017), sections 4.2 and 4.5, Table 5. https://arxiv.org/abs/1704.01444 . Quotations are excerpts from generated samples in Table 5. -->
+  <text x="8" y="25" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Amazon reviews</text>
+  <path d="M 207 19 L 233 19" fill="none" stroke="var(--muted, #526071)" stroke-width="2" opacity="1"/>
+  <path d="M 228 22.3 L 235 19 L 228 15.7 Z" fill="var(--muted, #526071)" opacity="1"/>
+  <text x="250" y="25" font-size="20" font-weight="550" text-anchor="start" fill="var(--ink, #293441)">Predict next byte</text>
+  <text x="8" y="78" font-size="21" font-weight="650" text-anchor="start" fill="var(--chart-blue, #376b9f)">Read one unit</text>
+  <rect x="9" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="28" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="47" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="66" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="85" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="104" y="95" width="14" height="27" rx="2" fill="var(--chart-teal, #2b7975)" fill-opacity="1" stroke="var(--chart-teal, #2b7975)" stroke-width="1"/>
+  <rect x="123" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="142" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="161" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="180" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <rect x="199" y="95" width="14" height="27" rx="2" fill="var(--surface, #f3f5f8)" fill-opacity="1" stroke="var(--line, #dce2e9)" stroke-width="1"/>
+  <text x="229" y="116" font-size="18" font-weight="450" text-anchor="start" fill="var(--muted, #526071)">… 4,096 units</text>
+  <text x="8" y="155" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">IMDb sentiment accuracy</text>
+  <text x="469" y="155" font-size="23" font-weight="650" text-anchor="end" fill="var(--chart-teal, #2b7975)">92.30%</text>
+  <path d="M 8 173 L 472 173" fill="none" stroke="var(--line, #dce2e9)" stroke-width="1.5" opacity="1"/>
+  <text x="8" y="204" font-size="21" font-weight="650" text-anchor="start" fill="var(--chart-blue, #376b9f)">Fix the unit during generation</text>
+  <rect x="8" y="221" width="58" height="34" rx="5" fill="var(--chart-teal, #2b7975)" fill-opacity="0.1" stroke="var(--chart-teal, #2b7975)" stroke-width="1.2"/>
+  <text x="37" y="244" font-size="18" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">+1</text>
+  <text x="83" y="245" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">“Highly recommended”</text>
+  <rect x="8" y="260" width="58" height="34" rx="5" fill="var(--chart-red, #ac4d5b)" fill-opacity="0.1" stroke="var(--chart-red, #ac4d5b)" stroke-width="1.2"/>
+  <text x="37" y="283" font-size="18" font-weight="570" text-anchor="middle" fill="var(--ink, #293441)">−1</text>
+  <text x="83" y="284" font-size="19" font-weight="450" text-anchor="start" fill="var(--ink, #293441)">“A waste of time and money.”</text>
+</svg>
