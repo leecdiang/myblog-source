@@ -1,0 +1,113 @@
+name: Check the code-training article
+on:
+  push:
+    branches: [codex/code-training-preview-20261127]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: code-training-article-preview
+  cancel-in-progress: true
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: blog
+          fetch-depth: 2
+      - uses: actions/checkout@v4
+        with:
+          repository: leecdiang/leecdiang.github.io
+          ref: 0bef019938f8bed59c5dbd98f30eb57a791d01a4
+          path: deployed
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: blog/package-lock.json
+      - name: Restore historical media using the established Pages release hook
+        working-directory: blog
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from textwrap import dedent
+          manifest = Path('../deployed/.github/workflows/publish-blog-from-source.yml').read_text()
+          marker = "cat > blog/scripts/ci-hydrate-legacy-media.js <<'JS'\n"
+          body = manifest.split(marker, 1)[1].split('\n          JS\n', 1)[0]
+          Path('scripts/ci-hydrate-legacy-media.js').write_text(dedent(body) + '\n')
+          PY
+          npm ci --no-audit --no-fund
+      - name: Generate the complete site
+        working-directory: blog
+        run: ./node_modules/.bin/hexo generate
+      - name: Apply the existing content, loading, and security checks
+        working-directory: blog
+        run: |
+          npm run check:content
+          npm run check:loading
+          npm run check:security
+      - name: Check article when its source is ready
+        id: readiness
+        working-directory: blog
+        run: |
+          if test -f public/2026/11/27/code-training-and-reasoning/index.html && test -f .qa-code-transfer/read.cjs && test -f .qa-code-transfer/export.py; then
+            echo "ready=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=no" >> "$GITHUB_OUTPUT"
+            echo "Baseline built; waiting for the article and its test driver."
+          fi
+      - name: Start a loopback-only Hexo preview
+        if: steps.readiness.outputs.ready == 'yes'
+        working-directory: blog
+        run: |
+          ./node_modules/.bin/hexo server --ip 127.0.0.1 -p 4000 -s > ../hexo-server.log 2>&1 &
+          for attempt in $(seq 1 40); do
+            if curl --noproxy '*' -fsS 'http://127.0.0.1:4000/2026/11/27/code-training-and-reasoning/' -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat ../hexo-server.log
+          exit 1
+      - name: Open the article in Chromium
+        if: steps.readiness.outputs.ready == 'yes'
+        working-directory: blog
+        run: |
+          npm install --prefix "$RUNNER_TEMP/article-browser" --no-audit --no-fund playwright@1.56.1
+          "$RUNNER_TEMP/article-browser/node_modules/.bin/playwright" install chromium
+          mkdir -p ../receipts
+          NODE_PATH="$RUNNER_TEMP/article-browser/node_modules" node .qa-code-transfer/read.cjs
+      - name: Prepare a scoped release manifest
+        if: steps.readiness.outputs.ready == 'yes'
+        working-directory: blog
+        run: python3 .qa-code-transfer/export.py
+      - name: Retain browser images and the validated release delta
+        if: always() && steps.readiness.outputs.ready == 'yes'
+        uses: actions/upload-artifact@v4
+        with:
+          name: article-preview
+          path: receipts/
+          retention-days: 5
+          if-no-files-found: ignore
+      - name: Store review material on a separate branch
+        if: always() && steps.readiness.outputs.ready == 'yes'
+        working-directory: blog
+        run: |
+          test -d ../receipts || exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin refs/heads/codex/code-training-receipts-20261127 >/dev/null; then
+            git fetch --depth=1 origin refs/heads/codex/code-training-receipts-20261127
+            git worktree add --detach ../receipt-tree FETCH_HEAD
+          else
+            git worktree add --detach ../receipt-tree HEAD
+          fi
+          mkdir -p ../receipt-tree/.qa-receipts
+          rsync -a --delete ../receipts/ ../receipt-tree/.qa-receipts/
+          echo "$GITHUB_SHA" > ../receipt-tree/.qa-receipts/source-sha.txt
+          git -C ../receipt-tree add -f .qa-receipts
+          git -C ../receipt-tree commit -m "Retain review of $GITHUB_SHA"
+          git -C ../receipt-tree push origin HEAD:refs/heads/codex/code-training-receipts-20261127
