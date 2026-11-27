@@ -13,6 +13,7 @@ class Page(HTMLParser):
     def __init__(self,body):
         super().__init__()
         self.in_title=False; self.title=''; self.widgets=[]; self.canonical=''; self.hrefs=set(); self.formulas=0
+        self.revision='六、续写更准，整道题就会做对吗' in body and '给训练指方向的已经是整段回答的得分' in body
         self.feed(body)
     def handle_starttag(self,t,attrs):
         a=dict(attrs)
@@ -41,10 +42,11 @@ if len(sys.argv)>1:
             marker=markers['pages_sha'][:12]+'-'+str(i)
             page=visit(article,marker)
             assert markers['title'] in page.title, page.title
+            assert page.revision, 'The previous version of the article is still being served'
             assert sorted(page.widgets)==['gradients','schedule','trace'] and page.formulas>0
             for path in ['/','/archives/']:
                 assert article in visit(path,marker).hrefs,path
-            print('Confirmed published article title, each interactive family, rendered formulas and both listing links.')
+            print('Confirmed revised article, each interactive family, rendered formulas and both listing links.')
             break
         except (OSError,ValueError,AssertionError) as e:
             print(str(e),flush=True)

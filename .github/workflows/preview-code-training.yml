@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: leecdiang/leecdiang.github.io
-          ref: 0bef019938f8bed59c5dbd98f30eb57a791d01a4
+          ref: 436a034d6f376ae80e8b93deef3752e0b01ca6b9
           path: deployed
           persist-credentials: false
       - uses: actions/setup-node@v4

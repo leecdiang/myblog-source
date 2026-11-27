@@ -42,6 +42,9 @@ async function main() {
       const fonts=(await devtools.send('CSS.getPlatformFontsForNode',{nodeId:titleNode.nodeId})).fonts;
       validate(fonts.some(font=>/CJK|Source Han|WenQuanYi/.test(font.familyName)&&font.glyphCount>2),'Article title must be painted using a Chinese typeface: '+JSON.stringify(fonts));
       const body = page.locator('.post-body');
+      for (const id of ['一、翻译模型早就会逐词生成','六、续写更准，整道题就会做对吗','一、翻译模型也能学到翻译以外的东西','六、为什么许多成绩仍能一起变好','ref-19']) {
+        validate(await page.evaluate(id=>Boolean(document.getElementById(id)),id), 'Revision anchor: '+id);
+      }
       const figures = body.locator('.v-figure,[data-transfer-widget]:not(.v-figure)');
       validate(await figures.count() >= 10, 'All numbered illustrations render');
       assert.equal(await body.locator('[data-transfer-ready="true"]').count(),3);

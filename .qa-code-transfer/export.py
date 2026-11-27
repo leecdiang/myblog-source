@@ -73,7 +73,7 @@ for rel in list(selected):
         asset=unquote(resolved.path).lstrip('/')
         if not asset or asset.endswith('/') or asset.endswith('.html'):continue
         if not (deployed/asset).is_file():keep(asset,'asset used by a release page')
-assert target+'index.html' in selected and 'atom.xml' in selected and 'archives/index.html' in selected,sorted(selected)
+assert target+'index.html' in selected, sorted(selected)
 assert not any('/.git' in k or k.startswith('.') or k.endswith(('.bak','.tmp')) for k in selected)
 # New isolated article resources are always from the tested build, including revisions to existing assets.
 for rel in list(selected):
