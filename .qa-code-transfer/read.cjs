@@ -34,6 +34,13 @@ async function main() {
       await page.evaluate(() => document.fonts.ready);
       await page.locator('[data-transfer-ready="true"]').first().waitFor();
       const title = await page.locator('h1.post-title').innerText();
+      const devtools=await context.newCDPSession(page);
+      await devtools.send('DOM.enable');
+      await devtools.send('CSS.enable');
+      const dom=await devtools.send('DOM.getDocument');
+      const titleNode=await devtools.send('DOM.querySelector',{nodeId:dom.root.nodeId,selector:'h1.post-title'});
+      const fonts=(await devtools.send('CSS.getPlatformFontsForNode',{nodeId:titleNode.nodeId})).fonts;
+      validate(fonts.some(font=>/CJK|Source Han|WenQuanYi/.test(font.familyName)&&font.glyphCount>2),'Article title must be painted using a Chinese typeface: '+JSON.stringify(fonts));
       const body = page.locator('.post-body');
       const figures = body.locator('.v-figure,[data-transfer-widget]:not(.v-figure)');
       validate(await figures.count() >= 10, 'All numbered illustrations render');
@@ -70,7 +77,7 @@ async function main() {
           await figure.scrollIntoViewIfNeeded();
           await figure.screenshot({path: out+'/'+width+'-'+mode+'-fig'+String(i+1).padStart(2,'0')+'.jpg',type:'jpeg',quality:78});
         }
-        report.runs.push({width, height, mode, title, geometry, figures:await figures.count()});
+        report.runs.push({width, height, mode, title, fonts, geometry, figures:await figures.count()});
       }
       await page.locator('#language-mode').click();
       validate((await page.locator('html').getAttribute('data-language'))==='en','English UI');

@@ -1,0 +1,16 @@
+name: Verify the published article on the custom domain
+on:
+  push:
+    branches: [codex/code-training-preview-20261127]
+    paths: ['.qa-code-transfer/production.json']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 .qa-code-transfer/public.py .qa-code-transfer/production.json

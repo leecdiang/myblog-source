@@ -2,6 +2,7 @@ name: Check the code-training article
 on:
   push:
     branches: [codex/code-training-preview-20261127]
+    paths-ignore: ['.qa-code-transfer/production.json']
   workflow_dispatch:
 permissions:
   contents: write
@@ -30,6 +31,12 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: blog/package-lock.json
+      - name: Install CJK glyphs for article text, diagrams and generated covers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          fc-match -f '%{family}\n' ':lang=zh-cn'
       - name: Restore historical media using the established Pages release hook
         working-directory: blog
         run: |
@@ -61,6 +68,9 @@ jobs:
             echo "ready=no" >> "$GITHUB_OUTPUT"
             echo "Baseline built; waiting for the article and its test driver."
           fi
+      - name: Read the current public site and the author's reference article
+        working-directory: blog
+        run: python3 .qa-code-transfer/public.py
       - name: Start a loopback-only Hexo preview
         if: steps.readiness.outputs.ready == 'yes'
         working-directory: blog
@@ -88,6 +98,10 @@ jobs:
         if: steps.readiness.outputs.ready == 'yes'
         working-directory: blog
         run: python3 .qa-code-transfer/export.py
+      - name: Assemble desktop and mobile contact sheets
+        if: always() && steps.readiness.outputs.ready == 'yes'
+        working-directory: blog
+        run: node .qa-code-transfer/contact.cjs
       - name: Retain browser images and the validated release delta
         if: always() && steps.readiness.outputs.ready == 'yes'
         uses: actions/upload-artifact@v4

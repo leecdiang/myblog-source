@@ -42,6 +42,13 @@ class Links(HTMLParser):
         if a.get('srcset'):
             self.refs.update(s.split()[0] for s in a['srcset'].split(',') if s.strip())
 
+relevant_taxonomies=set()
+for f in public.rglob('index.html'):
+    rel=f.relative_to(public).as_posix()
+    group=re.match(r'^((?:categories|tags)/[^/]+)/',rel)
+    if group and '/'+target in f.read_text():
+        relevant_taxonomies.add(group[1]+'/')
+
 for f in sorted(public.rglob('*')):
     if not f.is_file():continue
     rel = f.relative_to(public).as_posix()
@@ -52,7 +59,7 @@ for f in sorted(public.rglob('*')):
     raw = f.read_text()
     if '/'+target in raw:
         keep(rel,'page directly references the new article')
-    elif re.match(r'^(archives|page|categories|tags)/',rel):
+    elif re.match(r'^(archives|page)/',rel) or any(rel.startswith(prefix) for prefix in relevant_taxonomies):
         old=deployed/rel
         before=Links(old.read_text()).post_links if old.is_file() else []
         after=Links(raw).post_links
